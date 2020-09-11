@@ -167,9 +167,17 @@
             }
         },
         {
+            "label": "Config/Build ESP32 all-clusters-app Example",
+            "type": "shell",
+            "command": "scripts/examples/build-all-clusters-app.py --clear-config curr",
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Build ESP32 all-clusters-app Example",
             "type": "shell",
             "command": "scripts/examples/build-all-clusters-app.py",
+
             "group": "build",
             "problemMatcher": ["$gcc"]
         },
@@ -286,6 +294,7 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
+
                     "${workspaceFolder}/examples/lighting-app/telink/build/tlsr9518adk80d"
                 ]
             }
@@ -325,6 +334,30 @@
                     "relative",
                     "${workspaceFolder}/src/test_driver/mbed/build"
                 ]
+            }
+        },
+        {
+            "label": "Flash all-clusters esp32",
+            "type": "shell",
+            "command": "examples/all-clusters-app/esp32/build/chip-all-clusters-app.flash.py",
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Monitor esp32",
+            "type": "shell",
+            "command": "scripts/examples/monitor_esp32.sh",
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build python",
+            "type": "shell",
+            "command": "scripts/build_python.sh",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative"]
             }
         }
     ],
