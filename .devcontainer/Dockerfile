@@ -54,3 +54,9 @@ RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
 # $USERNAME needs to own the esp-idf and tools for the examples to build
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
+
+# $USERNAME needs to be part of the dialout group to access tty devices.
+RUN adduser $USERNAME dialout
+
+RUN apt-get install python3-pip
+RUN pip install pyserial

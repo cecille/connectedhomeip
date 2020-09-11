@@ -160,6 +160,14 @@
             "group": "build",
             "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Flash wifi echo esp32",
+            "type": "shell",
+            "command": "scripts/examples/flash_wifi_echo_esp32.sh",
+            "group": "none",
+            "dependsOn": "Bootstrap",
+            "problemMatcher": []
         }
     ]
 }
