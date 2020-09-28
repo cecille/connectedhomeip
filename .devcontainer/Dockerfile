@@ -60,3 +60,4 @@ RUN adduser $USERNAME dialout
 
 RUN apt-get install python3-pip
 RUN pip install pyserial
+RUN pip install future

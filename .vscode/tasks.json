@@ -166,7 +166,13 @@
             "type": "shell",
             "command": "scripts/examples/flash_wifi_echo_esp32.sh",
             "group": "none",
-            "dependsOn": "Bootstrap",
+            "problemMatcher": []
+        },
+        {
+            "label": "Monitor esp32",
+            "type": "shell",
+            "command": "scripts/examples/monitor_esp32.sh",
+            "group": "none",
             "problemMatcher": []
         }
     ]
