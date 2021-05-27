@@ -57,6 +57,16 @@ QueryResponderSettings QueryResponderBase::AddResponder(Responder * responder)
         return QueryResponderSettings();
     }
 
+    // First check to see if this responder has already been registered. The operational and commissionable discovery modes both add
+    // addresses with the same host name. We do not want to keep multiple copies of these records.
+    for (size_t i = 0; i < mResponderInfoSize; i++)
+    {
+        if (mResponderInfos[i].responder != nullptr && *mResponderInfos[i].responder == *responder)
+        {
+            return QueryResponderSettings(&mResponderInfos[i]);
+        }
+    }
+
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {
         if (mResponderInfos[i].responder == nullptr)

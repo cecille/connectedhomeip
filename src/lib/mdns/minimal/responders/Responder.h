@@ -40,6 +40,11 @@ class Responder
 public:
     Responder(QType qType, const FullQName & qName) : mQType(qType), mQName(qName) {}
     virtual ~Responder() {}
+    bool operator==(Responder const & other)
+    {
+        return other.GetQClass() == this->GetQClass() && other.GetQName() == this->GetQName() &&
+            other.GetQType() == this->GetQType();
+    }
 
     QClass GetQClass() const { return QClass::IN; }
     QType GetQType() const { return mQType; }
