@@ -363,15 +363,6 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
-    CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
-    {
-        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-        return CHIP_NO_ERROR;
-    }
-
-    ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
-
     /*
      * This function can be called to establish a secure session with the device.
      *
@@ -475,8 +466,6 @@ private:
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
-
-    uint8_t mCSRNonce[kOpCSRNonceLength];
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

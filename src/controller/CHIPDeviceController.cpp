@@ -897,18 +897,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    // If the CSRNonce is passed in, using that else using a random one..
-    if (params.HasCSRNonce())
-    {
-        VerifyOrReturnError(device->SetCSRNonce(params.GetCSRNonce().Value()) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    else
-    {
-        uint8_t mCSRNonce[kOpCSRNonceLength];
-        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
-        VerifyOrReturnError(device->SetCSRNonce(ByteSpan(mCSRNonce)) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
     err = mPairingSession.MessageDispatch().Init(mTransportMgr);
@@ -1128,6 +1116,41 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     }
 }
 
+CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
+{
+
+    // TODO(cecille): Or thread credentials.
+    if (!mIsIPRendezvous && !params.HasWifiCredentials())
+    {
+        ChipLogError(Discovery, "Wifi parameters are required for non-IP commissioning.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mCommissioningStage == CommissioningStage::kError)
+    {
+        mCommissioningStage = CommissioningStage::kSecurePairing;
+    }
+    if (mCommissioningStage != CommissioningStage::kSecurePairing)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // If the CSRNonce is passed in, using that else using a random one..
+    if (params.HasCSRNonce())
+    {
+        VerifyOrReturnError(params.GetCSRNonce().Value().size() == kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        Crypto::DRBG_get_bytes(mGeneratedCSRNonce, sizeof(mGeneratedCSRNonce));
+        params.SetCSRNonce(ByteSpan(mGeneratedCSRNonce));
+    }
+    mCommissioningParams = params;
+
+    AdvanceCommissioningStage(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
@@ -1158,30 +1181,25 @@ void DeviceCommissioner::OnSessionEstablished()
         return;
     }
 
+    mCommissioningStage = CommissioningStage::kSecurePairing;
+
+    ChipLogProgress(Controller, "Rendezvous cleanup");
+    mPairingSession.ToSerializable(device->GetPairing());
+    mPairedDevices.Insert(device->GetDeviceId());
+    mPairedDevicesUpdated = true;
+
+    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
+    // the rendezvous session and mark pairing success
+    PersistDevice(device);
+    // Also persist the device list at this time
+    // This makes sure that a newly added device is immediately available
+    PersistDeviceList();
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
+    }
+    RendezvousCleanup(CHIP_NO_ERROR);
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
-
-    // TODO: Add code to receive OpCSR from the device, and process the signing request
-    // For IP rendezvous, this is sent as part of the state machine.
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
-    bool sendOperationalCertsImmediately = !mIsIPRendezvous;
-#else
-    bool sendOperationalCertsImmediately = true;
-#endif
-
-    if (sendOperationalCertsImmediately)
-    {
-        err = SendTrustedRootCertificate(device);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
-            OnSessionEstablishmentError(err);
-            return;
-        }
-    }
-    else
-    {
-        AdvanceCommissioningStage(CHIP_NO_ERROR);
-    }
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(Device * device)
@@ -1194,7 +1212,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, mCommissioningParams.GetCSRNonce().Value()));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1275,9 +1293,12 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
     // Verify that Nonce matches with what we sent
-    const ByteSpan nonce = device->GetCSRNonce();
-    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mCommissioningParams.HasCSRNonce())
+    {
+        const ByteSpan nonce = mCommissioningParams.GetCSRNonce().Value();
+        VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
     ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
@@ -1411,32 +1432,7 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
-    if (mIsIPRendezvous)
-    {
-        AdvanceCommissioningStage(CHIP_NO_ERROR);
-    }
-    else
-#endif
-    {
-        mPairingSession.ToSerializable(device->GetPairing());
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
-        mPairedDevices.Insert(device->GetDeviceId());
-        mPairedDevicesUpdated = true;
-
-        // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
-        // the rendezvous session and mark pairing success
-        PersistDevice(device);
-        // Also persist the device list at this time
-        // This makes sure that a newly added device is immediately available
-        PersistDeviceList();
-        if (mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
-        }
-        RendezvousCleanup(CHIP_NO_ERROR);
-    }
+    AdvanceCommissioningStage(CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
 }
@@ -1620,6 +1616,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
+    // TODO(cecille): This probably should go after the full commissioning is complete, but need to make sure we're not breaking
+    // manual flows before it gets moved
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
 }
 
@@ -1645,7 +1643,9 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kCheckCertificates;
     case CommissioningStage::kCheckCertificates:
-        return CommissioningStage::kNetworkEnable; // TODO : for softAP, this needs to be network setup
+        return CommissioningStage::kNetworkSetup;
+    case CommissioningStage::kNetworkSetup:
+        return CommissioningStage::kNetworkEnable;
     case CommissioningStage::kNetworkEnable:
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
         return CommissioningStage::kFindOperational; // TODO : once case is working, need to add stages to find and reconnect
@@ -1660,7 +1660,6 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
 
     // Currently unimplemented.
     case CommissioningStage::kConfigACL:
-    case CommissioningStage::kNetworkSetup:
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kError;
     // Neither of these have a next stage so return kError;
@@ -1699,6 +1698,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     // TODO(cecille): This should be customized per command.
     constexpr uint32_t kCommandTimeoutMs = 3000;
 
+    mCommissioningStage = nextStage;
     switch (nextStage)
     {
     case CommissioningStage::kArmFailsafe: {
@@ -1768,11 +1768,24 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         }
     }
     break;
+    case CommissioningStage::kNetworkSetup:
+        if (mCommissioningParams.HasWifiCredentials())
+        {
+            ChipLogProgress(Controller, "Adding network");
+            NetworkCommissioningCluster netCom;
+            netCom.Associate(device, 0);
+            netCom.AddWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), mCommissioningParams.GetWifiCredentials().Value().ssid,
+                                  mCommissioningParams.GetWifiCredentials().Value().password, breadcrumb, kCommandTimeoutMs);
+        }
+        else
+        {
+            AdvanceCommissioningStage(GetNextCommissioningStage());
+        }
+        break;
     // TODO: Right now, these stages are not implemented as a separate stage because they are no-ops.
     // Once these are implemented through the clusters, these should be moved into their separate stages and the callbacks
     // should advance the commissioning stage.
     case CommissioningStage::kConfigACL:
-    case CommissioningStage::kNetworkSetup:
     case CommissioningStage::kScanNetworks:
         // TODO: Implement
         break;
@@ -1783,13 +1796,21 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         NetworkCommissioningCluster netCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         netCom.Associate(device, 0);
-        // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
-        // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
-        // returned in the scan results. For now, we use magic.
-        char magicNetworkEnableCode[] = "ETH0";
-        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
-                             ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
-                             breadcrumb, kCommandTimeoutMs);
+        if (mCommissioningParams.HasWifiCredentials())
+        {
+            netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(), mCommissioningParams.GetWifiCredentials().Value().ssid,
+                                 breadcrumb, kCommandTimeoutMs);
+        }
+        else
+        {
+            // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
+            // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
+            // returned in the scan results. For now, we use magic.
+            char magicNetworkEnableCode[] = "ETH0";
+            netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
+                                 ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
+                                 breadcrumb, kCommandTimeoutMs);
+        }
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -1809,30 +1830,14 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     }
     break;
     case CommissioningStage::kCleanup:
-        ChipLogProgress(Controller, "Rendezvous cleanup");
-        mPairingSession.ToSerializable(device->GetPairing());
+
         mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
-        mPairedDevices.Insert(device->GetDeviceId());
-        mPairedDevicesUpdated = true;
-
-        // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
-        // the rendezvous session and mark pairing success
-        PersistDevice(device);
-        // Also persist the device list at this time
-        // This makes sure that a newly added device is immediately available
-        PersistDeviceList();
-        if (mPairingDelegate != nullptr)
-        {
-            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
-        }
-        RendezvousCleanup(CHIP_NO_ERROR);
         break;
     case CommissioningStage::kSecurePairing:
     case CommissioningStage::kError:
         break;
     }
-    mCommissioningStage = nextStage;
 }
 
 } // namespace Controller

@@ -473,6 +473,8 @@ public:
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
 
+    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
@@ -645,6 +647,10 @@ private:
     Callback::Callback<NOCGenerated> mDeviceNOCCallback;
 
     PASESession mPairingSession;
+    CommissioningParameters mCommissioningParams;
+    // TODO: this is wasteful if the nonce is passed in. We should consider making the
+    // nonce non-optional and enforcing the random nonce by the caller.
+    uint8_t mGeneratedCSRNonce[kOpCSRNonceLength]; // Storage spaces for the nonce if required.
 };
 
 } // namespace Controller

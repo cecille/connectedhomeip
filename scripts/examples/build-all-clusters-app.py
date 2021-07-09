@@ -44,6 +44,11 @@ def main():
       default=None,
       choices=['m5stack', 'devkit', 'curr', 'default'],
   )
+  parser.add_argument(
+      '--generate-flash-script',
+      action='store_true',
+  )
+  
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -81,6 +86,8 @@ def main():
   logging.info('Compiling')
   e.execute('build')
 
+  if args.generate_flash_script:
+    e.execute('flashing_script')
 
 if __name__ == '__main__':
   # execute only if run as a script

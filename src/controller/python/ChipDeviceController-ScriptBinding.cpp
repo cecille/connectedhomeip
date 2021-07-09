@@ -96,6 +96,8 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
+CHIP_ERROR pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
+                                              const char * password, chip::NodeId nodeid);
 
 CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
                                                                                 uint16_t long_discriminator);
@@ -255,6 +257,20 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->PairDevice(nodeid, params);
+}
+
+CHIP_ERROR pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
+                                              const char * password, chip::NodeId nodeid)
+{
+    chip::CommissioningParameters params;
+    if (strcmp(ssid, "") != 0)
+    {
+        chip::WifiCredentials creds;
+        creds.ssid     = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
+        creds.password = chip::ByteSpan(reinterpret_cast<const uint8_t *>(password), strlen(password));
+        params.SetWifiCredentials(creds);
+    }
+    return devCtrl->Commission(nodeid, params);
 }
 
 CHIP_ERROR pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
