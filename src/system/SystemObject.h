@@ -62,6 +62,10 @@ class LayerSockets;
 class LayerLwIP;
 template <class T, unsigned int N>
 class ObjectPool;
+template <class T, size_t N>
+class ObjectDataStatic;
+template <class T>
+class ObjectDataDynamic;
 
 /**
  *  @class Object
@@ -83,6 +87,10 @@ class DLL_EXPORT Object
 {
     template <class T, unsigned int N>
     friend class ObjectPool;
+    template <class T, size_t N>
+    friend class ObjectDataStatic;
+    template <class T>
+    friend class ObjectDataDynamic;
 
 public:
     Object() : mRefCount(0)
@@ -194,6 +202,250 @@ union ObjectArena
 };
 
 /**
+ *  @class ObjectDataBase
+ *
+ *  @brief
+ *    This is the abstract base class for Static and Dynamic ObjectData objects.
+ *
+ *  @note
+ *      This base class can be used to pass pointers to the sized ObjectDataStatic and ObjectDataDynamic classes withouth requiring
+ * the class holding the reference to be templated on the pool size.
+ */
+template <typename T>
+class ObjectDataBase
+{
+public:
+    virtual ~ObjectDataBase()                                                                                           = default;
+    virtual T * Allocate()                                                                                              = 0;
+    virtual void Reset()                                                                                                = 0;
+    virtual void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) = 0;
+};
+
+/**
+ *  @class ObjectDataStatic
+ *
+ *  @brief
+ *    This is the data class for static object pools.
+ *
+ *  @tparam     T   a subclass of Object to be allocated.
+ *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
+ */
+template <typename T, size_t N>
+class ObjectDataStatic : public ObjectDataBase<T>
+{
+public:
+    ObjectDataStatic() {}
+    T * Allocate() override
+    {
+        T * lReturn = nullptr;
+        (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
+
+        unsigned int lIndex = 0;
+        for (lIndex = 0; lIndex < N; ++lIndex)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
+
+            if (lObject.TryCreate(sizeof(T)))
+            {
+                lReturn = &lObject;
+                break;
+            }
+        }
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        unsigned int lNumInUse = 0;
+
+        if (lReturn != nullptr)
+        {
+            lIndex++;
+            lNumInUse = lIndex;
+            GetNumObjectsInUse(lIndex, lNumInUse);
+        }
+        else
+        {
+            lNumInUse = N;
+        }
+
+        UpdateHighWatermark(lNumInUse);
+#endif
+        return lReturn;
+    }
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    /**
+     * Return the number of objects in use starting at a given index
+     *
+     * @param[in] aStartIndex      The index to start counting from; pass 0 to count over
+     *                             the whole pool.
+     * @param[in/out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
+     *                             the function adds to the counter without resetting it first.
+     */
+    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse)
+    {
+        unsigned int count = 0;
+
+        for (unsigned int lIndex = aStartIndex; lIndex < N; ++lIndex)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
+
+            if (lObject.IsRetained())
+            {
+                count++;
+            }
+        }
+
+        if (aStartIndex == 0)
+        {
+            aNumInUse = 0;
+        }
+
+        aNumInUse += count;
+    }
+    void UpdateHighWatermark(const unsigned int & aCandidate)
+    {
+        unsigned int lTmp;
+        while (aCandidate > (lTmp = mHighWatermark))
+        {
+            SYSTEM_OBJECT_HWM_TEST_HOOK();
+            (void) __sync_bool_compare_and_swap(&mHighWatermark, lTmp, aCandidate);
+        }
+    }
+    volatile unsigned int mHighWatermark;
+#endif
+
+    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) override
+    {
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        unsigned int lNumInUse;
+        unsigned int lHighWatermark;
+
+        GetNumObjectsInUse(0, lNumInUse);
+        lHighWatermark = mHighWatermark;
+
+        if (lNumInUse > CHIP_SYS_STATS_COUNT_MAX)
+        {
+            lNumInUse = CHIP_SYS_STATS_COUNT_MAX;
+        }
+        if (lHighWatermark > CHIP_SYS_STATS_COUNT_MAX)
+        {
+            lHighWatermark = CHIP_SYS_STATS_COUNT_MAX;
+        }
+        aNumInUse      = static_cast<chip::System::Stats::count_t>(lNumInUse);
+        aHighWatermark = static_cast<chip::System::Stats::count_t>(lHighWatermark);
+#endif
+    }
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+        for (unsigned int i = 0; i < N; ++i)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
+
+            if (lObject.IsRetained())
+            {
+                if (!function(&lObject))
+                    return false;
+            }
+        }
+        return true;
+    }
+    void Reset() override
+    {
+        memset(mArena.uMemory, 0, N * sizeof(T));
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        mHighWatermark = 0;
+#endif
+    }
+    ObjectArena<void *, N * sizeof(T)> mArena;
+};
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+/**
+ *  @class ObjectDataDynamic
+ *
+ *  @brief
+ *    This is the data class for dyanmic object pools.
+ *
+ *  @tparam     T   a subclass of Object to be allocated.
+ */
+template <typename T>
+class ObjectDataDynamic : public ObjectDataBase<T>
+{
+public:
+    T * Allocate() override
+    {
+
+        T * newNode = new T();
+
+        if (newNode->TryCreate(sizeof(T)))
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            Object * p = &mDummyHead;
+            if (p->mNext)
+            {
+                p->mNext->mPrev = newNode;
+            }
+            newNode->mNext     = p->mNext;
+            p->mNext           = newNode;
+            newNode->mPrev     = p;
+            newNode->mMutexRef = &mMutex;
+            return newNode;
+        }
+        else
+        {
+            delete newNode;
+            return nullptr;
+        }
+    }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        Object * p = mDummyHead.mNext;
+        while (p)
+        {
+            if (!function(static_cast<T *>(p)))
+            {
+                return false;
+            }
+            p = p->mNext;
+        }
+        return true;
+    }
+    void Reset() override
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        Object * p = mDummyHead.mNext;
+
+        while (p)
+        {
+            Object * del = p;
+            p            = p->mNext;
+            delete del;
+        }
+
+        mDummyHead.mNext = nullptr;
+    }
+    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) override {}
+    std::mutex mMutex;
+    Object mDummyHead;
+};
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+/**
  *  @brief
  *      A class template used for allocating Object subclass objects from an ObjectArena<> template union.
  *
@@ -219,71 +471,27 @@ public:
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-        std::lock_guard<std::mutex> lock(mMutex);
-        Object * p = mDummyHead.mNext;
-        while (p)
-        {
-            if (!function(static_cast<T *>(p)))
-            {
-                return false;
-            }
-            p = p->mNext;
-        }
-#else
-        for (unsigned int i = 0; i < N; ++i)
-        {
-            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
-
-            if (lObject.IsRetained())
-            {
-                if (!function(&lObject))
-                    return false;
-            }
-        }
-#endif
-        return true;
+        return mObjectData.ForEachActiveObject(function);
     }
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
+    void UpdateHighWatermark(const unsigned int & aCandidate);
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 private:
     friend class TestObject;
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    std::mutex mMutex;
-    Object mDummyHead;
+    ObjectDataDynamic<T> mObjectData;
 #else
-    ObjectArena<void *, N * sizeof(T)> mArena;
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
-    void UpdateHighWatermark(const unsigned int & aCandidate);
-    volatile unsigned int mHighWatermark;
-#endif
+    ObjectDataStatic<T, N> mObjectData;
 #endif
 };
 
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::Reset()
 {
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    std::lock_guard<std::mutex> lock(mMutex);
-    Object * p = mDummyHead.mNext;
-
-    while (p)
-    {
-        Object * del = p;
-        p            = p->mNext;
-        delete del;
-    }
-
-    mDummyHead.mNext = nullptr;
-#else
-    memset(mArena.uMemory, 0, N * sizeof(T));
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    mHighWatermark = 0;
-#endif
-#endif
+    return mObjectData.Reset();
 }
 
 /**
@@ -293,79 +501,15 @@ inline void ObjectPool<T, N>::Reset()
 template <class T, unsigned int N>
 inline T * ObjectPool<T, N>::TryCreate()
 {
-    T * lReturn = nullptr;
-
-    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
-
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    T * newNode = new T();
-
-    if (newNode->TryCreate(sizeof(T)))
-    {
-        std::lock_guard<std::mutex> lock(mMutex);
-        Object * p = &mDummyHead;
-        if (p->mNext)
-        {
-            p->mNext->mPrev = newNode;
-        }
-        newNode->mNext     = p->mNext;
-        p->mNext           = newNode;
-        newNode->mPrev     = p;
-        newNode->mMutexRef = &mMutex;
-        lReturn            = newNode;
-    }
-    else
-    {
-        delete newNode;
-    }
-#else // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    unsigned int lIndex = 0;
-
-    for (lIndex = 0; lIndex < N; ++lIndex)
-    {
-        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
-
-        if (lObject.TryCreate(sizeof(T)))
-        {
-            lReturn = &lObject;
-            break;
-        }
-    }
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    unsigned int lNumInUse = 0;
-
-    if (lReturn != nullptr)
-    {
-        lIndex++;
-        lNumInUse = lIndex;
-        GetNumObjectsInUse(lIndex, lNumInUse);
-    }
-    else
-    {
-        lNumInUse = N;
-    }
-
-    UpdateHighWatermark(lNumInUse);
-#endif
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-
-    return lReturn;
+    return mObjectData.Allocate();
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidate)
 {
-    unsigned int lTmp;
-
-    while (aCandidate > (lTmp = mHighWatermark))
-    {
-        SYSTEM_OBJECT_HWM_TEST_HOOK();
-        (void) __sync_bool_compare_and_swap(&mHighWatermark, lTmp, aCandidate);
-    }
+    return mObjectData.UpdateHighWatermark(aCandidate);
 }
-
 /**
  * Return the number of objects in use starting at a given index
  *
@@ -377,48 +521,15 @@ inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidat
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse)
 {
-    unsigned int count = 0;
-
-    for (unsigned int lIndex = aStartIndex; lIndex < N; ++lIndex)
-    {
-        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
-
-        if (lObject.IsRetained())
-        {
-            count++;
-        }
-    }
-
-    if (aStartIndex == 0)
-    {
-        aNumInUse = 0;
-    }
-
-    aNumInUse += count;
+    return mObjectData.GetNumObjectsInUse(aStartIndex, aNumInUse);
 }
+
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
 {
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    unsigned int lNumInUse;
-    unsigned int lHighWatermark;
-
-    GetNumObjectsInUse(0, lNumInUse);
-    lHighWatermark = mHighWatermark;
-
-    if (lNumInUse > CHIP_SYS_STATS_COUNT_MAX)
-    {
-        lNumInUse = CHIP_SYS_STATS_COUNT_MAX;
-    }
-    if (lHighWatermark > CHIP_SYS_STATS_COUNT_MAX)
-    {
-        lHighWatermark = CHIP_SYS_STATS_COUNT_MAX;
-    }
-    aNumInUse      = static_cast<chip::System::Stats::count_t>(lNumInUse);
-    aHighWatermark = static_cast<chip::System::Stats::count_t>(lHighWatermark);
-#endif
+    mObjectData.GetStatistics(aNumInUse, aHighWatermark);
 }
 
 } // namespace System
