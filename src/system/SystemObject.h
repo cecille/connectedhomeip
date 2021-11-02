@@ -60,12 +60,10 @@ namespace System {
 class Layer;
 class LayerSockets;
 class LayerLwIP;
-template <class T, unsigned int N>
-class ObjectPool;
 template <class T, size_t N>
-class ObjectDataStatic;
+class ObjectPoolStatic;
 template <class T>
-class ObjectDataDynamic;
+class ObjectPoolDynamic;
 
 /**
  *  @class Object
@@ -85,12 +83,10 @@ class ObjectDataDynamic;
  */
 class DLL_EXPORT Object
 {
-    template <class T, unsigned int N>
-    friend class ObjectPool;
     template <class T, size_t N>
-    friend class ObjectDataStatic;
+    friend class ObjectPoolStatic;
     template <class T>
-    friend class ObjectDataDynamic;
+    friend class ObjectPoolDynamic;
 
 public:
     Object() : mRefCount(0)
@@ -202,27 +198,27 @@ union ObjectArena
 };
 
 /**
- *  @class ObjectDataBase
+ *  @class ObjectPoolBase
  *
  *  @brief
- *    This is the abstract base class for Static and Dynamic ObjectData objects.
+ *    This is the abstract base class for Static and Dynamic ObjectPool objects.
  *
  *  @note
- *      This base class can be used to pass pointers to the sized ObjectDataStatic and ObjectDataDynamic classes withouth requiring
+ *      This base class can be used to pass pointers to the sized ObjectPoolStatic and ObjectPoolDynamic classes withouth requiring
  * the class holding the reference to be templated on the pool size.
  */
 template <typename T>
-class ObjectDataBase
+class ObjectPoolBase
 {
 public:
-    virtual ~ObjectDataBase()                                                                                           = default;
-    virtual T * Allocate()                                                                                              = 0;
+    virtual ~ObjectPoolBase()                                                                                           = default;
+    virtual T * TryCreate()                                                                                             = 0;
     virtual void Reset()                                                                                                = 0;
     virtual void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) = 0;
 };
 
 /**
- *  @class ObjectDataStatic
+ *  @class ObjectPoolStatic
  *
  *  @brief
  *    This is the data class for static object pools.
@@ -231,11 +227,10 @@ public:
  *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
  */
 template <typename T, size_t N>
-class ObjectDataStatic : public ObjectDataBase<T>
+class ObjectPoolStatic : public ObjectPoolBase<T>
 {
 public:
-    ObjectDataStatic() {}
-    T * Allocate() override
+    T * TryCreate() override
     {
         T * lReturn = nullptr;
         (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
@@ -366,7 +361,7 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 /**
- *  @class ObjectDataDynamic
+ *  @class ObjectPoolDynamic
  *
  *  @brief
  *    This is the data class for dyanmic object pools.
@@ -374,10 +369,10 @@ public:
  *  @tparam     T   a subclass of Object to be allocated.
  */
 template <typename T>
-class ObjectDataDynamic : public ObjectDataBase<T>
+class ObjectPoolDynamic : public ObjectPoolBase<T>
 {
 public:
-    T * Allocate() override
+    T * TryCreate() override
     {
 
         T * newNode = new T();
@@ -442,95 +437,40 @@ public:
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark) override {}
     std::mutex mMutex;
     Object mDummyHead;
+    friend class TestObject;
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
-/**
- *  @brief
- *      A class template used for allocating Object subclass objects from an ObjectArena<> template union.
- *
- *  @tparam     T   a subclass of Object to be allocated from the arena.
- *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
- */
-template <class T, unsigned int N>
-class ObjectPool
-{
-public:
-    void Reset();
-
-    T * TryCreate();
-    void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
-
-    /**
-     * @brief
-     *   Run a functor for each active object in the pool
-     *
-     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
-     *  @return    bool     Returns false if broke during iteration
-     */
-    template <typename Function>
-    bool ForEachActiveObject(Function && function)
-    {
-        return mObjectData.ForEachActiveObject(function);
-    }
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
-    void UpdateHighWatermark(const unsigned int & aCandidate);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-
-private:
-    friend class TestObject;
-
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    ObjectDataDynamic<T> mObjectData;
+template <typename T, unsigned int N>
+using ObjectPool = ObjectPoolDynamic<T>;
 #else
-    ObjectDataStatic<T, N> mObjectData;
+template <typename T, unsigned int N>
+using ObjectPool = ObjectPoolStatic<T, N>;
+#endif
+
+enum class ObjectPoolMem
+{
+    kStatic,
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    kDynamic
 #endif
 };
 
-template <class T, unsigned int N>
-inline void ObjectPool<T, N>::Reset()
-{
-    return mObjectData.Reset();
-}
+template <typename T, size_t N, ObjectPoolMem P>
+class MemTypeObjectPool;
 
-/**
- *  @brief
- *      Tries to initially retain the first object in the pool that is not retained.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::TryCreate()
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic> : public ObjectPoolStatic<T, N>
 {
-    return mObjectData.Allocate();
-}
+};
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <class T, unsigned int N>
-inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidate)
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <typename T, size_t N>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic> : public ObjectPoolDynamic<T>
 {
-    return mObjectData.UpdateHighWatermark(aCandidate);
-}
-/**
- * Return the number of objects in use starting at a given index
- *
- * @param[in] aStartIndex      The index to start counting from; pass 0 to count over
- *                             the whole pool.
- * @param[in/out] aNumInUse    The number of objects in use. If aStartIndex is not 0,
- *                             the function adds to the counter without resetting it first.
- */
-template <class T, unsigned int N>
-inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse)
-{
-    return mObjectData.GetNumObjectsInUse(aStartIndex, aNumInUse);
-}
-
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-
-template <class T, unsigned int N>
-inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
-{
-    mObjectData.GetStatistics(aNumInUse, aHighWatermark);
-}
+};
+#endif
 
 } // namespace System
 } // namespace chip
