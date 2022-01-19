@@ -1656,6 +1656,14 @@ void BasicSoftwareCallback(void * context, uint32_t softwareVersion)
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
+void OnFeatureMapSuccess(void * context, uint32_t value)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<FeatureMap>(value);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
 void AttributeReadFailure(void * context, CHIP_ERROR status)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1726,6 +1734,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         GeneralCommissioningCluster genCom;
         SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kGetNetworkTechnology: {
+        ChipLogProgress(Controller, "Sending request for network cluster feature map");
+        NetworkCommissioningCluster netCom;
+        // TODO: swap to givin endpoint once that PR is merged
+        netCom.Associate(proxy, 0);
+        netCom.ReadAttribute<app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(this, OnFeatureMapSuccess,
+                                                                                                    AttributeReadFailure);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
