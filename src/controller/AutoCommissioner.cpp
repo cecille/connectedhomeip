@@ -156,12 +156,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() && mNetworkTechnology.Has(NetworkClusterFeatureFlags::kWifi))
+            if (mParams.GetWiFiCredentials().HasValue() &&
+                mNetworkTechnology.Has(
+                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
             {
                 return CommissioningStage::kWiFiNetworkSetup;
             }
             else if (mParams.GetThreadOperationalDataset().HasValue() &&
-                     mNetworkTechnology.Has(NetworkClusterFeatureFlags::kThread))
+                     mNetworkTechnology.Has(
+                         chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
@@ -182,7 +185,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkTechnology.Has(NetworkClusterFeatureFlags::kThread))
+        if (mParams.GetThreadOperationalDataset().HasValue() &&
+            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -191,7 +195,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() && mNetworkTechnology.Has(NetworkClusterFeatureFlags::kWifi))
+        if (mParams.GetWiFiCredentials().HasValue() &&
+            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -201,7 +206,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkTechnology.Has(NetworkClusterFeatureFlags::kThread))
+        if (mParams.GetThreadOperationalDataset().HasValue() &&
+            mNetworkTechnology.Has(chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -341,9 +347,12 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kGetNetworkTechnology:
             mNetworkTechnology.SetRaw(report.Get<FeatureMap>().features);
             // Only one of these features can be set at a time.
-            if (!mNetworkTechnology.HasOnly(NetworkClusterFeatureFlags::kWifi) &&
-                !mNetworkTechnology.HasOnly(NetworkClusterFeatureFlags::kThread) &&
-                mNetworkTechnology.HasOnly(NetworkClusterFeatureFlags::kEthernet))
+            if (!mNetworkTechnology.HasOnly(
+                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface) &&
+                !mNetworkTechnology.HasOnly(
+                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface) &&
+                mNetworkTechnology.HasOnly(
+                    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
             {
                 ChipLogError(Controller,
                              "Network Commissioning cluster is malformed - more than one network technology is specified (0x%x)",
