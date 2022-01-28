@@ -24,6 +24,8 @@
 namespace chip {
 namespace Controller {
 
+class DeviceCommissioner;
+
 enum CommissioningStage : uint8_t
 {
     kError,
@@ -242,15 +244,17 @@ struct FeatureMap
 class CommissioningDelegate
 {
 public:
-    virtual ~CommissioningDelegate(){};
-
+    virtual ~CommissioningDelegate() {}
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, FeatureMap>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
         // TODO: Add other things the delegate needs to know.
     };
-    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
+    virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
+    virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
+    virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
+    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
 };
 
 } // namespace Controller
