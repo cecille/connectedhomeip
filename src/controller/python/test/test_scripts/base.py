@@ -247,7 +247,7 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
-    def TestFailsafe(self, nodeid: int, threadOperationalDataset: str):
+    def TestFailsafe(self, nodeid: int, threadOperationalDataset: str, setuppin:int, ip: str):
         self.logger.info("Testing arm failsafe")
 
         self.logger.info("Setting failsafe on CASE connection")
@@ -316,6 +316,22 @@ class BaseTestHelper:
         err, resp = self.devCtrl.ZCLSend("NetworkCommissioning", "AddOrUpdateThreadNetwork", nodeid, 0, 0, dict(operationalDataset=threadOperationalDataset.encode('utf-8'), breadcrumb=1), blocking=True)
         if err == 0:
             self.logger.error("Incorrectly succeeded in adding thread network")
+            return False
+
+        self.logger.info("Establishing a PASE connection on second commissioner - this should arm the failsafe")
+        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+        self.devCtrl2 = self.fabricAdmin2.NewController(
+            self.controllerNodeId, self.paaTrustStorePath)
+
+        if self.devCtrl2.EstablishPASESessionIP(ip.encode("utf-8"), setuppin, nodeid):
+            self.logger.info(
+                "Failed to establish PASE connection with device {}".format(ip))
+            return False
+
+        self.logger.info("Attemping to add a wifi network - this should succeed because the PASE session arms the failsafe")
+        err, resp = self.devCtrl2.ZCLSend("NetworkCommissioning", "AddOrUpdateThreadNetwork", nodeid, 0, 0, dict(operationalDataset=threadOperationalDataset.encode('utf-8'), breadcrumb=1), blocking=True)
+        if err != 0:
+            self.logger.error("Error adding thread network err = {}, resp = {}".format(err, resp))
             return False
 
         return True
