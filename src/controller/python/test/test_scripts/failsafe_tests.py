@@ -100,7 +100,7 @@ def main():
                                    nodeid=1),
               "Failed to finish key exchange")
 
-    FailIfNot(test.TestFailsafe(nodeid=1), "Failed failsafe test")
+    FailIfNot(test.TestFailsafe(nodeid=1, threadOperationalDataset=TEST_THREAD_NETWORK_DATASET_TLV), "Failed failsafe test")
 
 
     timeoutTicker.stop()

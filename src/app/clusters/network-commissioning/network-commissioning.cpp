@@ -108,6 +108,24 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
         ctxt.SetCommandHandled();
         return;
     }
+    switch (ctxt.mRequestPath.mCommandId)
+    {
+    case Commands::AddOrUpdateWiFiNetwork::Id:
+    case Commands::AddOrUpdateThreadNetwork::Id:
+    case Commands::RemoveNetwork::Id:
+    case Commands::ConnectNetwork::Id: {
+        // These commands all require that the failsafe is armed
+        DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+        if (!failSafeContext.IsFailSafeArmed())
+        {
+            ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            ctxt.SetCommandHandled();
+        }
+    }
+    break;
+    default:
+        break;
+    }
 
     // Since mPath is used for building the response command, and we have checked that we are not pending the response of another
     // command above. So it is safe to set the mPath here and not clear it when return.

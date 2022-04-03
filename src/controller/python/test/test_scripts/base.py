@@ -247,7 +247,7 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
-    def TestFailsafe(self, nodeid: int):
+    def TestFailsafe(self, nodeid: int, threadOperationalDataset: str):
         self.logger.info("Testing arm failsafe")
 
         self.logger.info("Setting failsafe on CASE connection")
@@ -308,9 +308,17 @@ class BaseTestHelper:
             self.logger.error(
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
             return False
-        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
-            return True
-        return False
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
+            self.logger.error("Incorrect error received from arm failsafe command: received {}, wanted busy".format(resp))
+            return False
+
+        self.logger.info("Attemping to add a wifi network - this should fail because the failsafe is not held")
+        err, resp = self.devCtrl.ZCLSend("NetworkCommissioning", "AddOrUpdateThreadNetwork", nodeid, 0, 0, dict(operationalDataset=threadOperationalDataset.encode('utf-8'), breadcrumb=1), blocking=True)
+        if err == 0:
+            self.logger.error("Incorrectly succeeded in adding thread network")
+            return False
+
+        return True
 
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
