@@ -886,12 +886,14 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
-    mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
         mDefaultCommissioner->StartCommissioning(this, device);
+    }
+    else
+    {
+        mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 }
 
@@ -1423,6 +1425,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     {
         return;
     }
+    mPairingDelegate->OnPairingComplete(completionStatus.err);
     mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
     PeerId peerId(GetCompressedFabricId(), nodeId);
     if (completionStatus.err == CHIP_NO_ERROR)
