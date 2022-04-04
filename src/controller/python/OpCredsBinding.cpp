@@ -196,6 +196,11 @@ public:
 
         return paseShouldBeOpen == paseIsOpen;
     }
+    bool CheckPaseAndCaseCallbacks(bool wantPASESuccess, bool wantPASEError, bool wantCASESuccess, bool wantCASEError)
+    {
+        return (wantPASESuccess == mReceivedPASESuccess) && (wantPASEError == mReceivedPASEError) &&
+            (wantCASESuccess == mReceivedCASESuccess) && (wantCASEError == mReceivedCASEError);
+    }
     void Reset()
     {
         mTestCommissionerUsed              = false;
@@ -208,6 +213,10 @@ public:
         }
         mSimulateFailureOnStage = chip::Controller::CommissioningStage::kError;
         mFailOnReportAfterStage = chip::Controller::CommissioningStage::kError;
+        mReceivedCASESuccess    = false;
+        mReceivedCASEError      = false;
+        mReceivedPASESuccess    = false;
+        mReceivedPASEError      = false;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }
@@ -227,6 +236,10 @@ public:
             mReceivedStageFailure[chip::to_underlying(stageCompleted)] = true;
         }
     }
+    void OnPASESessionEstablished(CommissioneeDeviceProxy * proxy) { mReceivedPASESuccess = true; }
+    void OnPASESessionError(CHIP_ERROR error) { mReceivedPASEError = true; }
+    void OnCASESessionEstablished(OperationalDeviceProxy * proxy) { mReceivedCASESuccess = true; }
+    void OnCASESessionError(CHIP_ERROR error) { mReceivedCASEError = true; }
 
 private:
     static constexpr uint8_t kNumCommissioningStages = chip::to_underlying(chip::Controller::CommissioningStage::kCleanup) + 1;
@@ -237,8 +250,12 @@ private:
     chip::Controller::CommissioningStage mReceivedCommissioningFailureStage = chip::Controller::CommissioningStage::kError;
     bool mReceivedStageSuccess[kNumCommissioningStages];
     bool mReceivedStageFailure[kNumCommissioningStages];
-    bool mIsWifi   = false;
-    bool mIsThread = false;
+    bool mIsWifi              = false;
+    bool mIsThread            = false;
+    bool mReceivedCASESuccess = false;
+    bool mReceivedCASEError   = false;
+    bool mReceivedPASESuccess = false;
+    bool mReceivedPASEError   = false;
     bool ValidStage(chip::Controller::CommissioningStage stage)
     {
         if (!mIsWifi &&
@@ -322,6 +339,22 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
 }
+void pychip_OnPASESessionEstablished(CommissioneeDeviceProxy * proxy)
+{
+    return sTestCommissioner.OnPASESessionEstablished(proxy);
+}
+void pychip_OnPASESessionError(CHIP_ERROR error)
+{
+    return sTestCommissioner.OnPASESessionError(error);
+}
+void pychip_OnCASESessionEstablished(OperationalDeviceProxy * proxy)
+{
+    return sTestCommissioner.OnCASESessionEstablished(proxy);
+}
+void pychip_OnCASESessionError(CHIP_ERROR error)
+{
+    return sTestCommissioner.OnCASESessionError(error);
+}
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
@@ -376,6 +409,10 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
         sPairingDelegate.SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
         sPairingDelegate.SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         sPairingDelegate.SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        sPairingDelegate.SetPASESessionEstablishedCallback(pychip_OnPASESessionEstablished);
+        sPairingDelegate.SetPASESessionErrorCallback(pychip_OnPASESessionError);
+        sPairingDelegate.SetCASESessionEstablishedCallback(pychip_OnCASESessionEstablished);
+        sPairingDelegate.SetCASESessionErrorCallback(pychip_OnCASESessionError);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
@@ -449,6 +486,10 @@ bool pychip_SetTestCommissionerSimulateFailureOnStage(uint8_t failStage)
 bool pychip_SetTestCommissionerSimulateFailureOnReport(uint8_t failStage)
 {
     return sTestCommissioner.SimulateFailOnReport(static_cast<chip::Controller::CommissioningStage>(failStage));
+}
+bool pychip_TestPaseAndCaseCallbacks(bool wantPASESuccess, bool wantPASEError, bool wantCASESuccess, bool wantCASEError)
+{
+    return sTestCommissioner.CheckPaseAndCaseCallbacks(wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError);
 }
 
 } // extern "C"

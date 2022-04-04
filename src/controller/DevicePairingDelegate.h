@@ -66,6 +66,38 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 
     /**
+     * @brief
+     *   Called when the PASE session is fully established
+     *
+     * @param proxy CommissioneeDeviceProxy that just completed
+     */
+    virtual void OnPASESessionEstablished(CommissioneeDeviceProxy * proxy) {}
+
+    /**
+     * @brief
+     *   Called when PASE session establishment has errored
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnPASESessionError(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *   Called when the CASE session is fully established
+     *
+     * @param proxy OperationalDeviceProxy that just completed
+     */
+    virtual void OnCASESessionEstablished(OperationalDeviceProxy * proxy) {}
+
+    /**
+     * @brief
+     *   Called when CASE session establishment has errored
+     *
+     * @param error Error cause, if any
+     */
+    virtual void OnCASESessionError(CHIP_ERROR error) {}
+
+    /**
      *   Called when the commissioning process is complete (with success or error)
      */
     virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}

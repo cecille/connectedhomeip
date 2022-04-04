@@ -42,6 +42,10 @@ typedef void (*DevicePairingDelegate_OnCommissioningFailureFunct)(
 typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId peerId,
                                                                        chip::Controller::CommissioningStage stageCompleted,
                                                                        CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnPASESessionEstablishedFunct)(CommissioneeDeviceProxy * proxy);
+typedef void (*DevicePairingDelegate_OnPASESessionErrorFunct)(CHIP_ERROR error);
+typedef void (*DevicePairingDelegate_OnCASESessionEstablishedFunct)(OperationalDeviceProxy * proxy);
+typedef void (*DevicePairingDelegate_OnCASESessionErrorFunct)(CHIP_ERROR error);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
@@ -53,12 +57,21 @@ public:
     void SetCommissioningStatusUpdateCallback(DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
     void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
+    void SetPASESessionEstablishedCallback(DevicePairingDelegate_OnPASESessionEstablishedFunct callback);
+    void SetPASESessionErrorCallback(DevicePairingDelegate_OnPASESessionErrorFunct callback);
+    void SetCASESessionEstablishedCallback(DevicePairingDelegate_OnCASESessionEstablishedFunct callback);
+    void SetCASESessionErrorCallback(DevicePairingDelegate_OnCASESessionErrorFunct callback);
+
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
     void OnCommissioningSuccess(PeerId peerId) override;
     void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
                                 Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override;
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
+    void OnPASESessionEstablished(CommissioneeDeviceProxy * proxy) override;
+    void OnPASESessionError(CHIP_ERROR error) override;
+    void OnCASESessionEstablished(OperationalDeviceProxy * proxy) override;
+    void OnCASESessionError(CHIP_ERROR error) override;
 
 private:
     DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback                     = nullptr;
@@ -66,6 +79,10 @@ private:
     DevicePairingDelegate_OnCommissioningSuccessFunct mOnCommissioningSuccessCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningFailureFunct mOnCommissioningFailureCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
+    DevicePairingDelegate_OnPASESessionEstablishedFunct mOnPASESessionEstablishedCallback       = nullptr;
+    DevicePairingDelegate_OnPASESessionErrorFunct mOnPASESessionErrorCallback                   = nullptr;
+    DevicePairingDelegate_OnCASESessionEstablishedFunct mOnCASESessionEstablishedCallback       = nullptr;
+    DevicePairingDelegate_OnCASESessionErrorFunct mOnCASESessionErrorCallback                   = nullptr;
 };
 
 } // namespace Controller

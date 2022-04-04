@@ -93,7 +93,25 @@ def main():
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to set network commissioning parameters")
 
-    logger.info("Testing PASE connection to device")
+    logger.info("Testing pase callbacks")
+    # wrong pin - should get error
+    try:
+        test.TestPaseOnly(ip=options.deviceAddress1, setuppin=111, nodeid=1)
+        # We expect the above to fail by throwing an exception so fail the test if this is ok
+        TestFail("Incorrectly established PASE with wrong PIN")
+    except:
+        pass
+    # args are wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError
+    FailIfNot(test.TestPaseAndCaseCallbacks(False, True, False, False), "Incorrect PASE/CASE callbacks")
+    test.ResetTestCommissioner()
+    FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
+                                setuppin=20202021,
+                                nodeid=1),
+            "Failed to establish PASE connection with device")
+    # args are wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError
+    FailIfNot(test.TestPaseAndCaseCallbacks(True, False, False, False), "Incorrect PASE/CASE callbacks")
+    test.ResetTestCommissioner()
+
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
@@ -119,7 +137,10 @@ def main():
                                 setuppin=20202021,
                                 nodeid=1),
               "Failed to establish PASE connection with device")
+    test.ResetTestCommissioner()
     FailIfNot(test.TestCommissionFailure(1, 0), "Failed to commission device")
+    # args are wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError
+    FailIfNot(test.TestPaseAndCaseCallbacks(False, False, True, False), "Incorrect PASE/CASE callbacks")
 
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,

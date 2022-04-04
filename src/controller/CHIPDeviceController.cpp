@@ -861,6 +861,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
+        mPairingDelegate->OnPASESessionError(err);
     }
 
     RendezvousCleanup(err);
@@ -892,6 +893,7 @@ void DeviceCommissioner::OnSessionEstablished()
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
     mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    mPairingDelegate->OnPASESessionEstablished(device);
 
     if (mRunCommissioningAfterConnection)
     {
@@ -1478,6 +1480,11 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
         commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
     }
 
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnCASESessionEstablished(device);
+    }
+
     // Release any CommissioneeDeviceProxies we have here as we now have an OperationalDeviceProxy.
     CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
     if (commissionee != nullptr)
@@ -1518,7 +1525,14 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     }
     else
     {
-        commissioner->mPairingDelegate->OnPairingComplete(error);
+        if (commissioner->mPairingDelegate)
+        {
+            commissioner->mPairingDelegate->OnPairingComplete(error);
+        }
+    }
+    if (commissioner->mPairingDelegate)
+    {
+        commissioner->mPairingDelegate->OnCASESessionError(error);
     }
 }
 

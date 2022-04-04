@@ -269,6 +269,12 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
+    def ResetTestCommissioner(self):
+        return self.devCtrl.ResetTestCommissioner()
+
+    def TestPaseAndCaseCallbacks(self, wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError):
+        return self.devCtrl.TestPaseAndCaseCallbacks(wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError)
+
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")
 

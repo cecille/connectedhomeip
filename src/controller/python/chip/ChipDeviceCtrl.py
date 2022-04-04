@@ -282,6 +282,10 @@ class ChipDeviceController():
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
             stage)
 
+    def TestPaseAndCaseCallbacks(self, wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError):
+        return self._dmLib.pychip_TestPaseAndCaseCallbacks(
+            wantPASESuccess, wantPASEError, wantCASESuccess, wantCASEError)
+
     def CheckTestCommissionerCallbacks(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
@@ -1058,3 +1062,6 @@ class ChipDeviceController():
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
+            self._dmLib.pychip_TestPaseAndCaseCallbacks.argtypes = [
+                c_bool, c_bool, c_bool, c_bool]
+            self._dmLib.pychip_TestPaseAndCaseCallbacks.restype = c_bool

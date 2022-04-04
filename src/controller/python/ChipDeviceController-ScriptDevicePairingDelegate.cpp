@@ -42,6 +42,22 @@ void ScriptDevicePairingDelegate::SetCommissioningFailureCallback(DevicePairingD
 {
     mOnCommissioningFailureCallback = callback;
 }
+void ScriptDevicePairingDelegate::SetPASESessionEstablishedCallback(DevicePairingDelegate_OnPASESessionEstablishedFunct callback)
+{
+    mOnPASESessionEstablishedCallback = callback;
+}
+void ScriptDevicePairingDelegate::SetPASESessionErrorCallback(DevicePairingDelegate_OnPASESessionErrorFunct callback)
+{
+    mOnPASESessionErrorCallback = callback;
+}
+void ScriptDevicePairingDelegate::SetCASESessionEstablishedCallback(DevicePairingDelegate_OnCASESessionEstablishedFunct callback)
+{
+    mOnCASESessionEstablishedCallback = callback;
+}
+void ScriptDevicePairingDelegate::SetCASESessionErrorCallback(DevicePairingDelegate_OnCASESessionErrorFunct callback)
+{
+    mOnCASESessionErrorCallback = callback;
+}
 
 void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
@@ -87,6 +103,34 @@ void ScriptDevicePairingDelegate::OnCommissioningStatusUpdate(PeerId peerId, Com
     if (mOnCommissioningStatusUpdateCallback != nullptr)
     {
         mOnCommissioningStatusUpdateCallback(peerId, stageCompleted, error);
+    }
+}
+void ScriptDevicePairingDelegate::OnPASESessionEstablished(CommissioneeDeviceProxy * proxy)
+{
+    if (mOnPASESessionEstablishedCallback != nullptr)
+    {
+        mOnPASESessionEstablishedCallback(proxy);
+    }
+}
+void ScriptDevicePairingDelegate::OnPASESessionError(CHIP_ERROR error)
+{
+    if (mOnPASESessionErrorCallback != nullptr)
+    {
+        mOnPASESessionErrorCallback(error);
+    }
+}
+void ScriptDevicePairingDelegate::OnCASESessionEstablished(OperationalDeviceProxy * proxy)
+{
+    if (mOnCASESessionEstablishedCallback != nullptr)
+    {
+        mOnCASESessionEstablishedCallback(proxy);
+    }
+}
+void ScriptDevicePairingDelegate::OnCASESessionError(CHIP_ERROR error)
+{
+    if (mOnCASESessionErrorCallback != nullptr)
+    {
+        mOnCASESessionErrorCallback(error);
     }
 }
 
