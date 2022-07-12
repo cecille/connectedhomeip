@@ -1239,7 +1239,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
+                c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]

@@ -40,9 +40,11 @@
 #include <inttypes.h>
 #include <net/if.h>
 
+#include <app/DefaultAttributePersistenceProvider.h>
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
+
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -256,6 +258,18 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     // null pointer dereferences.
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
+
+    //
+    // The single ChipDeviceCtrl.so that gets generated for the REPL is used in both controller and server
+    // capacities. In the latter modality, an endpoint_config.h is actually generated to compose in utility
+    // clusters into EP0. That in turn utilizes defaults, and so we need to ensure that we have a valid
+    // AttributePersistenceProvider for that bit of logic to work, even though we're just initializing the controller
+    // side here. That's because DeviceControllerFactory::Init() will initialize the data model handler logic, which is
+    // the same bits linked in and used for both controller and server modalities.
+    //
+    static app::DefaultAttributePersistenceProvider defaultPersistenceProvider;
+    ReturnErrorOnFailure(defaultPersistenceProvider.Init(storageAdapter).AsInteger());
+    SetAttributePersistenceProvider(&defaultPersistenceProvider);
 
     PyReturnErrorOnFailure(ToPyChipError(DeviceControllerFactory::GetInstance().Init(factoryParams)));
 
@@ -785,4 +799,5 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return ToPyChipError(CHIP_NO_ERROR);
+}
 }

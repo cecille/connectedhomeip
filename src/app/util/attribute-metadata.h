@@ -83,6 +83,7 @@ typedef struct
  */
 union EmberAfDefaultOrMinMaxAttributeValue
 {
+    constexpr EmberAfDefaultOrMinMaxAttributeValue() : defaultValue(0) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(uint32_t val) : defaultValue(val) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}

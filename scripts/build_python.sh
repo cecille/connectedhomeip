@@ -43,6 +43,7 @@ declare enable_pybindings=false
 declare chip_mdns
 declare case_retry_delta
 declare install_wheel=no
+declare extra_args=""
 
 help() {
 
@@ -57,15 +58,16 @@ Input Options:
                                                             By default it is minimal.
   -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
 
-  -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
+  -t, --time_between_case_retries MRPActiveRetryInterval    Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
+  -a, --extra_args extra_args                               Extra GN args
   -i, --install_wheel no|build-env|separate                 Where to install the Python wheel
                                                             no: Do not install
                                                             build-env: install to virtual env for build matter
                                                             separate: install to another virtual env (out/python_env)
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
-  -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
+  -z, --pregen_dir DIRECTORY                                Directory where generated zap files have been pre-generated.
 "
 }
 
@@ -73,46 +75,49 @@ file_name=${0##*/}
 
 while (($#)); do
     case $1 in
-        --help | -h)
-            help
-            exit 1
-            ;;
-        --chip_detail_logging | -d)
-            chip_detail_logging=$2
-            shift
-            ;;
-        --chip_mdns | -m)
-            chip_mdns=$2
-            shift
-            ;;
-        --enable_pybindings | -p)
-            enable_pybindings=$2
-            shift
-            ;;
-        --time_between_case_retries | -t)
-            chip_case_retry_delta=$2
-            shift
-            ;;
-        --install_wheel | -i)
-            install_wheel=$2
-            shift
-            ;;
-        --extra_packages)
-            extra_packages=$2
-            shift
-            ;;
-        --include_yamltests)
-            include_yamltests="yes"
-            ;;
-        --pregen_dir | -z)
-            pregen_dir=$2
-            shift
-            ;;
-        -*)
-            help
-            echo "Unknown Option \"$1\""
-            exit 1
-            ;;
+    --help | -h)
+        help
+        exit 1
+        ;;
+    --chip_detail_logging | -d)
+        chip_detail_logging=$2
+        shift
+        ;;
+    --chip_mdns | -m)
+        chip_mdns=$2
+        shift
+        ;;
+    --enable_pybindings | -p)
+        enable_pybindings=$2
+        shift
+        ;;
+    --time_between_case_retries | -t)
+        chip_case_retry_delta=$2
+        shift
+        ;;
+    --install_wheel | -i)
+        install_wheel=$2
+        shift
+        ;;
+    --extra_packages)
+        extra_packages=$2
+        shift
+        ;;
+    --include_yamltests)
+        include_yamltests="yes"
+        ;;
+    --pregen_dir | -z)
+        pregen_dir=$2
+        ;;
+    --extra_args | -a)
+        extra_args=$2
+        shift
+        ;;
+    -*)
+        help
+        echo "Unknown Option \"$1\""
+        exit 1
+        ;;
     esac
     shift
 done
@@ -128,7 +133,9 @@ source "$CHIP_ROOT/scripts/activate.sh"
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
 [[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg $extra_args"
+
+echo "GN Invocation:" gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg $extra_args"
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.

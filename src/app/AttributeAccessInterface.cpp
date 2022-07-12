@@ -64,6 +64,12 @@ constexpr TLV::TLVType kAttributeDataIBType         = TLV::kTLVType_Structure;
 
 } // anonymous namespace
 
+CHIP_ERROR AttributeReportBuilder::EncodePreValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::TLVReader & data)
+{
+    auto * tlvWriter = aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter();
+    return tlvWriter->CopyElement(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), data);
+}
+
 CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
 {
     VerifyOrDie(mCurrentEncodingListIndex == kInvalidListIndex);

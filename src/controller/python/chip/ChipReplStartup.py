@@ -9,6 +9,7 @@ import chip.FabricAdmin
 import chip.logging
 import chip.native
 import coloredlogs
+import chip.dynamic_server.Server as Server
 from chip.ChipStack import *
 from rich import inspect, pretty
 from rich.console import Console
@@ -81,39 +82,69 @@ console = Console()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default="/tmp/repl-storage.json")
+    "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default=None)
 parser.add_argument(
     "-d", "--debug", help="Set default logging level to debug.", action="store_true")
+parser.add_argument(
+    "-m", "--mode", help="Whether to start the REPL in controller or server modes.", action="store", default="controller")
+
 args = parser.parse_args()
 
 chip.native.Init()
 
 ReplInit(args.debug)
-chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
-certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
-certificateAuthorityManager.LoadAuthoritiesFromStorage()
+if (args.mode == "controller"):
+    if args.storagepath is None:
+        args.storagepath = '/tmp/repl-controller.json'
 
-if (len(certificateAuthorityManager.activeCaList) == 0):
-    ca = certificateAuthorityManager.NewCertificateAuthority()
-    ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
-elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
-    certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+    console.print(
+        '\n\n[bold red]>>>> Starting REPL in Controller Mode <<<<\n\n')
 
-caList = certificateAuthorityManager.activeCaList
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
 
-devCtrl = caList[0].adminList[0].NewController()
-builtins.devCtrl = devCtrl
+    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
+
+    certificateAuthorityManager.LoadAuthoritiesFromStorage()
+
+    if (len(certificateAuthorityManager.activeCaList) == 0):
+        ca = certificateAuthorityManager.NewCertificateAuthority()
+        ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+    elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
+        certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+
+    caList = certificateAuthorityManager.activeCaList
+
+    devCtrl = caList[0].adminList[0].NewController()
+    builtins.devCtrl = devCtrl
+
+    console.print(
+        '\n\n[blue]The following objects have been created:')
+    console.print(
+        '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
+            \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
+            \t[red]caList\[n]\[m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+
+    console.print(
+        f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), and is available as [bold red]devCtrl')
+
+    server_mode = False
+
+else:
+    if args.storagepath is None:
+        args.storagepath = '/tmp/repl-server.json'
+
+    console.print(
+        '\n\n[bold red]>>>> Starting REPL in Server Mode <<<<\n\n')
+
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=True)
+
+    server = Server.Server()
+
+    console.print(
+        '\n\n[blue]The following objects have been created:')
+    console.print(
+        '\n\n[blue]Default CHIP Server instance has been initialized and is available as [bold red]server')
+
 
 atexit.register(StackShutdown)
-
-console.print(
-    '\n\n[blue]The following objects have been created:')
-
-console.print(
-    '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
-\t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-\t[red]caList\[n]\[m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
-
-console.print(
-    f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), and is available as [bold red]devCtrl')

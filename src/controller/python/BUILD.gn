@@ -71,6 +71,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/credentials/cert.cpp",
       "chip/crypto/p256keypair.cpp",
       "chip/discovery/NodeResolution.cpp",
+      "chip/dynamic_server/Server.cpp",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
@@ -78,6 +79,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/PyChipError.cpp",
+      "chip/server/Options.cpp",
+      "chip/server/ServerInit.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -118,7 +121,7 @@ shared_library("ChipDeviceCtrl") {
 
   if (chip_controller) {
     public_deps += [
-      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/python/data-model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
       "${chip_root}/third_party/jsoncpp",
     ]
@@ -224,6 +227,8 @@ chip_python_wheel_action("chip-core") {
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
+        "chip/dynamic_server/AfTypes.py",
+        "chip/dynamic_server/Server.py",
         "chip/exceptions/__init__.py",
         "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",

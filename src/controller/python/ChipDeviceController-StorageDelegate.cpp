@@ -22,11 +22,11 @@
 #include <map>
 #include <string>
 
+#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 namespace chip {
 namespace Controller {
 

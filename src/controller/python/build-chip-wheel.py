@@ -116,6 +116,8 @@ try:
     # Build the chip package...
     #
     packages = manifest['packages']
+    if args.server:
+        packages.append('chip.server')
 
     print("packageName: {}".format(packageName))
     print("libName: {}".format(libName))
