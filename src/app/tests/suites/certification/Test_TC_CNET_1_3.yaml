@@ -118,7 +118,7 @@ tests:
           value: []
 
     - label: "TH reads GeneratedCommandList from DUT"
-      PICS "CNET.S.F00 || CNET.S.F01"
+      PICS: "CNET.S.F00 || CNET.S.F01"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
