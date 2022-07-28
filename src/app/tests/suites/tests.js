@@ -564,6 +564,10 @@ function getTests() {
         "TestAccessControlCluster",
     ];
 
+    const AccessControlEnforcement = [
+        "Test_TC_ACE_1_1",
+    ];
+
     const BooleanState = [
         "Test_TC_BOOL_1_1",
         "Test_TC_BOOL_2_1",
@@ -875,6 +879,7 @@ function getTests() {
 
     const tests = [
         AccessControl,
+        AccessControlEnforcement,
         BooleanState,
         Actions,
         ColorControl,
