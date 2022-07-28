@@ -1,0 +1,472 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 129.1. [TC-ACE-1.1] Privileges
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    # ADMINISTER PRIVILEGE TEST
+    - label: "TH gives itself administer privilege on EP0"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: null, DeviceType: null }],
+                  },
+              ]
+
+    # administer success
+    - label:
+          "TH reads NOCs from Node Operational Credentials (administer privilege
+          read)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+
+    - label:
+          "TH writes Location to Basic Information (administer privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+
+    - label:
+          "TH sends UpdateFabricLabel to Node Operational Credentials
+          (administer privilege cmd)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: Label
+                value: "TestFabric"
+
+    # manage success
+    - label: "TH write NodeLabel in Basic Information (manage privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+
+    - label:
+          "TH sends TestEventTrigger to General Diagnostics (manage privilege
+          cmd)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: EnableKey
+                value: "0"
+              - name: EventTrigger
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    # view success
+    - label: "TH reads VendorID from Basic Information (view privilege read)"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # MANAGE PRIVILEGE TEST
+    - label:
+          "TH gives itself administer privilege on ACL and manage privilege on
+          EP0"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: 0x001F, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 4,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: null, DeviceType: null }],
+                  },
+              ]
+
+    # administer failure
+    - label:
+          "TH reads NOCs from Node Operational Credentials (administer privilege
+          read)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH writes Location to Basic Information (administer privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends UpdateFabricLabel to Node Operational Credentials
+          (administer privilege cmd)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: Label
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # manage success
+    - label: "TH write NodeLabel in Basic Information (manage privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+
+    - label:
+          "TH sends TestEventTrigger to General Diagnostics (manage privilege
+          cmd)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: EnableKey
+                value: "0"
+              - name: EventTrigger
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    # view success
+    - label: "TH reads VendorID from Basic Information (view privilege read)"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # OPERATE PRIVILEGE TEST
+    - label:
+          "TH gives itself administer privilege on ACL and operate privilege on
+          EP0"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: 0x001F, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: null, DeviceType: null }],
+                  },
+              ]
+
+    # administer failure
+    - label:
+          "TH reads NOCs from Node Operational Credentials (administer privilege
+          read)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH writes Location to Basic Information (administer privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends UpdateFabricLabel to Node Operational Credentials
+          (administer privilege cmd)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: Label
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # manage failure
+    - label: "TH write NodeLabel in Basic Information (manage privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    #- label:
+    #      "TH sends TestEventTrigger to General Diagnostics (manage privilege
+    #     cmd)"
+    #cluster: "General Diagnostics"
+    #command: "TestEventTrigger"
+    #arguments:
+    #    values:
+    #        - name: EnableKey
+    #          value: "0"
+    #        - name: EventTrigger
+    #          value: 0
+    #response:
+    #    error: UNSUPPORTED_ACCESS
+    # NOTE: This is currently disabled because this cmd has the wrong privilege in the SDK
+
+    # view success
+    - label: "TH reads VendorID from Basic Information (view privilege read)"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # VIEW PRIVILEGE TEST
+    - label:
+          "TH gives itself administer privilege on ACL and view privilege on EP0"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: 0x001F, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: null, DeviceType: null }],
+                  },
+              ]
+
+    # administer failure
+    - label:
+          "TH reads NOCs from Node Operational Credentials (administer privilege
+          read)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH writes Location to Basic Information (administer privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends UpdateFabricLabel to Node Operational Credentials
+          (administer privilege cmd)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: Label
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # manage failure
+    - label: "TH write NodeLabel in Basic Information (manage privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    #- label:
+    #    "TH sends TestEventTrigger to General Diagnostics (manage privilege
+    #    cmd)"
+    #cluster: "General Diagnostics"
+    #command: "TestEventTrigger"
+    #arguments:
+    #    values:
+    #        - name: EnableKey
+    #          value: "0"
+    #        - name: EventTrigger
+    #          value: 0
+    #response:
+    #    error: UNSUPPORTED_ACCESS
+    # NOTE: This is currently disabled because this cmd has the wrong privilege in the SDK
+    # view success
+    - label: "TH reads VendorID from Basic Information (view privilege read)"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+      # NO PRIVILEGE TEST
+    - label:
+          "TH gives itself administer privilege on ACL and no other privilege on
+          EP0"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: 0x001F, DeviceType: null }],
+                  },
+              ]
+
+    # administer failure
+    - label:
+          "TH reads NOCs from Node Operational Credentials (administer privilege
+          read)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH writes Location to Basic Information (administer privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends UpdateFabricLabel to Node Operational Credentials
+          (administer privilege cmd)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: Label
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # manage failure
+    - label: "TH write NodeLabel in Basic Information (manage privilege write)"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends TestEventTrigger to General Diagnostics (manage privilege
+          cmd)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: EnableKey
+                value: "0"
+              - name: EventTrigger
+                value: 0
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # view failure
+    - label: "TH reads VendorID from Basic Information (view privilege read)"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # CLEANUP
+    - label: "Cleanup - TH gives itself administer privilege EP0 (default)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets:
+                          [{ Endpoint: 0, Cluster: null, DeviceType: null }],
+                  },
+              ]
