@@ -868,31 +868,39 @@ async function GetPixitType(type) {
   return basicType;
 }
 
-async function PixitInC (val, type) {
+async function PixitInC(val, type) {
   const basicType = await GetPixitType.call(this, type);
   return "mPixit[\"" + val + "\"].Get<" + basicType + ">()"
 }
 
-async function formatPixit(val, type, typeNamespace)
-{
+async function formatPixit(val, type, useSpans) {
   const pixitInC = await PixitInC.call(this, val, type);
   if (StringHelper.isOctetString(type)) {
-    // This will currently do weird things if the pixit is a hex string. So...don't do that.
-    return "chip::ByteSpan(chip::Uint8::from_const_char(" + pixitInC + ".c_str()), " + pixitInC + ".length())";
+    if (useSpans) {
+      // This will currently do weird things if the pixit is a hex string. So...don't do that.
+      return "chip::ByteSpan(chip::Uint8::from_const_char(" + pixitInC + ".c_str()), " + pixitInC + ".length())";
+    } else {
+      return pixitInC + ".c_str()";
+    }
   } else if (StringHelper.isCharString(type)) {
-    // This should be the UTF-8 encode length, but it's just the length. So, don't use weird chars.
-    return "chip::CharSpan(" + pixitInC + ".c_str(), " + pixitInC + ".length())";
-  }else {
+    if (useSpans) {
+      // This should be the UTF-8 encode length, but it's just the length. So, don't use weird chars.
+      return "chip::CharSpan(" + pixitInC + ".c_str(), " + pixitInC + ".length())";
+    } else {
+      return pixitInC + ".c_str()";
+    }
+  } else {
     return pixitInC;
   }
 }
 
-async function maybeSubPixit(val, type, typed)
-{
+async function maybeSubPixit(val, type, typedLiteral, useSpans) {
   if (isPixit(val)) {
-    return  await formatPixit.call(this, val, type);
-  } else if (typed) {
-    return  await asTypedLiteral.call(this, val, type);
+    return await formatPixit.call(this, val, type, useSpans);
+  } else if (typedLiteral) {
+    return await asTypedLiteral.call(this, val, type);
+  } else if (StringHelper.isOctetString(type) || StringHelper.isCharString(type)) {
+    return "\"" + val + "\"";
   } else {
     return val;
   }
