@@ -831,6 +831,7 @@ function getTests() {
         "TestDiscovery",
         "TestLogCommands",
         "TestSaveAs",
+        "TestPixit",
         "TestConfigVariables",
         "TestDescriptorCluster",
         "TestBasicInformation",

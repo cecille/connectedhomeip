@@ -19,34 +19,48 @@
 #include <errno.h>
 #include <string>
 
-void PixitTypeTransformer::PrintOutOfRangeError(std::string key, std::string valueAsString, PixitTypeTransformer::PixitType type)
+void PixitTypeTransformer::PrintOutOfRangeError(const std::string & key, const std::string & valueAsString,
+                                                PixitTypeTransformer::PixitType type)
 {
     ChipLogError(chipTool, "Value out of range for %s - read %s, expected %s type", key.c_str(), valueAsString.c_str(),
                  GetName(type).c_str());
 }
 
 const std::unordered_map<std::string, PixitTypeTransformer::PixitType> PixitTypeTransformer::mPixitType = {
-    { "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID", PixitType::kString },
-    { "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS", PixitType::kString },
-    { "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", PixitType::kString },
-    { "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS", PixitType::kString },
-    { "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET", PixitType::kString },
-    { "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET", PixitType::kString },
-    { "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET", PixitType::kString },
-    { "PIXIT.CNET.ENDPOINT_WIFI", PixitType::kUint8 },
-    { "PIXIT.CNET.ENDPOINT_THREAD", PixitType::kUint8 },
-    { "PIXIT.CNET.ENDPOINT_ETHERNET", PixitType::kUint8 },
+    { "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.CNET.ENDPOINT_WIFI", PixitTypeTransformer::PixitType::kUint8 },
+    { "PIXIT.CNET.ENDPOINT_THREAD", PixitTypeTransformer::PixitType::kUint8 },
+    { "PIXIT.CNET.ENDPOINT_ETHERNET", PixitTypeTransformer::PixitType::kUint8 },
 
     // PIXITS used for testing
-    { "PIXIT.UNITTEST.STRING", PixitType::kString },
-    { "PIXIT.UNITTEST.UINT8", PixitType::kUint8 },
-    { "PIXIT.UNITTEST.UINT16", PixitType::kUint16 },
-    { "PIXIT.UNITTEST.UINT32", PixitType::kUint32 },
-    { "PIXIT.UNITTEST.UINT64", PixitType::kUint64 },
-    { "PIXIT.UNITTEST.INT8", PixitType::kInt8 },
-    { "PIXIT.UNITTEST.INT16", PixitType::kInt16 },
-    { "PIXIT.UNITTEST.INT32", PixitType::kInt32 },
-    { "PIXIT.UNITTEST.INT64", PixitType::kInt64 },
+    { "PIXIT.UNITTEST.STRING-1", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.UNITTEST.STRING-2", PixitTypeTransformer::PixitType::kString },
+    { "PIXIT.UNITTEST.UINT8-1", PixitTypeTransformer::PixitType::kUint8 },
+    { "PIXIT.UNITTEST.UINT8-2", PixitTypeTransformer::PixitType::kUint8 },
+    { "PIXIT.UNITTEST.UINT16-1", PixitTypeTransformer::PixitType::kUint16 },
+    { "PIXIT.UNITTEST.UINT16-2", PixitTypeTransformer::PixitType::kUint16 },
+    { "PIXIT.UNITTEST.UINT32-1", PixitTypeTransformer::PixitType::kUint32 },
+    { "PIXIT.UNITTEST.UINT32-2", PixitTypeTransformer::PixitType::kUint32 },
+    { "PIXIT.UNITTEST.UINT64-1", PixitTypeTransformer::PixitType::kUint64 },
+    { "PIXIT.UNITTEST.UINT64-2", PixitTypeTransformer::PixitType::kUint64 },
+    { "PIXIT.UNITTEST.INT8-1", PixitTypeTransformer::PixitType::kInt8 },
+    { "PIXIT.UNITTEST.INT8-2", PixitTypeTransformer::PixitType::kInt8 },
+    { "PIXIT.UNITTEST.INT16-1", PixitTypeTransformer::PixitType::kInt16 },
+    { "PIXIT.UNITTEST.INT16-2", PixitTypeTransformer::PixitType::kInt16 },
+    { "PIXIT.UNITTEST.INT32-1", PixitTypeTransformer::PixitType::kInt32 },
+    { "PIXIT.UNITTEST.INT32-2", PixitTypeTransformer::PixitType::kInt32 },
+    { "PIXIT.UNITTEST.INT64-1", PixitTypeTransformer::PixitType::kInt64 },
+    { "PIXIT.UNITTEST.INT64-2", PixitTypeTransformer::PixitType::kInt64 },
+    { "PIXIT.UNITTEST.SIZET-1", PixitTypeTransformer::PixitType::kSizet },
+    { "PIXIT.UNITTEST.SIZET-2", PixitTypeTransformer::PixitType::kSizet },
+    { "PIXIT.UNITTEST.BOOL-T", PixitTypeTransformer::PixitType::kBool },
+    { "PIXIT.UNITTEST.BOOL-F", PixitTypeTransformer::PixitType::kBool },
 };
 
 bool PixitTypeTransformer::IsSigned(PixitType type)
@@ -71,6 +85,7 @@ bool PixitTypeTransformer::IsUnsigned(PixitType type)
     case PixitType::kUint16:
     case PixitType::kUint32:
     case PixitType::kUint64:
+    case PixitType::kSizet:
         return true;
     default:
         return false;
@@ -104,12 +119,20 @@ std::string PixitTypeTransformer::GetName(PixitType type)
     }
 }
 
-PixitTypeTransformer::PixitValueHolder PixitTypeTransformer::TransformToType(std::string key, std::string valueAsString)
+bool PixitTypeTransformer::Exists(const char * key)
 {
-
-    PixitTypeTransformer::PixitValueHolder ret;
-    std::transform(key.begin(), key.end(), key.begin(), [](unsigned char c) { return std::toupper(c); });
     auto it = mPixitType.find(key);
+    return it != mPixitType.end();
+}
+
+PixitTypeTransformer::PixitValueHolder PixitTypeTransformer::TransformToType(const std::string & key,
+                                                                             const std::string & valueAsString)
+{
+    PixitTypeTransformer::PixitValueHolder ret;
+    std::string upperKey = key;
+
+    std::transform(upperKey.begin(), upperKey.end(), upperKey.begin(), [](unsigned char c) { return std::toupper(c); });
+    auto it = mPixitType.find(upperKey);
     if (it == mPixitType.end())
     {
         ChipLogError(chipTool, "Unable to find %s in list of supported PIXIT values", key.c_str());
@@ -182,6 +205,22 @@ PixitTypeTransformer::PixitValueHolder PixitTypeTransformer::TransformToType(std
     case PixitType::kInt64:
         err = SetPixitValueHolder<int64_t>(signedNumber, ret);
         break;
+    case PixitType::kSizet:
+        err = SetPixitValueHolder<size_t>(unsignedNumber, ret);
+        break;
+    case PixitType::kBool: {
+        std::string upperCaseVal = valueAsString;
+        std::transform(upperCaseVal.begin(), upperCaseVal.end(), upperCaseVal.begin(),
+                       [](unsigned char c) { return std::toupper(c); });
+        if (upperCaseVal == "0" || upperCaseVal == "FALSE")
+        {
+            ret.Set<bool>(false);
+        }
+        else if (upperCaseVal == "1" || upperCaseVal == "TRUE")
+        {
+            ret.Set<bool>(true);
+        }
+    }
     }
     if (err != CHIP_NO_ERROR)
     {

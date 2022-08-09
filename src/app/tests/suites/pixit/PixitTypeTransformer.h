@@ -31,8 +31,10 @@
 class PixitTypeTransformer
 {
 public:
-    using PixitValueHolder = chip::Variant<std::string, uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t>;
-    static PixitValueHolder TransformToType(std::string key, std::string valueAsString);
+    using PixitValueHolder =
+        chip::Variant<std::string, uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, bool, size_t>;
+    static PixitValueHolder TransformToType(const std::string & key, const std::string & valueAsString);
+    static bool Exists(const char * key);
 
 private:
     enum class PixitType
@@ -46,11 +48,13 @@ private:
         kInt16,
         kInt32,
         kInt64,
+        kBool,
+        kSizet,
     };
     static bool IsUnsigned(PixitType type);
     static bool IsSigned(PixitType type);
     static std::string GetName(PixitType type);
-    static void PrintOutOfRangeError(std::string key, std::string valueAsString, PixitType type);
+    static void PrintOutOfRangeError(const std::string & key, const std::string & valueAsString, PixitType type);
 
     template <typename T, typename ExtractedType>
     static CHIP_ERROR SetPixitValueHolder(ExtractedType extracted, PixitValueHolder & val)

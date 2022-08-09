@@ -1,0 +1,774 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Test Cluster"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                value: 20
+
+    # Tests for Boolean attribute - TODO add boolean support for pixits
+
+    - label: "Write attribute BOOLEAN PIXIT 1"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BOOLEAN PIXIT 1"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: 0
+
+    - label: "Write attribute BOOLEAN PIXIT 2"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BOOLEAN PIXIT 2"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: 1
+
+    # Tests for Bitmap8 attribute
+
+    - label: "Write attribute BITMAP8 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: PIXIT.UNITTEST.UINT8-1
+
+    - label: "Read attribute BITMAP8 PIXIT 1"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: 1
+
+    - label: "Write attribute BITMAP8 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: 2
+
+    - label: "Read attribute BITMAP8 PIXIT 2"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: PIXIT.UNITTEST.UINT8-2
+
+    - label: "Read attribute BITMAP8 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT8-1
+              minValue: PIXIT.UNITTEST.UINT8-1
+              maxValue: PIXIT.UNITTEST.UINT8-2
+
+    # Tests for Bitmap16 attribute
+
+    - label: "Write attribute BITMAP16 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: PIXIT.UNITTEST.UINT16-1
+
+    - label: "Read attribute BITMAP16 PIXIT 1"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: 1
+
+    - label: "Write attribute BITMAP16 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: 2
+
+    - label: "Read attribute BITMAP16 PIXIT 2"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: PIXIT.UNITTEST.UINT16-2
+
+    - label: "Read attribute BITMAP16 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT16-1
+              minValue: PIXIT.UNITTEST.UINT16-1
+              maxValue: PIXIT.UNITTEST.UINT16-2
+
+    # Tests for Bitmap32 attribute
+
+    - label: "Write attribute BITMAP32 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: PIXIT.UNITTEST.UINT32-1
+
+    - label: "Read attribute BITMAP32 PIXIT 1"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 1
+
+    - label: "Write attribute BITMAP32 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 2
+
+    - label: "Read attribute BITMAP32 PIXIT 2"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: PIXIT.UNITTEST.UINT32-2
+
+    - label: "Read attribute BITMAP32 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT32-1
+              minValue: PIXIT.UNITTEST.UINT32-1
+              maxValue: PIXIT.UNITTEST.UINT32-2
+
+    # Tests for Bitmap64 attribute
+
+    - label: "Write attribute BITMAP64 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: PIXIT.UNITTEST.UINT64-1
+
+    - label: "Read attribute BITMAP64 PIXIT 1"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: 1
+
+    - label: "Write attribute BITMAP64 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: 2
+
+    - label: "Read attribute BITMAP64 PIXIT 2"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: PIXIT.UNITTEST.UINT64-2
+
+    - label: "Read attribute BITMAP64 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT64-1
+              minValue: PIXIT.UNITTEST.UINT64-1
+              maxValue: PIXIT.UNITTEST.UINT64-2
+
+    # Tests for UInt8 attribute
+
+    - label: "Write attribute INT8U PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: PIXIT.UNITTEST.UINT8-1
+
+    - label: "Read attribute INT8U PIXIT 1"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: 1
+
+    - label: "Write attribute INT8U PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT8U PIXIT 2"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: PIXIT.UNITTEST.UINT8-2
+
+    - label: "Read attribute INT8U - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT8-1
+              minValue: PIXIT.UNITTEST.UINT8-1
+              maxValue: PIXIT.UNITTEST.UINT8-2
+
+    # Tests for UInt16 attribute
+
+    - label: "Write attribute INT16U PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: PIXIT.UNITTEST.UINT16-1
+
+    - label: "Read attribute INT16U PIXIT 1"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: 1
+
+    - label: "Write attribute INT16U PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT16U PIXIT 2"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: PIXIT.UNITTEST.UINT16-2
+
+    - label: "Read attribute INT16U - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT16-1
+              minValue: PIXIT.UNITTEST.UINT16-1
+              maxValue: PIXIT.UNITTEST.UINT16-2
+
+    # Tests for UInt32 attribute
+
+    - label: "Write attribute INT32U PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: PIXIT.UNITTEST.UINT32-1
+
+    - label: "Read attribute INT32U PIXIT 1"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: 1
+
+    - label: "Write attribute INT32U PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT32U PIXIT 2"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: PIXIT.UNITTEST.UINT32-2
+
+    - label: "Read attribute INT32U - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT32-1
+              minValue: PIXIT.UNITTEST.UINT32-1
+              maxValue: PIXIT.UNITTEST.UINT32-2
+
+    # Tests for UInt64 attribute
+
+    - label: "Write attribute INT64U PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: PIXIT.UNITTEST.UINT64-1
+
+    - label: "Read attribute INT64U PIXIT 1"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: 1
+
+    - label: "Write attribute INT64U PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT64U PIXIT 2"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: PIXIT.UNITTEST.UINT64-2
+
+    - label: "Read attribute INT64U - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT64-1
+              minValue: PIXIT.UNITTEST.UINT64-1
+              maxValue: PIXIT.UNITTEST.UINT64-2
+
+    # Tests for Int8 attribute
+
+    - label: "Write attribute INT8 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: PIXIT.UNITTEST.INT8-1
+
+    - label: "Read attribute INT8 PIXIT 1"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: 1
+
+    - label: "Write attribute INT8 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT8 PIXIT 2"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: PIXIT.UNITTEST.INT8-2
+
+    - label: "Read attribute INT8 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.INT8-1
+              minValue: PIXIT.UNITTEST.INT8-1
+              maxValue: PIXIT.UNITTEST.INT8-2
+
+    # Tests for UInt16 attribute
+
+    - label: "Write attribute INT16 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: PIXIT.UNITTEST.INT16-1
+
+    - label: "Read attribute INT16 PIXIT 1"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: 1
+
+    - label: "Write attribute INT16 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT16 PIXIT 2"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: PIXIT.UNITTEST.INT16-2
+
+    - label: "Read attribute INT16 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.INT16-1
+              minValue: PIXIT.UNITTEST.INT16-1
+              maxValue: PIXIT.UNITTEST.INT16-2
+
+    # Tests for UInt32 attribute
+
+    - label: "Write attribute INT32 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: PIXIT.UNITTEST.INT32-1
+
+    - label: "Read attribute INT32 PIXIT 1"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: 1
+
+    - label: "Write attribute INT32 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT32 PIXIT 2"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: PIXIT.UNITTEST.INT32-2
+
+    - label: "Read attribute INT32 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.INT32-1
+              minValue: PIXIT.UNITTEST.INT32-1
+              maxValue: PIXIT.UNITTEST.INT32-2
+
+    # Tests for UInt64 attribute
+
+    - label: "Write attribute INT64 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: PIXIT.UNITTEST.INT64-1
+
+    - label: "Read attribute INT64 PIXIT 1"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: 1
+
+    - label: "Write attribute INT64 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: 2
+
+    - label: "Read attribute INT64 PIXIT 2"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: PIXIT.UNITTEST.INT64-2
+
+    - label: "Read attribute INT64 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.INT64-1
+              minValue: PIXIT.UNITTEST.INT64-1
+              maxValue: PIXIT.UNITTEST.INT64-2
+
+    # Tests for Enum8 attribute
+
+    - label: "Write attribute ENUM8 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: PIXIT.UNITTEST.UINT8-1
+
+    - label: "Read attribute ENUM8 PIXIT 1"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: 1
+
+    - label: "Write attribute ENUM8 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: 2
+
+    - label: "Read attribute ENUM8 PIXIT 2"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: PIXIT.UNITTEST.UINT8-2
+
+    - label: "Read attribute ENUM8 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT8-1
+              minValue: PIXIT.UNITTEST.UINT8-1
+              maxValue: PIXIT.UNITTEST.UINT8-2
+
+    # Tests for Enum16 attribute
+
+    - label: "Write attribute ENUM16 PIXIT 1"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: PIXIT.UNITTEST.UINT16-1
+
+    - label: "Read attribute ENUM16 PIXIT 1"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: 1
+
+    - label: "Write attribute ENUM16 PIXIT 2"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: 2
+
+    - label: "Read attribute ENUM16 PIXIT 2"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: PIXIT.UNITTEST.UINT16-2
+
+    - label: "Read attribute ENUM16 - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT16-1
+              minValue: PIXIT.UNITTEST.UINT16-1
+              maxValue: PIXIT.UNITTEST.UINT16-2
+
+    # Tests for Epoch Microseconds
+
+    - label: "Write attribute EPOCH_US PIXIT 1"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: PIXIT.UNITTEST.UINT64-1
+
+    - label: "Read attribute EPOCH_US PIXIT 1"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: 1
+
+    - label: "Write attribute EPOCH_US PIXIT 2"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: 2
+
+    - label: "Read attribute EPOCH_US PIXIT 2"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: PIXIT.UNITTEST.UINT64-2
+
+    - label: "Read attribute EPOCH_US - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT64-1
+              minValue: PIXIT.UNITTEST.UINT64-1
+              maxValue: PIXIT.UNITTEST.UINT64-2
+
+    # Tests for Epoch Seconds
+
+    - label: "Write attribute EPOCH_S PIXIT 1"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: PIXIT.UNITTEST.UINT32-1
+
+    - label: "Read attribute EPOCH_S PIXIT 1"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: 1
+
+    - label: "Write attribute EPOCH_S PIXIT 2"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: 2
+
+    - label: "Read attribute EPOCH_S PIXIT 2"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: PIXIT.UNITTEST.UINT32-2
+
+    - label: "Read attribute EPOCH_S - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT32-1
+              minValue: PIXIT.UNITTEST.UINT32-1
+              maxValue: PIXIT.UNITTEST.UINT32-2
+
+    # Tests for vendor id
+
+    - label: "Write attribute vendor_id PIXIT 1"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: PIXIT.UNITTEST.UINT16-1
+
+    - label: "Read attribute vendor_id PIXIT 1"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          value: 1
+
+    - label: "Write attribute vendor_id PIXIT 2"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: 2
+
+    - label: "Read attribute vendor_id PIXIT 2"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          value: PIXIT.UNITTEST.UINT16-2
+
+    - label: "Read attribute vendor_id - constraints notValue minValue maxValue"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          constraints:
+              notValue: PIXIT.UNITTEST.UINT16-1
+              minValue: PIXIT.UNITTEST.UINT16-1
+              maxValue: PIXIT.UNITTEST.UINT16-2
+
+    # Tests for CHAR_STRING
+
+    - label: "Write attribute char_string PIXIT 1"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: PIXIT.UNITTEST.STRING-1
+
+    - label: "Read attribute char_string PIXIT 1"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: "string1"
+
+    - label: "Write attribute char_string PIXIT 2"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "string2"
+
+    - label: "Read attribute char_string PIXIT 2"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: PIXIT.UNITTEST.STRING-2
+
+    - label: "Read attribute char_string - constraints startsWith endsWith"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              startsWith: PIXIT.UNITTEST.STRING-2
+              endsWith: PIXIT.UNITTEST.STRING-2
+              minLength: PIXIT.UNITTEST.UINT8-2
+
+    - label: "Write attribute char_string for constraints"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "t"
+
+    - label: "Read attribute char_string - constraints minLength maxLength"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              maxLength: PIXIT.UNITTEST.UINT8-2
+              minLength: PIXIT.UNITTEST.UINT8-1
+
+    # Tests for OCTET_STRING
+
+    - label: "Write attribute octet_string PIXIT 1"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: PIXIT.UNITTEST.STRING-1
+
+    - label: "Read attribute octet_string PIXIT 1"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "string1"
+
+    - label: "Write attribute octet_string PIXIT 2"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "string2"
+
+    - label: "Read attribute octet_string PIXIT 2"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: PIXIT.UNITTEST.STRING-2
+
+    - label: "Read attribute char_string - constraints startsWith endsWith"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              startsWith: PIXIT.UNITTEST.STRING-2
+              endsWith: PIXIT.UNITTEST.STRING-2
+              minLength: PIXIT.UNITTEST.UINT8-2
+
+    - label: "Write attribute char_string for constraints"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "t"
+
+    - label: "Read attribute char_string - constraints minLength maxLength"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              maxLength: PIXIT.UNITTEST.SIZET-2
+              minLength: PIXIT.UNITTEST.SIZET-1
+
+    - label: "Read attribute char_string - constraints uppercase lowercase hex"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: PIXIT.UNITTEST.BOOL-F
+              isLowerCase: PIXIT.UNITTEST.BOOL-T
+              isHexString: PIXIT.UNITTEST.BOOL-F
+# writing a list with a pixit inside
+# reading a list with pixit constraints
+# reading strings with pixit constraints
+#comparing array value to string pixit? or pixits inside?
