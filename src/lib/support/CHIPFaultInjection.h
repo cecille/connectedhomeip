@@ -26,7 +26,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 
-#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
+#if CHIP_WITH_NLFAULTINJECTION
 
 #include <nlfaultinjection.hpp>
 
@@ -61,6 +61,7 @@ typedef enum
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE
+    kFault_Cecille,
     kFault_NumItems,
 } Id;
 
@@ -109,6 +110,7 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
             int32_t arg = aMaxArg;                                                                                                 \
             mgr.StoreArgsAtFault(aFaultID, 1, &arg);                                                                               \
         }                                                                                                                          \
+        ChipLogProgress(NotSpecified, "Injecting fault here");                                                                     \
         nlFAULT_INJECT_WITH_ARGS(mgr, aFaultID, aProtectedStatements, aUnprotectedStatements);                                     \
     } while (0)
 

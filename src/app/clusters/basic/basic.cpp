@@ -24,6 +24,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -98,7 +99,12 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case VendorID::Id: {
         uint16_t vendorId = 0;
-        status            = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
+        // Test returning an incorrect vendor ID
+        ChipLogProgress(NotSpecified, "about to inject fault");
+        CHIP_FAULT_INJECT(chip::FaultInjection::kFault_Cecille, return aEncoder.Encode(static_cast<uint16_t>(0xFFFF)));
+        ChipLogProgress(NotSpecified, "fault injected");
+
+        status = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
         if (status == CHIP_NO_ERROR)
         {
             status = aEncoder.Encode(vendorId);

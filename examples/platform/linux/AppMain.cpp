@@ -32,6 +32,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
@@ -278,6 +279,14 @@ exit:
         // End the program with non zero error code to indicate a error.
         return 1;
     }
+
+#if CHIP_WITH_NLFAULTINJECTION
+    ChipLogProgress(NotSpecified, "ggggggg - Initializing faults");
+    chip::FaultInjection::GetManager().FailAtFault(chip::FaultInjection::kFault_Cecille, 0, 1);
+#else
+    ChipLogProgress(NotSpecified, "ggggg - oh no, it's not on");
+#endif
+
     return 0;
 }
 
