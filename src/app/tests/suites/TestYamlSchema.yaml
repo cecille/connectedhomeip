@@ -1,0 +1,330 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "Test all the schema parts"
+
+# Test whether we can set config parameters for all the things.
+config:
+    nodeId: 0x12344321
+    endpoint: 0x1
+    cluster: "Test Cluster"
+    timeout: 0x100
+    allClustersPayload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    newEndpoint:
+        type: int16u
+        defaultValue: 0
+    newCluster:
+        type: char_string
+        defaultValue: "Descriptor"
+    newCommand:
+        type: char_string
+        defaultValue: "readAttribute"
+    newAttribute:
+        type: char_string
+        defaultValue: "boolean"
+    booleanTrue:
+        type: boolean
+        defaultValue: True
+    booleanFalse:
+        type: boolean
+        defaultValue: False
+    three:
+        type: int16u
+        defaultValue: 3
+    five:
+        type: int16u
+        defaultValue: 5
+
+tests:
+    #################################################
+    # Config parameters
+    #################################################
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+                
+    - label: "Test that the config parameters work"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: false
+    
+    # This does work, but permanantly changes the endpoint for the remainder of the tests
+    # This is different than the cluster setting which changes only for the current tests item
+    - label: "Test overwriting endpoint"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "Boolean"
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    # This is only needed because the above command sets the endpoint globally
+    - label: "Test overwriting endpoint"
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "Boolean"
+
+    # This will pass the zap compiler, but generates code that doesn't compile
+    - label: "Test overwriting endpoint with variable"
+      endpoint: newEndpoint
+      command: "readAttribute"
+      attribute: "Boolean"
+      response:
+          error: UNSUPPORTED_CLUSTER
+      disabled: True
+
+    - label: "Test overwriting cluster"
+      cluster: "Descriptor"
+      command: "readAttribute"
+      attribute: "PartsList"
+      response:
+          value: []
+    
+    # Cluster can't be overwritten with a variable currently
+    - label: "Test overwriting cluster with variable"
+      cluster: newCluster
+      command: "readAttribute"
+      attribute: "PartsList"
+      response:
+          value: []
+      disabled: true
+
+    - label: "Test setting command from variable"
+      command: newCommand
+      attribute: "boolean"
+
+    - label: "Test setting attribute from variable"
+      command: "readAttribute"
+      attribute: newAttribute
+
+    # NodeId apparently can't be overwritten in tests
+    - label: "Test overwriting nodeId"
+      nodeId: 0x1
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          error: TIMEOUT
+      disabled: True
+
+    #################################################
+    # IM commands - minimal mandatory properties
+    # readAttribute
+    # writeAttribute
+    # suscribeAttribute
+    # readEvent
+    # subscribeEvent
+    #
+    # attribute
+    # event
+    #################################################
+    - label: "Test readAttribute"
+      command: "readAttribute"
+      attribute: "boolean"
+    
+    - label: "Test writeAttribute"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+
+    - label: "Test subscribeAttribute"
+      command: "subscribeAttribute"
+      attribute: "boolean"
+      minInterval: 3
+      maxInterval: 0x5
+
+    - label: "Test readEvent"
+      command: "readEvent"
+      event: "TestEvent"
+
+    - label: "Test subscribeEvent"
+      event: "TestEvent"
+      minInterval: 0x3
+      maxInterval: 5
+
+    #################################################
+    # Tests properties
+    # disabled
+    # identify
+    # optional
+    # PICS
+    # timedInteractionTimeoutMs
+    # fabricFiltered
+    # suppressResponse
+    # minInterval
+    # maxInterval
+    #################################################
+
+    # DISABLED
+    - label: "this test should fail, but that's ok because it's disabled"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: false
+      optional: True
+
+    # IDENTITY
+    # We should be allowed to commission on a second fabric if identify
+    # works correctly. Once the fabric is removed, we should revert back
+    # to the default fabric, which will let the rest of the test cases
+    # run correctly.
+    - label: "Open Commissioning Window"
+      endpoint: 0
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: allClustersPayload
+
+    - label: "Wait for the commissioned device to be retrieved"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read from beta"
+      identity: "beta"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          value: 2
+
+    - label: "Read from original identity"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          value: 1
+
+    # FABRIC FILTERED
+    - label: "Read non-fabric filtered"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: False
+      response:
+          constraints:
+              minLength: 2
+              maxLength: 2
+
+    - label: "Read fabric-filtered"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: True
+      response:
+          constraints:
+              minLength: 1
+              maxLength: 1
+
+    # This is only needed because the above command sets the endpoint globally
+    - label: "Set the endpoint back, which should not be required, but is"
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "Boolean"
+
+    # OPTIONAL
+    - label: "this test should fail, but that's ok because it's optional"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: False
+      optional: True
+
+    # PICS
+    # TODO: fill this in - we know this works from other tests, so leaving for now
+
+    # SUPPRESS RESPONSE, MIN INTERVAL, MAX INTERVAL
+    - label: "Test suppressResponse, minInterval, maxInterval"
+      command: "subscribeEvent"
+      event: "TestEvent"
+      suppressResponse: True
+      minInterval: 3
+      maxInterval: 5
+
+    # REPEAT COUNT - note that neither of these 
+    - label: "Test Repeats no delay"
+      command: "Test"
+      repeatCount: 2
+
+    - label: "Test Repeats with delay"
+      command: "Test"
+      repeatCount: 2
+      repeatDelayMs: 5
+      nonsense: "yay"
+
+    #################################################
+    # Boolean
+    #################################################
+    - label: "Setup boolean with variable"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: booleanTrue
+
+    - label: "Test boolean no variables"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          error: SUCCESS
+          value: True
+          constraints:
+              # it's not clear how this applies to non-optional fields
+              # and this should actually probably not work
+              hasValue: True
+              minValue: 1
+              maxValue: 1
+              #notValue: 0
+              #minLength: 1
+              #maxLength: 1
+              #startsWith: 1
+              #endsWith: 1
+              #isLowerCase: False
+              #isUpperCase: False
+              #isHexString: False
+
+
+
+
+
+
+    
