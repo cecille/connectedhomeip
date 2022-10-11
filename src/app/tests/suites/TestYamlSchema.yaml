@@ -35,38 +35,59 @@ config:
     newAttribute:
         type: char_string
         defaultValue: "boolean"
+    newIdentity:
+        type: char_string
+        defaultValue: "beta"
     booleanTrue:
         type: boolean
         defaultValue: True
     booleanFalse:
         type: boolean
         defaultValue: False
+    zero:
+        type: int16u
+        defaultValue: 0
+    one:
+        type: int16u
+        defaultValue: 1
+    two:
+        type: int16u
+        defaultValue: 2
     three:
         type: int16u
         defaultValue: 3
     five:
         type: int16u
         defaultValue: 5
+    randomString:
+        type: char_string
+        defaultValue: "random"
+    startString:
+        type: char_string
+        defaultValue: "te"
+    endString:
+        type: char_string
+        defaultValue: "st"
 
 tests:
     #################################################
     # Config parameters
     #################################################
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
+    #- label: "Wait for the commissioned device to be retrieved"
+    - cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeId
-                
+
     - label: "Test that the config parameters work"
       command: "readAttribute"
       attribute: "boolean"
       response:
           value: false
-    
+
     # This does work, but permanantly changes the endpoint for the remainder of the tests
     # This is different than the cluster setting which changes only for the current tests item
     - label: "Test overwriting endpoint"
@@ -97,7 +118,7 @@ tests:
       attribute: "PartsList"
       response:
           value: []
-    
+
     # Cluster can't be overwritten with a variable currently
     - label: "Test overwriting cluster with variable"
       cluster: newCluster
@@ -107,13 +128,20 @@ tests:
           value: []
       disabled: true
 
-    - label: "Test setting command from variable"
-      command: newCommand
-      attribute: "boolean"
+    # Setting command from variable is not supported. Disabled doesn't
+    # work here because apparently the command portion is evaluated
+    # before enabled/disabled
+    #- label: "Test setting command from variable"
+    #  command: newCommand
+    #  attribute: "boolean"
+    #  disabled: True
 
+    # Setting attribute from variable is not supported. Disabled does
+    # appear to work here through, so it's got that going for it.
     - label: "Test setting attribute from variable"
       command: "readAttribute"
       attribute: newAttribute
+      disabled: True
 
     # NodeId apparently can't be overwritten in tests
     - label: "Test overwriting nodeId"
@@ -128,7 +156,7 @@ tests:
     # IM commands - minimal mandatory properties
     # readAttribute
     # writeAttribute
-    # suscribeAttribute
+    # subscribeAttribute
     # readEvent
     # subscribeEvent
     #
@@ -138,7 +166,7 @@ tests:
     - label: "Test readAttribute"
       command: "readAttribute"
       attribute: "boolean"
-    
+
     - label: "Test writeAttribute"
       command: "writeAttribute"
       attribute: "boolean"
@@ -156,6 +184,7 @@ tests:
       event: "TestEvent"
 
     - label: "Test subscribeEvent"
+      command: "subscribeEvent"
       event: "TestEvent"
       minInterval: 0x3
       maxInterval: 5
@@ -172,6 +201,11 @@ tests:
     # minInterval
     # maxInterval
     #################################################
+    - label: "Set boolean to true"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
 
     # DISABLED
     - label: "this test should fail, but that's ok because it's disabled"
@@ -179,7 +213,29 @@ tests:
       attribute: "boolean"
       response:
           value: false
-      optional: True
+      disabled: True
+
+    - label: "This test should not be disabled - set boolean to false"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: false
+      disabled: False
+
+    - label: "Ensure the last test was not disabled"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: false
+
+    # surprisingly, this appears to work
+    - label:
+          "this test should fail, but that's ok because it's disabled (variable)"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: true
+      disabled: booleanTrue
 
     # IDENTITY
     # We should be allowed to commission on a second fabric if identify
@@ -225,6 +281,17 @@ tests:
       response:
           value: 2
 
+    # Does not work
+    - label: "Read from beta set by variable"
+      identity: newIdentity
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          value: 2
+      disabled: True
+
     - label: "Read from original identity"
       endpoint: 0
       cluster: "Operational Credentials"
@@ -234,6 +301,16 @@ tests:
           value: 1
 
     # FABRIC FILTERED
+    - label: "Default is fabric-filtered"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      response:
+          constraints:
+              minLength: 1
+              maxLength: 1
+
     - label: "Read non-fabric filtered"
       endpoint: 0
       cluster: "Operational Credentials"
@@ -256,6 +333,29 @@ tests:
               minLength: 1
               maxLength: 1
 
+    # This doesn't work
+    - label: "Read non-fabric filtered from variable"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: booleanFalse
+      response:
+          constraints:
+              minLength: 2
+              maxLength: 2
+      disabled: True
+
+    - label: "We should go back to default here (fabric-filtered)"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      response:
+          constraints:
+              minLength: 1
+              maxLength: 1
+
     # This is only needed because the above command sets the endpoint globally
     - label: "Set the endpoint back, which should not be required, but is"
       endpoint: 1
@@ -263,15 +363,27 @@ tests:
       attribute: "Boolean"
 
     # OPTIONAL
+    - label: "Set boolean to true"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+
+    # NOTE: as it turns out, having this test fail causes a full-out test failure.
+    # so much for optional, eh?
     - label: "this test should fail, but that's ok because it's optional"
       command: "readAttribute"
       attribute: "boolean"
       response:
           value: False
       optional: True
+      disabled: True
 
     # PICS
     # TODO: fill this in - we know this works from other tests, so leaving for now
+
+    # timedInteractionTimeoutMs
+    # TODO: fill this in
 
     # SUPPRESS RESPONSE, MIN INTERVAL, MAX INTERVAL
     - label: "Test suppressResponse, minInterval, maxInterval"
@@ -281,7 +393,7 @@ tests:
       minInterval: 3
       maxInterval: 5
 
-    # REPEAT COUNT - note that neither of these 
+    # REPEAT COUNT - note that neither of these actually repeat, which is incorrect
     - label: "Test Repeats no delay"
       command: "Test"
       repeatCount: 2
@@ -290,10 +402,16 @@ tests:
       command: "Test"
       repeatCount: 2
       repeatDelayMs: 5
-      nonsense: "yay"
 
     #################################################
-    # Boolean
+    # Constraints
+    # Test each of the constraints with the matrix
+    # of values
+    # single number - normal / null / optional / nulloptional
+    # single string - normal / null / optional / nulloptional
+    # list - normal / null / optional / nulloptional
+    # struct - normal / null / optional / nulloptional
+    # bitmap
     #################################################
     - label: "Setup boolean with variable"
       command: "writeAttribute"
@@ -301,30 +419,131 @@ tests:
       arguments:
           value: booleanTrue
 
-    - label: "Test boolean no variables"
+    - label: "Test boolean no variables - constraints"
       command: "readAttribute"
       attribute: "boolean"
       response:
-          error: SUCCESS
-          value: True
           constraints:
-              # it's not clear how this applies to non-optional fields
-              # and this should actually probably not work
+              # The parser should actually error on the ones that don't make
+              # sense in context, but for now we just test the positive cases
+              # to ensure they work
+              # Silently ignored for non-optional values. This should warn.
               hasValue: True
+              type: boolean
               minValue: 1
               maxValue: 1
-              #notValue: 0
-              #minLength: 1
-              #maxLength: 1
+              notValue: 0
+              # surprisingly, these seem to work and pass
+              minLength: 1
+              maxLength: 1
+              # For numbers, these will generate code, but the code will not compile
               #startsWith: 1
               #endsWith: 1
               #isLowerCase: False
               #isUpperCase: False
               #isHexString: False
+              # zap will let this slide, but creates code that does not compile
+              # if you use these with non-lists
+              #contains: [1]
+              #excludes: [0]
+              # I shouldn't be allowed to do this, but here we are
+              hasMasksSet: [1]
+              hasMasksClear: [0x2]
 
+    - label: "Test boolean no variables - constraints with variables"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          constraints:
+              type: boolean
+              #none of these work - zap will generate, but the code won't compile.
+              #minValue: one
+              #maxValue: one
+              #notValue: zero
+              #minLength: one
+              #maxLength: one
+              #hasMasksSet: [one]
+              #hasMasksClear: [two]
 
+    - label: "Set null value on nullable_boolean"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: null
 
+    - label: "Test null value on nullable_boolean"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: null
 
+    - label: "Set char_string value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "testytest"
 
+    - label: "Test string no variables - constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              # The parser should actually error on the ones that don't make
+              # sense in context, but for now we just test the positive cases
+              # to ensure they work
+              # Silently ignored for non-optional values. This should warn.
+              hasValue: True
+              type: char_string
+              # zap will generate code for these, but it won't compile
+              #minValue: 1
+              #maxValue: 1
+              # This apparently does not work for strings
+              # notValue: "hello"
+              # surprisingly, these seem to work and pass
+              minLength: 1
+              maxLength: 100
+              startsWith: "te"
+              endsWith: "st"
+              isLowerCase: True
+              isUpperCase: False
+              isHexString: False
+              # zap will let this slide, but creates code that does not compile
+              # if you use these with non-lists
+              #contains: [1]
+              #excludes: [0]
+              # generates non-compilable code for strings
+              #hasMasksSet: [1]
+              #hasMasksClear: [0x2]
 
-    
+    - label: "Test string with variables - constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              type: char_string
+              # these generate, but don't work because they're assumed to be the actual strings we want
+              #startsWith: startString
+              #endsWith: endString
+              # no dice on these
+              #isLowerCase: booleanTrue
+              #isUpperCase: boooleanFalse
+              #isHexString: booleanFalse
+
+    - label: "Set null value on nullable_char_string"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: null
+
+    - label: "Test null value on nullable_char_string"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: null
+#list_nullables_and_optionals_struct
+
+#Checking command return types
+# test error
+# test all values, min max, not constraints, type
+
+#constraints on individual struct pieces
