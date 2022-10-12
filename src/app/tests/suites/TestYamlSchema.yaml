@@ -35,6 +35,9 @@ config:
     newAttribute:
         type: char_string
         defaultValue: "boolean"
+    newEvent:
+        type: char_string
+        defaultValue: "TestEvent"
     newIdentity:
         type: char_string
         defaultValue: "beta"
@@ -87,6 +90,11 @@ tests:
       attribute: "boolean"
       response:
           value: false
+
+    # Test overwriting label with variable
+    - label: endString
+      command: "readAttribute"
+      attribute: "boolean"
 
     # This does work, but permanantly changes the endpoint for the remainder of the tests
     # This is different than the cluster setting which changes only for the current tests item
@@ -143,6 +151,12 @@ tests:
       attribute: newAttribute
       disabled: True
 
+    # Unsurprisingly, this also doesn't work.
+    - label: "Test setting event from variable"
+      command: "readEvent"
+      event: newEvent
+      disabled: True
+
     # NodeId apparently can't be overwritten in tests
     - label: "Test overwriting nodeId"
       nodeId: 0x1
@@ -197,9 +211,14 @@ tests:
     # PICS
     # timedInteractionTimeoutMs
     # fabricFiltered
-    # suppressResponse
     # minInterval
     # maxInterval
+    # suppressResponse
+    # dataVesion
+    # keepSubsciptions
+    # eventNumber
+    # repeatCount
+    # repeatDelayMs
     #################################################
     - label: "Set boolean to true"
       command: "writeAttribute"
@@ -236,6 +255,22 @@ tests:
       response:
           value: true
       disabled: booleanTrue
+
+    # This doesn't work though - test gets disabled because apparently any value
+    # here disables the test
+    - label: "This test should not be disabled - set boolean to false (variable)"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+      disabled: booleanFalse
+
+    - label: "Ensure the last test was not disabled"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: true
+      disabled: True
 
     # IDENTITY
     # We should be allowed to commission on a second fabric if identify
@@ -284,6 +319,58 @@ tests:
     # Does not work
     - label: "Read from beta set by variable"
       identity: newIdentity
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          value: 2
+      disabled: True
+
+    - label: "Read from original identity"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          value: 1
+
+    # Test setting identity from number
+    - label: "Open Commissioning Window"
+      endpoint: 0
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    # Setting identity by number doesn't currently work
+    - label: "Commission from 4"
+      identity: 4
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: allClustersPayload
+      disabled: True
+
+    - label: "Wait for the commissioned device to be retrieved"
+      identity: 4
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+      disabled: True
+
+    - label: "Read from 4"
+      identity: 4
       endpoint: 0
       cluster: "Operational Credentials"
       command: "readAttribute"
@@ -385,11 +472,60 @@ tests:
     # timedInteractionTimeoutMs
     # TODO: fill this in
 
-    # SUPPRESS RESPONSE, MIN INTERVAL, MAX INTERVAL
-    - label: "Test suppressResponse, minInterval, maxInterval"
+    # MIN INTERVAL, MAX INTERVAL
+    - label: "Test minInterval, maxInterval"
       command: "subscribeEvent"
       event: "TestEvent"
+      minInterval: 3
+      maxInterval: 5
+
+    # Generates uncompilable code
+    - label: "Test minInterval, maxInterval variables"
+      command: "subscribeEvent"
+      event: "TestEvent"
+      minInterval: three
+      maxInterval: five
+      disabled: True
+
+    # SUPPRESS RESPONSE
+    # This generates uncompilable code. The zapt specifies a bool, but it seems
+    # the underlying code is expecting a short.
+    - label: "Test suppressResponse"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
       suppressResponse: True
+      disabled: True
+
+    # Generates uncompilable code too. But this code would not work with the variable
+    # even if suppress response actually worked. Which it doesn't.
+    - label: "Test suppressResponse variable"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: true
+      suppressResponse: booleanTrue
+      disabled: true
+
+    # This doesn't work either.
+    - label: "Test suppressResponse with commands"
+      command: "Test"
+      suppressResponse: True
+      disabled: true
+
+    - label: "Test keep subscriptions"
+      command: "subscribeAttribute"
+      attribute: "int8u"
+      keepSubscriptions: true
+      minInterval: 3
+      maxInterval: 5
+
+    # This generates and compiles, but doesn't actually set the keepSubscriptions
+    - label: "Test keep subscriptions with variable"
+      command: "subscribeAttribute"
+      attribute: "int16u"
+      keepSubscripions: booleanTrue
       minInterval: 3
       maxInterval: 5
 
