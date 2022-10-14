@@ -23,7 +23,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/linux/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlfaultinjection/repo/include"                      
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support/faultinjection/include"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"

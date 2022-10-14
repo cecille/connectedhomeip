@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for nlfaultinjection.
-  nlfaultinjection_root = "//third_party/nlfaultinjection"
+  nlfaultinjection_root = "//src/lib/support/faultinjection"
 }
