@@ -529,6 +529,20 @@ tests:
       minInterval: 3
       maxInterval: 5
 
+    - label: "Test eventNumber"
+      command: "subscribeEvent"
+      event: "TestEvent"
+      minInterval: 3
+      maxInterval: 5
+      eventNumber: 1
+
+    - label: "Test eventNumber from variable"
+      command: "subscribeEvent"
+      event: "TestEvent"
+      minInterval: 3
+      maxInterval: 5
+      eventNumber: one
+
     # REPEAT COUNT - note that neither of these actually repeat, which is incorrect
     - label: "Test Repeats no delay"
       command: "Test"
