@@ -1,7 +1,3 @@
-[submodule "nlassert"]
-	path = third_party/nlassert/repo
-	url = https://github.com/nestlabs/nlassert.git
-	branch  = master
 [submodule "nlio"]
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git

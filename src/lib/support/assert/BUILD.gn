@@ -13,11 +13,11 @@
 # limitations under the License.
 
 config("nlassert_config") {
-  include_dirs = [ "repo/include" ]
+  include_dirs = [ "include" ]
 }
 
 source_set("nlassert") {
-  sources = [ "repo/include/nlassert.h" ]
+  sources = [ "include/nlassert.h" ]
 
   public_configs = [ ":nlassert_config" ]
 }

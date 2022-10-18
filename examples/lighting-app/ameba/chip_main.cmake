@@ -199,7 +199,7 @@ target_include_directories(
     ${chip_dir}/src/include/
     ${chip_dir}/src/lib/
     ${chip_dir}/src/
-    ${chip_dir}/third_party/nlassert/repo/include/
+    ${chip_dir}/src/lib/support/assert/include/
     ${chip_dir}/src/app/
     ${chip_dir}/src/app/util/
     ${chip_dir}/src/app/server/

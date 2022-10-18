@@ -270,7 +270,7 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
-    ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/src/lib/support/assert/include
     ${CHIP_ROOT}/third_party/telink_sdk
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
