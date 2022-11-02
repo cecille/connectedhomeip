@@ -13,7 +13,7 @@
         "${workspaceFolder}/src/include/**",
         "${workspaceFolder}/src/lib/**",
         "${workspaceFolder}/src/system/**",
-        "${workspaceFolder}/third_party/nlassert/repo/include/**",
+        "${workspaceFolder}/src/lib/support/assert/include/**",
         "${workspaceFolder}/third_party/nlio/repo/include/**"
     ],
     "[cpp]": {
