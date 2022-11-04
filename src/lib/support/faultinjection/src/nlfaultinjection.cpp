@@ -38,7 +38,7 @@ namespace FaultInjection {
 
 static void Die(void) __attribute__((noreturn));
 
-static GlobalContext *sGlobalContext = NULL;
+static GlobalContext *sGlobalContext = nullptr;
 
 /**
  * The callback function that implements the deterministic
@@ -70,7 +70,7 @@ static bool DeterministicCbFn(Identifier aId,
  * Callback list node for DeterministicCbFn.
  * This node terminates all callback lists.
  */
-static Callback sDeterministicCb = { DeterministicCbFn, NULL, NULL };
+static Callback sDeterministicCb = { DeterministicCbFn, nullptr, nullptr };
 
 /**
  * The callback function that implements the random
@@ -103,7 +103,7 @@ static bool RandomCbFn(Identifier aId,
  * All Record instances are initialized to point to
  * this callback node.
  */
-static Callback sRandomCb = { RandomCbFn, NULL, &sDeterministicCb };
+static Callback sRandomCb = { RandomCbFn, nullptr, &sDeterministicCb };
 
 /**
  * Alias for the address of the first default callback.
@@ -137,9 +137,9 @@ int32_t Manager::Init(size_t inNumFaults,
     mNumFaults = inNumFaults;
     mFaultRecords = inFaultArray;
     mFaultNames = inFaultNames;
-    mLock = NULL;
-    mUnlock = NULL;
-    mLockContext = NULL;
+    mLock = nullptr;
+    mUnlock = nullptr;
+    mLockContext = nullptr;
 
     // Link all callback lists to the two default callbacks.
     for (i = 0; i < mNumFaults; i++)
@@ -281,7 +281,7 @@ int32_t Manager::StoreArgsAtFault(Identifier inId, uint16_t inNumArgs, int32_t *
     size_t i;
 
     nlEXPECT_ACTION(inId < mNumFaults &&
-                    mFaultRecords[inId].mArguments != NULL &&
+                    mFaultRecords[inId].mArguments != nullptr &&
                     mFaultRecords[inId].mLengthOfArguments >= inNumArgs &&
                     inNumArgs <= UINT8_MAX,
                     exit,
@@ -353,9 +353,9 @@ int32_t Manager::RemoveCallbackAtFault(Identifier inId,
                                        bool inTakeMutex)
 {
     int32_t err = 0;
-    Callback **cb = NULL;
+    Callback **cb = nullptr;
 
-    nlEXPECT_ACTION((inId < mNumFaults) && (inCallBack != NULL), exit, err = -EINVAL);
+    nlEXPECT_ACTION((inId < mNumFaults) && (inCallBack != nullptr), exit, err = -EINVAL);
 
     if (inTakeMutex)
     {
@@ -364,7 +364,7 @@ int32_t Manager::RemoveCallbackAtFault(Identifier inId,
 
     cb = &mFaultRecords[inId].mCallbackList;
 
-    while (*cb != NULL)
+    while (*cb != nullptr)
     {
         if (*cb == inCallBack)
         {
@@ -409,8 +409,8 @@ int32_t Manager::RemoveCallbackAtFault(Identifier inId,
 bool Manager::CheckFault(Identifier inId, bool inTakeMutex)
 {
     bool retval = false;
-    Callback *cb = NULL;
-    Callback *next = NULL;
+    Callback *cb = nullptr;
+    Callback *next = nullptr;
     bool reboot = false;
 
     nlEXPECT(inId < mNumFaults, exit);
@@ -422,7 +422,7 @@ bool Manager::CheckFault(Identifier inId, bool inTakeMutex)
 
     cb = mFaultRecords[inId].mCallbackList;
 
-    while (cb != NULL)
+    while (cb != nullptr)
     {
         // Save mNext now, in case the callback removes itself
         // calling RemoveCallbackAtFault
@@ -571,7 +571,7 @@ int32_t Manager::ResetFaultConfigurations(Identifier inId)
     cb = mFaultRecords[inId].mCallbackList;
     // All callback handling code in this module is based on the assumption
     // that custom callbacks are inserted at the beginning of the list
-    while (cb != sEndOfCustomCallbacks && cb != NULL)
+    while (cb != sEndOfCustomCallbacks && cb != nullptr)
     {
         (void)RemoveCallbackAtFault(inId, cb, kMutexDoNotTake);
         cb = mFaultRecords[inId].mCallbackList;
@@ -653,7 +653,7 @@ void SetGlobalContext(GlobalContext *inGlobalContext)
  */
 static bool ParseInt(const char *str, int32_t *num)
 {
-    char *endptr = NULL;
+    char *endptr = nullptr;
     long tmp;
     bool retval = true;
 
@@ -747,10 +747,10 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const GetManagerFn *inArra
  */
 bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTables, size_t inNumTables)
 {
-    char *tok1 = NULL;
-    char *savePtr1 = NULL;
-    char *tok2 = NULL;
-    char *savePtr2 = NULL;
+    char *tok1 = nullptr;
+    char *savePtr1 = nullptr;
+    char *tok2 = nullptr;
+    char *savePtr2 = nullptr;
     char *outerString = aFaultInjectionStr;
     size_t i = 0;
     nl::FaultInjection::Identifier j = 0;
@@ -759,7 +759,7 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
     int32_t args[kMaxFaultArgs];
     uint16_t numArgs = 0;
 
-    nl::FaultInjection::Manager *mgr = NULL;
+    nl::FaultInjection::Manager *mgr = nullptr;
     nl::FaultInjection::Identifier faultId = 0;
 
     memset(args, 0, sizeof(args));
@@ -772,12 +772,12 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
         bool gotPercentage = false;
         bool gotReboot = false;
         bool gotArguments = false;
-        const Name *faultNames = NULL;
+        const Name *faultNames = nullptr;
 
-        outerString = NULL;
+        outerString = nullptr;
 
         tok2 = strtok_r(tok1, "_", &savePtr2);
-        nlEXPECT(tok2 != NULL, exit);
+        nlEXPECT(tok2 != nullptr, exit);
 
 		// this is the module
 		for (i = 0; i < inNumTables; i++)
@@ -792,10 +792,10 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
                 }
             }
         }
-        nlEXPECT(mgr != NULL, exit);
+        nlEXPECT(mgr != nullptr, exit);
 
-        tok2 = strtok_r(NULL, "_", &savePtr2);
-        nlEXPECT(tok2 != NULL, exit);
+        tok2 = strtok_r(nullptr, "_", &savePtr2);
+        nlEXPECT(tok2 != nullptr, exit);
 
         // this is the fault name
         faultNames = mgr->GetFaultNames();
@@ -810,7 +810,7 @@ bool ParseFaultInjectionStr(char *aFaultInjectionStr, const ManagerTable *inTabl
 
         nlEXPECT(j != mgr->GetNumFaults(), exit);
 
-        while ((tok2 = strtok_r(NULL, "_", &savePtr2)))
+        while ((tok2 = strtok_r(nullptr, "_", &savePtr2)))
         {
             switch (tok2[0])
             {
