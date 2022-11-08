@@ -111,6 +111,11 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/IniEscaping.cpp': {'string'},
     'src/lib/support/IniEscaping.h': {'string'},
 
+    # This is third party code that we intend to switch to matter-owned
+    # Once the code is in the matter repo, we can clean them
+    # This file is only used when compiling fault injection for testing
+    'src/lib/support/faultinjection/third_party/cstyle/repo/cstyle.pl': {'string'},
+
     # Itself in DENY.
     'src/lib/support/CHIPListUtils.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
