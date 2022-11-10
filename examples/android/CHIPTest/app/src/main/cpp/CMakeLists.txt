@@ -34,7 +34,7 @@ set_property(TARGET CHIPTest APPEND PROPERTY INCLUDE_DIRECTORIES
         ${MATTER_SDK_ROOT}/src/lib/support/assert/include/
         ${MATTER_SDK_ROOT}/third_party/nlio/repo/include/
         ${MATTER_SDK_ROOT}/src/lib/support/faultinjection/include/
-        ${MATTER_SDK_ROOT}/third_party/nlunit-test/repo/src/)
+        ${MATTER_SDK_ROOT}/src/lib/support/unit-test/src/)
 set_target_properties(CHIPTest PROPERTIES COMPILE_DEFINITIONS "CHIP_HAVE_CONFIG_H=1")
 
 set(CHIPTest_Libs

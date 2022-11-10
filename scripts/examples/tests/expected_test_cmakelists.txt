@@ -71,7 +71,7 @@ set_property(TARGET "${target}" APPEND PROPERTY INCLUDE_DIRECTORIES
   "//TEST_ROOT_PATH/src/lib/support/assert/include/"
   "//TEST_ROOT_PATH/third_party/nlio/repo/include/"
   "//TEST_ROOT_PATH/src/lib/support/faultinjection/include/"
-  "//TEST_ROOT_PATH/third_party/nlunit-test/repo/src/")
+  "//TEST_ROOT_PATH/src/lib/support/unit-test/src/")
 set_target_properties("${target}" PROPERTIES COMPILE_DEFINITIONS "CHIP_HAVE_CONFIG_H=1;")
 set_target_properties("${target}" PROPERTIES COMPILE_FLAGS "-O0 -std=gnu++14 -fno-rtti ")
 set_target_properties("${target}" PROPERTIES LINK_FLAGS "-O0 ")

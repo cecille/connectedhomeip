@@ -60,7 +60,7 @@ list(
     ${CHIP_ROOT}/src/app
     ${CHIP_ROOT}/src/lib/support/assert/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
-    ${CHIP_ROOT}/third_party/nlunit-test/repo/src
+    ${CHIP_ROOT}/src/lib/support/unit-test/src
 )
 
 execute_process(

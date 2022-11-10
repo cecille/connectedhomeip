@@ -427,8 +427,8 @@ if test "${nl_cv_build_tests}" = "yes"; then
 	    # external package cannot be run here. Simply set the appropriate
 	    # variables and trust all will be well.
 
-            NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlunit-test/repo/src"
-            NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/third_party/nlunit-test/repo/src"
+            NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/src/lib/support/unit-test/src"
+            NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/src/lib/support/unit-test/src"
             NLUNIT_TEST_LIBS="-lnlunit-test"
         ],
         [
@@ -527,8 +527,8 @@ if test "${nl_with_nlassert}" = "internal"; then
 fi
 
 if test "${nl_with_nlunit_test}" = "internal"; then
-    AC_CONFIG_SUBDIRS([third_party/nlunit-test/repo])
-    AC_SUBST(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/third_party/nlunit-test/repo/src"])
+    AC_CONFIG_SUBDIRS([src/lib/support/unit-test])
+    AC_SUBST(NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY,["${ac_pwd}/src/lib/support/unit-test/src"])
 fi
 
 #

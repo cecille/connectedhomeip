@@ -61,6 +61,6 @@ matrix:
       # converts markdown to HTML
       - pyspelling.filters.markdown:
     sources:
-      - '**/*.md|!third_party/**|!src/lib/support/**/third_party/**|!src/lib/support/faultinjection/README.md|!src/lib/support/assert/README.md|!examples/common/**/repo/**|!docs/ERROR_CODES.md'
+      - '**/*.md|!third_party/**|!src/lib/support/**/third_party/**|!src/lib/support/faultinjection/README.md|!src/lib/support/assert/README.md|!src/lib/support/unit-test/README.md|!examples/common/**/repo/**|!docs/ERROR_CODES.md'
     aspell:
       ignore-case: true

@@ -833,7 +833,7 @@ DOT
 NLUNIT_TEST_CPPFLAGS
 NLUNIT_TEST_LDFLAGS
 NLUNIT_TEST_LIBS'
-ac_subdirs_all='third_party/nlunit-test/repo'
+ac_subdirs_all='src/lib/support/unit-test'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -18906,8 +18906,8 @@ $as_echo "${nl_with_nlunit_test}" >&6; }
 	    # external package cannot be run here. Simply set the appropriate
 	    # variables and trust all will be well.
 
-            NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/third_party/nlunit-test/repo/src"
-            NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/third_party/nlunit-test/repo/src"
+            NLUNIT_TEST_CPPFLAGS="-I\${abs_top_srcdir}/src/lib/support/unit-test/src"
+            NLUNIT_TEST_LDFLAGS="-L${ac_pwd}/src/lib/support/unit-test/src"
             NLUNIT_TEST_LIBS="-lnlunit-test"
 
 
@@ -19455,9 +19455,9 @@ LIBS="${LIBS} ${NL_COVERAGE_LIBS}"
 if test "${nl_with_nlunit_test}" = "internal"; then
 
 
-subdirs="$subdirs third_party/nlunit-test/repo"
+subdirs="$subdirs src/lib/support/unit-test"
 
-    NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY="${ac_pwd}/third_party/nlunit-test/repo/src"
+    NLUNIT_TEST_FOREIGN_SUBDIR_DEPENDENCY="${ac_pwd}/src/lib/support/unit-test/src"
 
 fi
 

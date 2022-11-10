@@ -55,7 +55,7 @@ exclude:
     - "lib/support/assert/**/*" # These are new third-party code libraries coming into matter.
     - "lib/support/faultinjection/**/*" # They will be brought up to Matter style as we integrate them
     - "third_party/nlio/repo/**/*" # from here down built with $ awk '/path =/ {print $3 "/**/*"}' .gitmodules
-    - "third_party/nlunit-test/repo/**/*"
+    - "lib/support/unit-test/**/*" # They will be brought up to Matter style as we integrate them
     - "third_party/mbedtls/repo/**/*"
     - "examples/common/QRCode/repo/**/*"
     - "examples/common/m5stack-tft/repo/**/*"
