@@ -77,6 +77,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }

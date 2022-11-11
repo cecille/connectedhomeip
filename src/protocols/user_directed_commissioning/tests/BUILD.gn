@@ -28,7 +28,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols",
     "${nlio_root}:nlio",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 
   cflags = [ "-Wconversion" ]

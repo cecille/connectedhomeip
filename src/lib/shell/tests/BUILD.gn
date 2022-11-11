@@ -32,6 +32,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/support:testing",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }

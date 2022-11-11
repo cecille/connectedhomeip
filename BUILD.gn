@@ -163,7 +163,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${mbedtls_root}:mbedtls",
       "${nlassert_root}:nlassert",
       "${nlio_root}:nlio",
-      "${nlunit_test_root}:nlunit-test",
+      "${chip_root}/src/lib/support/unit-test:nlunit-test",
     ]
 
     if (enable_fuzz_test_targets) {

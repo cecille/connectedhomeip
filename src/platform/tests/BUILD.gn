@@ -43,7 +43,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/platform",
       "${chip_root}/src/system",
-      "${nlunit_test_root}:nlunit-test",
+      "${chip_root}/src/lib/support/unit-test:nlunit-test",
     ]
 
     if (chip_mdns != "none" && chip_enable_dnssd_tests &&

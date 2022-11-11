@@ -40,7 +40,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/dnssd/minimal_mdns",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }
 

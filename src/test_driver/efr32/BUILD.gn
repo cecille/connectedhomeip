@@ -89,7 +89,7 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 
   # OpenThread Settings

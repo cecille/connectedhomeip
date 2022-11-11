@@ -228,6 +228,6 @@ static_library("testing") {
     ":support",
     "${chip_root}/src/lib/core",
     "${nlassert_root}:nlassert",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }

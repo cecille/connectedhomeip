@@ -56,7 +56,7 @@ static_library("helpers") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }
 
@@ -70,7 +70,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:testing",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 
   test_sources = [
