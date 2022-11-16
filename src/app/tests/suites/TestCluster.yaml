@@ -1611,6 +1611,9 @@ tests:
                 value: false
               - name: "value"
                 value: 5
+                constraints:
+                    minValue: 2
+                    maxValue: 5
               - name: "originalValue"
                 value: 5
 
