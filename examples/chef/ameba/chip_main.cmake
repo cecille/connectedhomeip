@@ -11,26 +11,28 @@ set(list_chip_main_sources chip_main_sources)
 include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 include(${chip_dir}/examples/chef/project_include.cmake)
 
-if (matter_enable_shell)
-list(
-    APPEND ${list_chip_main_sources}
-    #shell
-    ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
-)
-endif (matter_enable_shell)
+if(matter_enable_shell)
+    list(
+        APPEND ${list_chip_main_sources}
 
-if (matter_enable_ota_requestor)
-list(
-    APPEND ${list_chip_main_sources}
-    #OTARequestor
-    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
-)
-endif (matter_enable_ota_requestor)
+        # shell
+        ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
+    )
+endif(matter_enable_shell)
+
+if(matter_enable_ota_requestor)
+    list(
+        APPEND ${list_chip_main_sources}
+
+        # OTARequestor
+        ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+        ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+        ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+        ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+        ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+        ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
+    )
+endif(matter_enable_ota_requestor)
 
 list(
     APPEND ${list_chip_main_sources}
@@ -81,7 +83,7 @@ target_include_directories(
     ${chip_dir}/src/app/util/
     ${chip_dir}/src/app/server/
     ${chip_dir}/src/controller/data_model
-    ${chip_dir}/third_party/nlio/repo/include/
+    ${chip_dir}/src/lib/support/io/include/
     ${chip_dir}/src/lib/support/unit-test/src
 )
 
@@ -98,31 +100,31 @@ list(
     -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}
 )
 
-if (matter_enable_persistentstorage_audit)
-list(
-    APPEND chip_main_flags
+if(matter_enable_persistentstorage_audit)
+    list(
+        APPEND chip_main_flags
 
-    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
-)
-endif (matter_enable_persistentstorage_audit)
+        -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+    )
+endif(matter_enable_persistentstorage_audit)
 
-if (matter_enable_shell)
-list(
-    APPEND chip_main_flags
+if(matter_enable_shell)
+    list(
+        APPEND chip_main_flags
 
-    -DCONFIG_ENABLE_CHIP_SHELL=1
-)
-endif (matter_enable_shell)
+        -DCONFIG_ENABLE_CHIP_SHELL=1
+    )
+endif(matter_enable_shell)
 
 list(
     APPEND chip_main_cpp_flags
 
-	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
-	-fno-rtti
+    -Wno-unused-parameter
+    -std=gnu++11
+    -std=c++14
+    -fno-rtti
 )
-target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
+target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags})
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
 
 # move static library post build command

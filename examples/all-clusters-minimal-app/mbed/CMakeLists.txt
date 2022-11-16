@@ -7,7 +7,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
+get_filename_component(NLIO_ROOT ${CHIP_ROOT}/src/lib/support/io/include REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -28,10 +28,12 @@ if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
 endif()
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
+
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
+
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 project(${APP_TARGET})
@@ -46,23 +48,23 @@ add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
 mbed_configure_app_target(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
-                           main/include/
-                           ${MBED_COMMON}/util/include
-                           ${ALL_CLUSTERS_COMMON}/include
-                           ${GEN_DIR}/app-common
-                           ${GEN_DIR}/all-clusters-minimal-app
-                           ${NLIO_ROOT}
+    main/include/
+    ${MBED_COMMON}/util/include
+    ${ALL_CLUSTERS_COMMON}/include
+    ${GEN_DIR}/app-common
+    ${GEN_DIR}/all-clusters-minimal-app
+    ${NLIO_ROOT}
 )
 
 target_sources(${APP_TARGET} PRIVATE
-               main/main.cpp
-               main/AppTask.cpp
-               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
-               ${MBED_COMMON}/util/LEDWidget.cpp
-               ${MBED_COMMON}/util/DFUManager.cpp
-               ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
-               ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
+    main/main.cpp
+    main/AppTask.cpp
+    ${GEN_DIR}/all-clusters-minimal-app/zap-generated/callback-stub.cpp
+    ${GEN_DIR}/all-clusters-minimal-app/zap-generated/IMClusterCommandHandler.cpp
+    ${MBED_COMMON}/util/LEDWidget.cpp
+    ${MBED_COMMON}/util/DFUManager.cpp
+    ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
@@ -79,6 +81,7 @@ endif()
 mbed_set_post_build(${APP_TARGET})
 
 option(VERBOSE_BUILD "Have a verbose build process")
+
 if(VERBOSE_BUILD)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()

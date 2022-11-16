@@ -14,9 +14,9 @@ message(STATUS "MATTER_SDK_UTEST_LIB=${MATTER_SDK_UTEST_LIB}")
 set(MATTER_SDK_ROOT "${PROJECT_SOURCE_DIR}/../../../../../../..")
 
 if(IS_ABSOLUTE ${MATTER_SDK_BUILD_ROOT})
-set(MATTER_SDK_BUILD ${MATTER_SDK_BUILD_ROOT})
+        set(MATTER_SDK_BUILD ${MATTER_SDK_BUILD_ROOT})
 else()
-set(MATTER_SDK_BUILD "${MATTER_SDK_ROOT}/${MATTER_SDK_BUILD_ROOT}")
+        set(MATTER_SDK_BUILD "${MATTER_SDK_ROOT}/${MATTER_SDK_BUILD_ROOT}")
 endif()
 
 message(STATUS "MATTER_SDK_ROOT=${MATTER_SDK_ROOT}")
@@ -32,7 +32,7 @@ set_property(TARGET CHIPTest APPEND PROPERTY INCLUDE_DIRECTORIES
         ${MATTER_SDK_ROOT}/src/lib/
         ${MATTER_SDK_ROOT}/config/standalone/
         ${MATTER_SDK_ROOT}/src/lib/support/assert/include/
-        ${MATTER_SDK_ROOT}/third_party/nlio/repo/include/
+        ${MATTER_SDK_ROOT}/src/lib/support/io/include/
         ${MATTER_SDK_ROOT}/src/lib/support/faultinjection/include/
         ${MATTER_SDK_ROOT}/src/lib/support/unit-test/src/)
 set_target_properties(CHIPTest PROPERTIES COMPILE_DEFINITIONS "CHIP_HAVE_CONFIG_H=1")
@@ -58,9 +58,9 @@ set(CHIPTest_Libs
         -Wl,-no-whole-archive
 
         -Wl,--end-group
-        )
+)
 target_link_libraries(CHIPTest ${CHIPTest_Libs})
 
-#if( MATTER_SDK_SRC_DIR )
-#    include(../../../../${MATTER_SDK_SRC_DIR}/CMakeLists.txt)
-#endif()
+# if( MATTER_SDK_SRC_DIR )
+# include(../../../../${MATTER_SDK_SRC_DIR}/CMakeLists.txt)
+# endif()

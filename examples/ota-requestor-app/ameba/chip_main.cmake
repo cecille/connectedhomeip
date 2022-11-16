@@ -46,7 +46,7 @@ chip_configure_data_model(chip_main
 target_include_directories(
     ${chip_main}
     PUBLIC
-	${inc_path}
+    ${inc_path}
     ${chip_dir}/zzz_generated/ota-requestor-app
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/zzz_generated
@@ -59,7 +59,7 @@ target_include_directories(
     ${chip_dir}/src/app/util/
     ${chip_dir}/src/app/server/
     ${chip_dir}/src/controller/data_model
-    ${chip_dir}/third_party/nlio/repo/include/
+    ${chip_dir}/src/lib/support/io/include/
     ${chip_dir}/src/lib/support/unit-test/src
     ${chip_dir}/src/app/clusters/ota-requestor
     ${chip_dir}/examples/ota-requestor-app/ameba/main/include
@@ -79,23 +79,23 @@ list(
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
-if (matter_enable_persistentstorage_audit)
-list(
-    APPEND chip_main_flags
+if(matter_enable_persistentstorage_audit)
+    list(
+        APPEND chip_main_flags
 
-    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
-)
-endif (matter_enable_persistentstorage_audit)
+        -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+    )
+endif(matter_enable_persistentstorage_audit)
 
 list(
     APPEND chip_main_cpp_flags
 
-	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
-	-fno-rtti
+    -Wno-unused-parameter
+    -std=gnu++11
+    -std=c++14
+    -fno-rtti
 )
-target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )
+target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags})
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
 
 # move static library post build command
