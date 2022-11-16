@@ -14,7 +14,7 @@
         "${workspaceFolder}/src/lib/**",
         "${workspaceFolder}/src/system/**",
         "${workspaceFolder}/src/lib/support/assert/include/**",
-        "${workspaceFolder}/third_party/nlio/repo/include/**"
+        "${workspaceFolder}/src/lib/support/io/include/**"
     ],
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"

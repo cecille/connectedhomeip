@@ -13,26 +13,26 @@
 # limitations under the License.
 
 config("nlio_config") {
-  include_dirs = [ "repo/include" ]
+  include_dirs = [ "include" ]
 }
 
 source_set("nlio") {
   sources = [
-    "repo/include/nlbyteorder-big.h",
-    "repo/include/nlbyteorder-little.h",
-    "repo/include/nlbyteorder.h",
-    "repo/include/nlbyteorder.hpp",
-    "repo/include/nlio-base.h",
-    "repo/include/nlio-base.hpp",
-    "repo/include/nlio-byteorder-big.h",
-    "repo/include/nlio-byteorder-big.hpp",
-    "repo/include/nlio-byteorder-little.h",
-    "repo/include/nlio-byteorder-little.hpp",
-    "repo/include/nlio-byteorder.h",
-    "repo/include/nlio-byteorder.hpp",
-    "repo/include/nlio-private.h",
-    "repo/include/nlio.h",
-    "repo/include/nlio.hpp",
+    "include/nlbyteorder-big.h",
+    "include/nlbyteorder-little.h",
+    "include/nlbyteorder.h",
+    "include/nlbyteorder.hpp",
+    "include/nlio-base.h",
+    "include/nlio-base.hpp",
+    "include/nlio-byteorder-big.h",
+    "include/nlio-byteorder-big.hpp",
+    "include/nlio-byteorder-little.h",
+    "include/nlio-byteorder-little.hpp",
+    "include/nlio-byteorder.h",
+    "include/nlio-byteorder.hpp",
+    "include/nlio-private.h",
+    "include/nlio.h",
+    "include/nlio.hpp",
   ]
 
   public_configs = [ ":nlio_config" ]

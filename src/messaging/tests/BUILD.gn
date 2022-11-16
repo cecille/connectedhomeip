@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -35,7 +34,7 @@ static_library("helpers") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/tests:helpers",
-    "${nlio_root}:nlio",
+    "${chip_root}/src/lib/support/io:nlio",
   ]
 }
 
@@ -75,7 +74,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlio_root}:nlio",
+    "${chip_root}/src/lib/support/io:nlio",
     "${chip_root}/src/lib/support/unit-test:nlunit-test",
   ]
 }

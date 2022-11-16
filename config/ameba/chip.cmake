@@ -59,7 +59,7 @@ list(
     ${CHIP_ROOT}/src/system
     ${CHIP_ROOT}/src/app
     ${CHIP_ROOT}/src/lib/support/assert/include
-    ${CHIP_ROOT}/third_party/nlio/repo/include
+    ${CHIP_ROOT}/src/lib/support/io/repo/include
     ${CHIP_ROOT}/src/lib/support/unit-test/src
 )
 

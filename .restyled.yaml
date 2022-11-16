@@ -52,10 +52,10 @@ exclude:
     - "third_party/lwip/repo/**/*"
     - "third_party/nlbuild-autotools/repo/**/*"
     - "third_party/nlbuild-autotools/repo/.**/*" # "**/*" doesn't include directories that start with "."
-    - "lib/support/assert/**/*" # These are new third-party code libraries coming into matter.
-    - "lib/support/faultinjection/**/*" # They will be brought up to Matter style as we integrate them
-    - "third_party/nlio/repo/**/*" # from here down built with $ awk '/path =/ {print $3 "/**/*"}' .gitmodules
-    - "lib/support/unit-test/**/*" # They will be brought up to Matter style as we integrate them
+    - "src/lib/support/assert/**/*" # These are new third-party code libraries coming into matter.
+    - "src/lib/support/faultinjection/**/*" # They will be brought up to Matter style as we integrate them
+    - "src/lib/support/io/**/*" # from here down built with $ awk '/path =/ {print $3 "/**/*"}' .gitmodules
+    - "src/lib/support/unit-test/**/*" # They will be brought up to Matter style as we integrate them
     - "third_party/mbedtls/repo/**/*"
     - "examples/common/QRCode/repo/**/*"
     - "examples/common/m5stack-tft/repo/**/*"
@@ -78,10 +78,9 @@ exclude:
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h" # Too big?
     - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # Too big?
 
-
 changed_paths:
-  maximum: 100000
-  outcome: error
+    maximum: 100000
+    outcome: error
 
 # Restylers to run, and how
 restylers:
@@ -213,12 +212,12 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: 'restyled/restyler-autopep8:v1.5.7'
+      image: "restyled/restyler-autopep8:v1.5.7"
       command:
-        - autopep8
-        - '--in-place'
+          - autopep8
+          - "--in-place"
       arguments: []
       include:
-        - '**/*.py'
+          - "**/*.py"
       interpreters:
-        - python
+          - python
