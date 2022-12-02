@@ -2805,6 +2805,27 @@ PICS:
       id: FLW.M.FlowChange
 
     # Pump Configuration and Control cluster
+    - label: "Does the device support the Constant pressure (PRSCONST) feature?"
+      id: PCC.S.F00
+
+    - label: "Does the device support the Compensated pressure (PRSCOMP) feature?"
+      id: PCC.S.F01
+
+    - label: "Does the device support the Constant flow (FLW) feature?"
+      id: PCC.S.F02
+
+    - label: "Does the device support the Constant speed (SPD) feature?"
+      id: PCC.S.F03
+
+    - label: "Does the device support the Constant temperature (TEMP) feature?"
+      id: PCC.S.F04
+
+    - label: "Does the device support the Automatic (AUTO) feature?"
+      id: PCC.S.F05
+
+    - label: "Does the device support the Local operation (LOCAL) feature?"
+      id: PCC.S.F06
+
     - label: "Does the device implement the MaxPressure attribute?"
       id: PCC.S.A0000
 
