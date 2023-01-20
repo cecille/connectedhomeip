@@ -864,7 +864,7 @@ class ChipDeviceController():
             device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
-    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
         If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
@@ -885,10 +885,10 @@ class ChipDeviceController():
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).raise_on_error()
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
         Write a list of attributes on a target node.
 
@@ -918,7 +918,7 @@ class ChipDeviceController():
                     v[0], v[1], v[2], 1, v[1].value))
 
         ClusterAttribute.WriteAttributes(
-            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs).raise_on_error()
+            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[

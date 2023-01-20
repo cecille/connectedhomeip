@@ -1004,25 +1004,25 @@ public class ChipStructs {
     }
   }
 
-  public static class OperationalCredentialsClusterFabricDescriptor {
+  public static class OperationalCredentialsClusterFabricDescriptorStruct {
     public byte[] rootPublicKey;
-    public Integer vendorId;
-    public Long fabricId;
-    public Long nodeId;
+    public Integer vendorID;
+    public Long fabricID;
+    public Long nodeID;
     public String label;
     public Integer fabricIndex;
 
-    public OperationalCredentialsClusterFabricDescriptor(
+    public OperationalCredentialsClusterFabricDescriptorStruct(
         byte[] rootPublicKey,
-        Integer vendorId,
-        Long fabricId,
-        Long nodeId,
+        Integer vendorID,
+        Long fabricID,
+        Long nodeID,
         String label,
         Integer fabricIndex) {
       this.rootPublicKey = rootPublicKey;
-      this.vendorId = vendorId;
-      this.fabricId = fabricId;
-      this.nodeId = nodeId;
+      this.vendorID = vendorID;
+      this.fabricID = fabricID;
+      this.nodeID = nodeID;
       this.label = label;
       this.fabricIndex = fabricIndex;
     }
@@ -1030,18 +1030,18 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("OperationalCredentialsClusterFabricDescriptor {\n");
+      output.append("OperationalCredentialsClusterFabricDescriptorStruct {\n");
       output.append("\trootPublicKey: ");
       output.append(Arrays.toString(rootPublicKey));
       output.append("\n");
-      output.append("\tvendorId: ");
-      output.append(vendorId);
+      output.append("\tvendorID: ");
+      output.append(vendorID);
       output.append("\n");
-      output.append("\tfabricId: ");
-      output.append(fabricId);
+      output.append("\tfabricID: ");
+      output.append(fabricID);
       output.append("\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
+      output.append("\tnodeID: ");
+      output.append(nodeID);
       output.append("\n");
       output.append("\tlabel: ");
       output.append(label);
@@ -1318,11 +1318,11 @@ public class ChipStructs {
     }
   }
 
-  public static class DoorLockClusterDlCredential {
+  public static class DoorLockClusterCredentialStruct {
     public Integer credentialType;
     public Integer credentialIndex;
 
-    public DoorLockClusterDlCredential(Integer credentialType, Integer credentialIndex) {
+    public DoorLockClusterCredentialStruct(Integer credentialType, Integer credentialIndex) {
       this.credentialType = credentialType;
       this.credentialIndex = credentialIndex;
     }
@@ -1330,7 +1330,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("DoorLockClusterDlCredential {\n");
+      output.append("DoorLockClusterCredentialStruct {\n");
       output.append("\tcredentialType: ");
       output.append(credentialType);
       output.append("\n");
@@ -1454,11 +1454,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TargetNavigatorClusterTargetInfo {
+  public static class TargetNavigatorClusterTargetInfoStruct {
     public Integer identifier;
     public String name;
 
-    public TargetNavigatorClusterTargetInfo(Integer identifier, String name) {
+    public TargetNavigatorClusterTargetInfoStruct(Integer identifier, String name) {
       this.identifier = identifier;
       this.name = name;
     }
@@ -1466,7 +1466,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TargetNavigatorClusterTargetInfo {\n");
+      output.append("TargetNavigatorClusterTargetInfoStruct {\n");
       output.append("\tidentifier: ");
       output.append(identifier);
       output.append("\n");
@@ -1502,13 +1502,13 @@ public class ChipStructs {
     }
   }
 
-  public static class MediaInputClusterInputInfo {
+  public static class MediaInputClusterInputInfoStruct {
     public Integer index;
     public Integer inputType;
     public String name;
     public String description;
 
-    public MediaInputClusterInputInfo(
+    public MediaInputClusterInputInfoStruct(
         Integer index, Integer inputType, String name, String description) {
       this.index = index;
       this.inputType = inputType;
@@ -1519,7 +1519,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("MediaInputClusterInputInfo {\n");
+      output.append("MediaInputClusterInputInfoStruct {\n");
       output.append("\tindex: ");
       output.append(index);
       output.append("\n");

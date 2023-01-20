@@ -85,6 +85,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
 
@@ -93,10 +97,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::DoorLock::Structs::DlCredential::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::Type & request,
                         Json::Value & value);
 
@@ -113,10 +113,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request);
+static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                         Json::Value & value);
 
@@ -129,10 +130,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::MediaInput::Structs::InputInfo::Type & request);
+static void Finalize(chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::LabelStruct::Type & request, Json::Value & value);
 
 static void Finalize(chip::app::Clusters::detail::Structs::LabelStruct::Type & request);
@@ -221,10 +222,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AccessControl::Structs::Target::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & request);
+static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::TargetStruct::Type & request,
                         Json::Value & value);
 
