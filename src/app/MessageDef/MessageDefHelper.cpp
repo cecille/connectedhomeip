@@ -23,7 +23,7 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 #include <inttypes.h>
@@ -33,7 +33,7 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
+#if CHIP_CONFIG_IM_PRETTY_PRINT && CHIP_DETAIL_LOGGING
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
@@ -98,7 +98,7 @@ void DecreaseDepth()
 }
 #endif
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel)
 {
     if (aDepth == 0)
@@ -171,16 +171,19 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
     case TLV::kTLVType_UTF8String: {
         char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
+#if CHIP_DETAIL_LOGGING
+        uint32_t readerLen = aReader.GetLength();
+#endif // CHIP_DETAIL_LOGGING
         CHIP_ERROR err = aReader.GetString(value_s, sizeof(value_s));
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
 
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
-            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+            PRETTY_PRINT_SAMELINE("... (char string too long: %" PRIu32 " chars) ...", readerLen);
         }
         else
         {
-            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
+            PRETTY_PRINT_SAMELINE("\"%s\" (%" PRIu32 " chars), ", value_s, readerLen);
         }
         break;
     }
@@ -214,11 +217,11 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         {
             for (size_t i = 0; i < len; i++)
             {
-                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
+                PRETTY_PRINT_SAMELINE("0x%02x, ", value_b[i]);
             }
         }
 
-        PRETTY_PRINT("]");
+        PRETTY_PRINT("] (%" PRIu32 " bytes)", readerLen);
         break;
     }
 
@@ -257,8 +260,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
     return CHIP_NO_ERROR;
 }
-
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 }; // namespace app
 }; // namespace chip

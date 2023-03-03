@@ -23,18 +23,13 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#include <glib.h>
 #include <memory>
+
+#include <bluetooth.h>
+#include <glib.h>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
-#include <system/SystemLayer.h>
-
-#include <bluetooth.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -70,7 +65,10 @@ public:
     virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnChipScanComplete(void) = 0;
+    virtual void OnScanComplete(void) = 0;
+
+    // Called on scan error
+    virtual void OnScanError(CHIP_ERROR err) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -115,5 +113,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

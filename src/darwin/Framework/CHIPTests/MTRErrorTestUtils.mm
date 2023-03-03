@@ -34,11 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    if (error.domain != MTRInteractionErrorDomain) {
+    if (![error.domain isEqualToString:MTRInteractionErrorDomain]) {
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    return error.code;
+    return static_cast<uint8_t>(error.code);
 }
 @end
 

@@ -26,6 +26,7 @@
 
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -130,12 +131,13 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
@@ -158,6 +160,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -166,7 +169,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     callback.mSuite = inSuite;
 
@@ -266,6 +269,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -274,7 +278,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     callback.mSuite = inSuite;
 
@@ -359,6 +363,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -367,7 +372,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     callback.mSuite = inSuite;
 
@@ -490,6 +495,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -498,7 +504,7 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     callback.mSuite = inSuite;
 
@@ -597,6 +603,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -605,7 +612,7 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
     callback.mSuite = inSuite;
 
     sessionManager.SetMessageDelegate(&callback);
@@ -702,7 +709,20 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
 
 void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    FabricTableHolder fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage1, deviceStorage2;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     SessionManager sessionManager;
+
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage1,
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     // Allocate a session.
     uint16_t sessionId1;
@@ -735,10 +755,24 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     }
 
     // Reconstruct the Session Manager to reset state.
+    sessionManager.Shutdown();
     sessionManager.~SessionManager();
     new (&sessionManager) SessionManager();
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage2,
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
-    prevSessionId = 0;
+    // Allocate a single session so we know what random id we are starting at.
+    {
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        prevSessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
+        handle.Value()->AsSecureSession()->MarkForEviction();
+    }
+
     // Verify that we increment session ID by 1 for each allocation (except for
     // the wraparound case where we skip session ID 0), even when allocated
     // sessions are immediately freed.
@@ -790,17 +824,17 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
                 ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             NL_TEST_ASSERT(inSuite, handle.HasValue());
             auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
-            for (size_t h = 0; h < numHandles; ++h)
+            for (uint16_t sessionId : sessionIds)
             {
-                NL_TEST_ASSERT(inSuite, potentialCollision != sessionIds[h]);
+                NL_TEST_ASSERT(inSuite, potentialCollision != sessionId);
             }
             handle.Value()->AsSecureSession()->MarkForEviction();
         }
 
         // Free our allocated sessions.
-        for (size_t h = 0; h < numHandles; ++h)
+        for (auto & handle : handles)
         {
-            handles[h].Value()->AsSecureSession()->MarkForEviction();
+            handle.Value()->AsSecureSession()->MarkForEviction();
         }
     }
 
@@ -819,6 +853,7 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
     FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
@@ -827,7 +862,7 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -886,6 +921,8 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
 
 static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
@@ -894,9 +931,17 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     FabricIndex aliceFabricIndex = 1;
     FabricIndex bobFabricIndex   = 1;
 
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
     SessionManager sessionManager;
-    secure_channel::MessageCounterManager gMessageCounterManager;
-    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -955,6 +1000,58 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void TestFindSecureSessionForNode(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    aliceToBobSession->AsSecureSession()->MarkActive();
+
+    SessionHolder newAliceToBobSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastActivityTime())
+    {
+        // Wait for the clock to advance so the new session is
+        // more-recently-active.
+    }
+    newAliceToBobSession->AsSecureSession()->MarkActive();
+
+    auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
+                                                                MakeOptional(SecureSession::Type::kCASE));
+    NL_TEST_ASSERT(inSuite, foundSession.HasValue());
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession.Contains(foundSession.Value()));
+    NL_TEST_ASSERT(inSuite, !aliceToBobSession.Contains(foundSession.Value()));
+
+    sessionManager.Shutdown();
+}
+
 // Test Suite
 
 /**
@@ -972,6 +1069,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
     NL_TEST_DEF("Session Counter Exhausted Test", SessionCounterExhaustedTest),
     NL_TEST_DEF("SessionShiftingTest",            SessionShiftingTest),
+    NL_TEST_DEF("TestFindSecureSessionForNode",   TestFindSecureSessionForNode),
 
     NL_TEST_SENTINEL()
 };

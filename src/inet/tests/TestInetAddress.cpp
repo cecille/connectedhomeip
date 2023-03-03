@@ -1010,7 +1010,10 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr_1, ip_addr_2;
-        ip_addr_1 = *(ip6_addr_t *) addr;
+        memcpy(ip_addr_1.addr, addr, sizeof(addr));
+#if LWIP_IPV6_SCOPES
+        ip_addr_1.zone = 0;
+#endif
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
         ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1047,7 +1050,7 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr;
-        ip_addr = *(ip6_addr_t *) addr;
+        memcpy(ip_addr.addr, addr, sizeof(addr));
 #else
         struct in6_addr ip_addr;
         ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1489,10 +1492,13 @@ void CheckMakeULA(nlTestSuite * inSuite, void * inContext)
         // Call MakeULA function that we test.
         test_addr = IPAddress::MakeULA(lCurrent->global, lCurrent->subnet, lCurrent->interface);
 
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[0] == htonl(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[1] == htonl((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(lCurrent->interface));
+        NL_TEST_ASSERT(
+            inSuite, test_addr.Addr[0] == htonl(static_cast<uint32_t>(ULA_PREFIX | (lCurrent->global & ULA_UP_24_BIT_MASK) >> 16)));
+        NL_TEST_ASSERT(inSuite,
+                       test_addr.Addr[1] ==
+                           htonl(static_cast<uint32_t>((lCurrent->global & ULA_LO_16_BIT_MASK) << 16 | lCurrent->subnet)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(static_cast<uint32_t>(lCurrent->interface >> 32)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(static_cast<uint32_t>(lCurrent->interface)));
 
         ++lCurrent;
     }
@@ -1516,8 +1522,8 @@ void CheckMakeLLA(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, test_addr.Addr[0] == htonl(LLA_PREFIX));
         NL_TEST_ASSERT(inSuite, test_addr.Addr[1] == 0);
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(lCurrent->interface >> 32));
-        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(lCurrent->interface));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[2] == htonl(static_cast<uint32_t>(lCurrent->interface >> 32)));
+        NL_TEST_ASSERT(inSuite, test_addr.Addr[3] == htonl(static_cast<uint32_t>(lCurrent->interface)));
 
         ++lCurrent;
     }
@@ -1695,7 +1701,7 @@ void CheckIPPrefix(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(test_addr_1, lCurrent);
 
         ipprefix_1.IPAddr = test_addr_1;
-        ipprefix_1.Length = 128 - (i++ % 128);
+        ipprefix_1.Length = static_cast<uint8_t>(128 - (i++ % 128));
         ipprefix_2        = ipprefix_1;
 
         NL_TEST_ASSERT(inSuite, !ipprefix_1.IsZero());
@@ -1877,7 +1883,7 @@ int TestTeardown(void * inContext)
 
 } // namespace
 
-int TestInetAddress(void)
+int TestInetAddress()
 {
     // clang-format off
     nlTestSuite theSuite = {

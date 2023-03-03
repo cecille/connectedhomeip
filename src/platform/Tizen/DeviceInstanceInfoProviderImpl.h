@@ -18,7 +18,13 @@
 
 #pragma once
 
-#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
+#include <cstdint>
+
+#include <lib/core/CHIPError.h>
+
+#include "ConfigurationManagerImpl.h"
+#include "PosixConfig.h"
+#include "platform/internal/GenericDeviceInstanceInfoProvider.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -29,14 +35,15 @@ public:
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
 
-private:
-    friend DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl();
-    static DeviceInstanceInfoProviderImpl sInstance;
+    DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl & configManager) :
+        Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>(configManager)
+    {}
 };
 
 inline DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl()
 {
-    return DeviceInstanceInfoProviderImpl::sInstance;
+    static DeviceInstanceInfoProviderImpl sInstance(ConfigurationManagerImpl::GetDefaultInstance());
+    return sInstance;
 }
 } // namespace DeviceLayer
 } // namespace chip

@@ -15,9 +15,12 @@
 
 name: 3.10.1. [TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)
 
+PICS:
+    - MCORE.OTA.Requestor
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -26,7 +29,9 @@ tests:
           first fabric to the DUT. TH2 is set as the default Provider for the
           fabric."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]" 0x0000001234567890 0
+
+          verify success response on chip-tool logs:
 
           status = 0x00 (SUCCESS),
       disabled: true
@@ -35,7 +40,9 @@ tests:
           "TH sends a read request to read the DefaultOTAProviders Attribute on
           the first fabric to the DUT."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x1234567890 0
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
@@ -50,14 +57,20 @@ tests:
           second fabric to the DUT. TH3 is set as the default Provider for the
           fabric."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+
+          verify success response in chip-tool logs:
+
+          status = 0x00 (SUCCESS),
       disabled: true
 
     - label:
           "TH sends a read request to read the DefaultOTAProviders Attribute on
           the first and second fabric to the DUT."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x1234567890 0
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
@@ -66,7 +79,9 @@ tests:
           [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]      }
 
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x858 0 --commissioner-name beta
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
@@ -83,11 +98,15 @@ tests:
           fabric. TH sends a read request to read the DefaultOTAProviders
           Attribute on the first and second fabric to the DUT."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 10, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": 20, "endpoint": 0}]' 0x0000001234567890 0
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[{"fabricIndex": 1, "providerNodeID": 10, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": 20, "endpoint": 0}]" 0x0000001234567890 0
+
+          verify Constraint_Error on chip-tool logs:
 
           [1651278243153] [27005:35448520] CHIP: [TOO] Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
 
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x1234567890 0
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
@@ -96,7 +115,9 @@ tests:
           [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]      }
 
-          chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x858 0 --commissioner-name beta
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
@@ -112,12 +133,16 @@ tests:
           read request to read the DefaultOTAProviders Attribute on the first
           and second fabric to the DUT."
       verification: |
-          chip-tool otasoftwareupdaterequestor write default-ota-providers '[]' 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[]" 0x858 0 --commissioner-name beta
+
+          verify the Success response on chip-tool logs:
 
           status = 0x00 (SUCCESS),
 
 
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x1234567890 0
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
@@ -126,7 +151,9 @@ tests:
           [1651277342848] [26860:35431852] CHIP: [TOO]       FabricIndex: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]      }
 
-          ./chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 0x858 0 --commissioner-name beta
+
+          verify DefaultOtaProviders on chip-tool logs:
 
           [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOtaProviders: 0 entries
       disabled: true
@@ -139,7 +166,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID
 
-          Verify on the chip-tool logs
+          Verify update-possible on the chip-tool logs is set to True:
 
           [1645822694702] [22599:21229305] CHIP: [DMG] ReportDataMessage =
           [1645822694702] [22599:21229305] CHIP: [DMG] {
@@ -170,12 +197,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a read request to read the UpdateState attribute from the
-          DUT"
+          "TH sends a read request to read the UpdateState Attribute from the
+          DUT."
       verification: |
           ./chip-tool otasoftwareupdaterequestor read update-state 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID
+
+          verify  UpdateState value on chip-tool logs as 1:
 
           Verify that the value is set to one of the valid attribute values based on the current update state on the chip-tool logs
           [1655444388.600153][6051:6056] CHIP:DMG: ReportDataMessage =
@@ -211,7 +240,7 @@ tests:
     - label:
           "DUT should start initiating the Software update process. While the
           DUT is downloading the image, TH sends a read request to read the
-          UpdateStateProgress attribute from the DUT"
+          UpdateStateProgress attribute from the DUT."
       verification: |
           ./chip-tool otasoftwareupdaterequestor read update-state-progress 0x1234567890 0
 

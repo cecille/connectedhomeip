@@ -18,6 +18,7 @@ import pty
 import queue
 import re
 import subprocess
+import sys
 import threading
 import typing
 
@@ -55,8 +56,8 @@ class LogPipe(threading.Thread):
         return False, len(self.captured_logs)
 
     def FindLastMatchingLine(self, matcher):
-        for l in reversed(self.captured_logs):
-            match = re.match(matcher, l)
+        for line in reversed(self.captured_logs):
+            match = re.match(matcher, line)
             if match:
                 return match
         return None
@@ -129,6 +130,10 @@ class Runner:
         errpipe = LogPipe(
             logging.INFO, capture_delegate=self.capture_delegate,
             name=name + ' ERR')
+
+        if sys.platform == 'darwin':
+            # Try harder to avoid any stdout buffering in our tests
+            cmd = ['stdbuf', '-o0'] + cmd
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)

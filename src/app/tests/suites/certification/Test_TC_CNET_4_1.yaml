@@ -14,11 +14,14 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.1. [TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]
+    12.4.1. [TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]
+
+PICS:
+    - CNET.S.F00
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
@@ -37,6 +40,8 @@ tests:
           from the DUT"
       verification: |
           ./chip-tool descriptor read server-list 1 0
+
+          Verify "server list has value: 49" on the TH(Chip-tool) Log:
 
           [1654250292.680821][5262:5267] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 812190876
           [1654250292.681079][5262:5267] CHIP:TOO:   server list: 26 entries
@@ -72,6 +77,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read feature-map 1 0
 
+          Verify "FeatureMap: 1" on the TH(Chip-tool) Log:
+
           [1653473169.784344][29771:29776] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
           [1653473169.784413][29771:29776] CHIP:TOO:   FeatureMap: 1
           [1653473169.784516][29771:29776] CHIP:EM: Sending Standalone Ack for MessageCounter:3349837 on exchange 7603i
@@ -82,13 +89,15 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 1 0
 
+          Verify "MaxNetworks" on the TH(Chip-tool) Log:
+
           [1653473181.407542][29777:29782] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
           [1653473181.407621][29777:29782] CHIP:TOO:   MaxNetworks: 1
           [1653473181.407725][29777:29782] CHIP:EM: Sending Standalone Ack for MessageCounter:15199397 on exchange 5841i
       disabled: true
 
     - label:
-          "TH saves the MaxNetworks attribute value as 'MaxNetworksValue' for
+          "TH saves the MaxNetworks attribute value as MaxNetworksValue for
           future use"
       verification: |
 
@@ -98,6 +107,9 @@ tests:
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
+
+
+          Verify "Networks entiries and its status" on the TH(Chip-tool) Log:
 
           [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
           [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
@@ -112,6 +124,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read scan-max-time-seconds 1 0
 
+          Verify  "ScanMaxTimeSeconds" on the TH(Chip-tool) Log:
+
 
           [1653473784.850830][29813:29818] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002 DataVersion: 1600858167
           [1653473784.850916][29813:29818] CHIP:TOO:   ScanMaxTimeSeconds: 10
@@ -123,6 +137,9 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read connect-max-time-seconds 1 0
 
+
+          Verify "ConnectMaxTimeSeconds" on the TH(Chip-tool) Log:
+
           [1653473821.367214][29821:29826] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003 DataVersion: 1600858167
           [1653473821.367283][29821:29826] CHIP:TOO:   ConnectMaxTimeSeconds: 20
           [1653473821.367379][29821:29826] CHIP:EM: Sending Standalone Ack for MessageCounter:187119 on exchange 50022i
@@ -132,6 +149,9 @@ tests:
       PICS: CNET.S.A0004
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 1 0
+
+
+          Verify "InterfaceEnabled" on the TH(Chip-tool) Log:
 
           [1653473893.275901][29834:29839] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004 DataVersion: 1600858167
           [1653473893.275964][29834:29839] CHIP:TOO:   InterfaceEnabled: TRUE
@@ -143,6 +163,9 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
+
+          Verify "LastNetworkingStatus" on the TH(Chip-tool) Log:
+
           [1653473918.484769][29840:29845] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
           [1653473918.484843][29840:29845] CHIP:TOO:   LastNetworkingStatus: 0
           [1653473918.484940][29840:29845] CHIP:EM: Sending Standalone Ack for MessageCounter:10161085 on exchange 18769i
@@ -153,18 +176,34 @@ tests:
           Networks attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
-          ./chip-tool networkcommissioning read last-network-id 1 0
+          ./chip-tool networkcommissioning read last-network-id 1  0
+
+          Verify "LastNetworkID" on the TH(Chip-tool) Log:
 
 
           "[1653474059.383553][27286:27291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 1912591449
           [1653474059.383618][27286:27291] CHIP:TOO:   LastNetworkID: 47524C50726976617465
           [1653474059.383723][27286:27291] CHIP:EM: Sending Standalone Ack for MessageCounter:6975079 on exchange 34674i"
+
+          ./chip-tool networkcommissioning read networks 1 0
+
+          Verify "lastnetworkID is present in the NetworkID in the entries of Network" on the TH(Chip-tool) Log:
+
+          [1654250379.881780][5309:5314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3741733376
+          [1654250379.881974][5309:5314] CHIP:TOO:   Networks: 1 entries
+          [1654250379.882123][5309:5314] CHIP:TOO:     [1]: {
+          [1654250379.882196][5309:5314] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1654250379.882257][5309:5314] CHIP:TOO:       Connected: TRUE
+          [1654250379.882312][5309:5314] CHIP:TOO:      }
       disabled: true
 
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"
       PICS: CNET.S.A0007
       verification: |
           ./chip-tool networkcommissioning read last-connect-error-value 1 0
+
+
+          Verify "LastConnectErrorValue" on the TH(Chip-tool) Log:
 
 
           [1653474102.061746][29860:29865] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 1600858167

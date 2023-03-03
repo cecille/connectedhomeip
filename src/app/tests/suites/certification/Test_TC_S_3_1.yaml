@@ -15,9 +15,16 @@
 
 name: 123.3.1. [TC-S-3.1] Functionality with client as DUT
 
+PICS:
+    - S.C
+    - S.C.AM-READ
+    - S.C.AO-READ
+    - S.C.AM-WRITE
+    - S.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

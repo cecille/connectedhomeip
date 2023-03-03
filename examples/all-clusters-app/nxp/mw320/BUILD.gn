@@ -37,19 +37,22 @@ mw320_sdk("sdk") {
     "include/FreeRTOSConfig.h",
   ]
 
-  defines = []
+  defines = [ "CHIP_CONFIG_MAX_FABRICS=5" ]
 
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
     defines += [ "BUILD_RELEASE=1" ]
   }
+  if (wifi_conn_abort_support == true) {
+    defines += [ "WIFI_CONN_ABORT_SUPPORT" ]
+  }
 }
 
 mw320_executable("shell_mw320") {
   include_dirs = []
   defines = []
-  output_name = "all-cluster-mw320.out"
+  output_name = "chip-mw320-all-clusters-app.out"
 
   public_deps = [
     ":sdk",

@@ -15,9 +15,12 @@
 
 name: 14.3.3. [TC-SC-3.3] CASE Session Resumption [DUT - Initiator]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

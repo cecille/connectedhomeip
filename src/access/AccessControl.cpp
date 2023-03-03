@@ -19,16 +19,19 @@
 // Included for the default AccessControlDelegate logging enables/disables.
 // See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
 // the levels available.
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 #include "AccessControl.h"
 
-namespace {
+namespace chip {
+namespace Access {
 
 using chip::CATValues;
 using chip::FabricIndex;
 using chip::NodeId;
 using namespace chip::Access;
+
+namespace {
 
 AccessControl defaultAccessControl;
 AccessControl * globalAccessControl = &defaultAccessControl;
@@ -68,12 +71,22 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
 
 constexpr bool IsValidCaseNodeId(NodeId aNodeId)
 {
-    return chip::IsOperationalNodeId(aNodeId) || (chip::IsCASEAuthTag(aNodeId) && ((aNodeId & chip::kTagVersionMask) != 0));
+    if (IsOperationalNodeId(aNodeId))
+    {
+        return true;
+    }
+
+    if (IsCASEAuthTag(aNodeId) && (GetCASEAuthTagVersion(CASEAuthTagFromNodeId(aNodeId)) != 0))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 constexpr bool IsValidGroupNodeId(NodeId aNodeId)
 {
-    return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
+    return IsGroupId(aNodeId) && IsValidGroupId(GroupIdFromNodeId(aNodeId));
 }
 
 #if CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
@@ -160,9 +173,6 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 #endif // CHIP_PROGRESS_LOGGING && CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
 } // namespace
-
-namespace chip {
-namespace Access {
 
 AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
 AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
@@ -539,11 +549,11 @@ bool AccessControl::IsValid(const Entry & entry)
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
 
-    AuthMode authMode;
-    FabricIndex fabricIndex;
-    Privilege privilege;
-    size_t subjectCount = 0;
-    size_t targetCount  = 0;
+    AuthMode authMode       = AuthMode::kNone;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    Privilege privilege     = static_cast<Privilege>(0);
+    size_t subjectCount     = 0;
+    size_t targetCount      = 0;
 
     SuccessOrExit(entry.GetAuthMode(authMode));
     SuccessOrExit(entry.GetFabricIndex(fabricIndex));
@@ -620,6 +630,11 @@ void SetAccessControl(AccessControl & accessControl)
 {
     ChipLogProgress(DataManagement, "AccessControl: setting");
     globalAccessControl = &accessControl;
+}
+
+void ResetAccessControlToDefault()
+{
+    globalAccessControl = &defaultAccessControl;
 }
 
 } // namespace Access

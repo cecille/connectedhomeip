@@ -20,16 +20,16 @@ name: Basic Group Messaging Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0x43211234
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
@@ -40,40 +40,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
-    - label: "Add Group 1 (endpoint 1)"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 1
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0101
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0101
-
-    - label: "Add Group 2 (endpoint 0)"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 0
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0102
-              - name: "groupName"
-                value: "Group #2"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0102
 
     - label: "KeySet Write 1"
       cluster: "Group Key Management"
@@ -122,6 +88,40 @@ tests:
                   { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
     - label: "Install ACLs"
       cluster: "Access Control"
       command: "writeAttribute"
@@ -149,14 +149,14 @@ tests:
     # Test Pair 1 : Check initial value (ensure it's not the test value)
     - label: "Read initial Attribute value"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
     # Test Pair 2 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: "xyzzy"
@@ -169,19 +169,19 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 1000
 
       # Test Pair 2 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: "xyzzy"
 
     # Test Pair 3 : Sends a Group Write Attribute
     - label: "Restore initial Attribute value"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: ""
@@ -199,7 +199,7 @@ tests:
     # Test Pair 3 : Validates previous group write attribute with a unicast to read
     - label: "Read back Attribute"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
@@ -259,7 +259,7 @@ tests:
               ]
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -289,42 +289,6 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
-
-    - label: "Add Group 1 (endpoint 1) for gamma"
-      identity: "gamma"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 1
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0101
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0101
-
-    - label: "Add Group 2 (endpoint 0) for gamma"
-      identity: "gamma"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 0
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x0102
-              - name: "groupName"
-                value: "Group #2"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x0102
 
     - label: "KeySet Write 1 for gamma"
       identity: "gamma"
@@ -376,6 +340,42 @@ tests:
                   { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
               ]
 
+    - label: "Add Group 1 (endpoint 1) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
     - label: "Install ACLs for gamma"
       identity: "gamma"
       cluster: "Access Control"
@@ -405,7 +405,7 @@ tests:
     - label: "Read initial Attribute value for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 
@@ -413,7 +413,7 @@ tests:
     - label: "Group Write Attribute for gamma"
       identity: "gamma"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: "xyzzy"
@@ -433,7 +433,7 @@ tests:
     - label: "Read back Attribute for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: "xyzzy"
 
@@ -441,7 +441,7 @@ tests:
     - label: "Restore initial Attribute value for gamma"
       identity: "gamma"
       command: "writeAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       groupId: 0x0102
       arguments:
           value: ""
@@ -461,7 +461,7 @@ tests:
     - label: "Read back Attribute for gamma"
       identity: "gamma"
       command: "readAttribute"
-      attribute: "nodeLabel"
+      attribute: "NodeLabel"
       response:
           value: ""
 

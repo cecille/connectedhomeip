@@ -14,6 +14,9 @@
 
 name: 19.12.1. [TC-CONTENTLAUNCHER-10.1] Read Content Launcher Attributes
 
+PICS:
+    - CONTENTLAUNCHER.S
+
 config:
     nodeId: 0x12344321
     cluster: "Content Launcher"
@@ -29,7 +32,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads the AcceptHeader attribute from the DUT"
-      PICS: MC_CONTENTLAUNCHER.S.A0000
+      PICS: CONTENTLAUNCHER.S.A0000
       command: "readAttribute"
       attribute: "AcceptHeader"
       response:
@@ -37,9 +40,9 @@ tests:
               type: list
 
     - label: "TH reads the SupportedStreamingProtocols attribute from the DUT"
-      PICS: MC_CONTENTLAUNCHER.S.A0001
+      PICS: CONTENTLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "SupportedStreamingProtocols"
       response:
           constraints:
-              type: map32
+              type: bitmap32

@@ -17,6 +17,7 @@
 
 #include "LEDWidget.h"
 #include "ColorFormat.h"
+#include "led_strip.h"
 
 static const char * TAG = "LEDWidget";
 
@@ -121,12 +122,11 @@ void LEDWidget::DoSet(void)
     {
         HsvColor_t hsv = { mHue, mSaturation, brightness };
         RgbColor_t rgb = HsvToRgb(hsv);
-
         mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
         mStrip->refresh(mStrip, 100);
     }
 #else
-    ESP_LOGE(TAG, "DoSet to GPIO number %d", mGPIONum);
+    ESP_LOGI(TAG, "DoSet to GPIO number %d", mGPIONum);
     if (mGPIONum < GPIO_NUM_MAX)
     {
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);

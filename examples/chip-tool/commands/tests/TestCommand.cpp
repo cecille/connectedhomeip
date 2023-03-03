@@ -41,24 +41,28 @@ CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
     // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
     // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
     //
-    GetCommissioner(identity).SessionMgr()->ExpireAllSessions(chip::ScopedNodeId(value.nodeId, fabricIndex));
+    if (value.expireExistingSession.ValueOr(true))
+    {
+        GetCommissioner(identity).SessionMgr()->ExpireAllSessions(chip::ScopedNodeId(value.nodeId, fabricIndex));
+    }
 
     SetIdentity(identity);
     return GetCommissioner(identity).GetConnectedDevice(value.nodeId, &mOnDeviceConnectedCallback,
                                                         &mOnDeviceConnectionFailureCallback);
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+void TestCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                      const chip::SessionHandle & sessionHandle)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevices[command->GetIdentity()] = device;
+    command->mDevices[command->GetIdentity()] = std::make_unique<chip::OperationalDeviceProxy>(&exchangeMgr, sessionHandle);
 
     LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
-void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void TestCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
                     peerId.GetNodeId(), error.Format());
@@ -77,6 +81,32 @@ void TestCommand::ExitAsync(intptr_t context)
 
 void TestCommand::Exit(std::string message, CHIP_ERROR err)
 {
+    bool shouldContinueOnFailure = mContinueOnFailure.HasValue() && mContinueOnFailure.Value();
+    if (shouldContinueOnFailure)
+    {
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Step Failure: %s\n", message.c_str());
+            mErrorMessages.push_back(message);
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+            return;
+        }
+
+        // If the test runner has been configured to not stop after a test failure, exit can be called with a success but it could
+        // be pending errors from previous steps.
+        uint32_t errorsCount = static_cast<uint32_t>(mErrorMessages.size());
+        if (errorsCount)
+        {
+            ChipLogError(chipTool, "Error: %u error(s) has been encountered:", errorsCount);
+
+            for (uint32_t i = 0; i < errorsCount; i++)
+            {
+                ChipLogError(chipTool, "\t%u. %s", (i + 1), mErrorMessages.at(i).c_str());
+            }
+            err = CHIP_ERROR_INTERNAL;
+        }
+    }
+
     mContinueProcessing = false;
 
     LogEnd(message, err);

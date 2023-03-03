@@ -33,11 +33,13 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
+    "TestCryptoContext.cpp",
     "TestGroupMessageCounter.cpp",
     "TestPeerConnections.cpp",
     "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
     "TestSessionManager.cpp",
+    "TestSessionManagerDispatch.cpp",
   ]
 
   if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&

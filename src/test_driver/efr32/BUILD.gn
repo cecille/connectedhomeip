@@ -31,7 +31,8 @@ import("//build_overrides/nlunit_test.gni")
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/src/test_driver/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 pw_proto_library("nl_test_service") {
   sources = [ "${efr32_project_dir}/proto/nl_test.proto" ]
@@ -48,14 +49,13 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
-    "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
 
     # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
@@ -70,8 +70,8 @@ efr32_executable("efr32_device_tests") {
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_plat_dir}/PigweedLogger.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
+    "${examples_common_plat_dir}/PigweedLogger.cpp",
+    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "src/main.cpp",
   ]
@@ -88,29 +88,29 @@ efr32_executable("efr32_device_tests") {
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_openthread_ftd) {
+  # OpenThread Settings
+  if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
+      "${examples_plat_dir}:efr-matter-shell",
     ]
-  } else {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-    ]
+  }
+
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 
   deps += pw_build_LINK_DEPS
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

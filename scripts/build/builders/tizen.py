@@ -20,8 +20,15 @@ from xml.etree import ElementTree as ET
 
 from .gn import GnBuilder
 
-App = namedtuple('App', ['name', 'source', 'outputs'])
 Board = namedtuple('Board', ['target_cpu'])
+App = namedtuple('App', ['name', 'source', 'outputs'])
+Tool = namedtuple('Tool', ['name', 'source', 'outputs'])
+TestDriver = namedtuple('TestDriver', ['name', 'source'])
+
+
+class TizenBoard(Enum):
+
+    ARM = Board('arm')
 
 
 class TizenApp(Enum):
@@ -36,30 +43,41 @@ class TizenApp(Enum):
         'examples/all-clusters-minimal-app/tizen',
         ('chip-all-clusters-minimal-app',
          'chip-all-clusters-minimal-app.map'))
-    CHIP_TOOL = App(
-        'chip-tool',
-        'examples/chip-tool',
-        ('chip-tool',
-         'chip-tool.map'))
     LIGHT = App(
         'chip-lighting-app',
         'examples/lighting-app/tizen',
         ('chip-lighting-app',
          'chip-lighting-app.map'))
 
-    def PackageName(self):
+    CHIP_TOOL = Tool(
+        'chip-tool',
+        'examples/chip-tool',
+        ('chip-tool',
+         'chip-tool.map'))
+
+    TESTS = TestDriver(
+        'tests',
+        'src/test_driver/tizen')
+
+    @property
+    def is_tpk(self):
+        """If True, this app is a TPK."""
+        return isinstance(self.value, App)
+
+    @property
+    def package(self):
+        return f'{self.package_name}-{self.package_version}.tpk'
+
+    @property
+    def package_name(self):
         return self.manifest.get('package')
 
-    def PackageVersion(self):
+    @property
+    def package_version(self):
         return self.manifest.get('version')
 
     def parse_manifest(self, manifest: str):
         self.manifest = ET.parse(manifest).getroot()
-
-
-class TizenBoard(Enum):
-
-    ARM = Board('arm')
 
 
 class TizenBuilder(GnBuilder):
@@ -73,6 +91,7 @@ class TizenBuilder(GnBuilder):
                  enable_wifi: bool = True,
                  use_asan: bool = False,
                  use_tsan: bool = False,
+                 use_ubsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, app.value.source),
@@ -82,15 +101,16 @@ class TizenBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
 
-        try:
-            # Try to load Tizen application XML manifest. We have to use
-            # try/except here, because of TestBuilder test. This test runs
-            # in a fake build root /TEST/BUILD/ROOT which obviously does
-            # not have Tizen manifest file.
-            self.app.parse_manifest(
-                os.path.join(self.root, "tizen-manifest.xml"))
-        except FileNotFoundError:
-            pass
+        if self.app.is_tpk:
+            try:
+                # Try to load Tizen application XML manifest. We have to use
+                # try/except here, because of TestBuilder test. This test runs
+                # in a fake build root /TEST/BUILD/ROOT which obviously does
+                # not have Tizen manifest file.
+                self.app.parse_manifest(
+                    os.path.join(self.root, "tizen-manifest.xml"))
+            except FileNotFoundError:
+                pass
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
@@ -100,6 +120,8 @@ class TizenBuilder(GnBuilder):
             self.extra_gn_options.append('is_asan=true')
         if use_tsan:
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
+        if use_ubsan:
+            self.extra_gn_options.append('is_ubsan=true')
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined
@@ -116,9 +138,10 @@ class TizenBuilder(GnBuilder):
         ]
 
     def _generate_flashbundle(self):
-        logging.info('Packaging %s', self.output_dir)
-        cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
-        self._Execute(cmd, title='Packaging ' + self.identifier)
+        if self.app.is_tpk:
+            logging.info('Packaging %s', self.output_dir)
+            cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
+            self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
         return {
@@ -127,7 +150,10 @@ class TizenBuilder(GnBuilder):
         }
 
     def flashbundle(self):
-        tpk = f'{self.app.PackageName()}-{self.app.PackageVersion()}.tpk'
+        if not self.app.is_tpk:
+            return {}
         return {
-            tpk: os.path.join(self.output_dir, 'package', 'out', tpk),
+            self.app.package: os.path.join(self.output_dir,
+                                           self.app.package_name, 'out',
+                                           self.app.package),
         }

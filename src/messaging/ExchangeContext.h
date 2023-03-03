@@ -54,6 +54,7 @@ public:
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
+ *
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
                                    public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
@@ -182,6 +183,10 @@ public:
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using
     // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
     // using this function is recommended.
+    //
+    // If a timeout of 0 is provided, it implies no response is expected. Consequently, ExchangeDelegate::OnResponseTimeout will not
+    // be called.
+    //
     void SetResponseTimeout(Timeout timeout);
 
     // This API is used by commands that need to shut down all existing
@@ -194,23 +199,6 @@ public:
     // This API is a no-op if called on an exchange that is not using a
     // SecureSession.
     void AbortAllOtherCommunicationOnFabric();
-
-private:
-    class ExchangeSessionHolder : public SessionHolderWithDelegate
-    {
-    public:
-        ExchangeSessionHolder(ExchangeContext & exchange) : SessionHolderWithDelegate(exchange) {}
-        void GrabExpiredSession(const SessionHandle & session);
-    };
-
-    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
-
-    ExchangeMessageDispatch & mDispatch;
-
-    ExchangeSessionHolder mSession; // The connection state
-    uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -227,6 +215,40 @@ private:
      * yet been sent).
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    enum class InjectedFailureType : uint8_t
+    {
+        kFailOnSend = 0x01
+    };
+
+    void InjectFailure(InjectedFailureType failureType) { mInjectedFailures.Set(failureType); }
+
+    void ClearInjectedFailures() { mInjectedFailures.ClearAll(); }
+#endif
+
+private:
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    BitFlags<InjectedFailureType> mInjectedFailures;
+#endif
+
+    class ExchangeSessionHolder : public SessionHolderWithDelegate
+    {
+    public:
+        ExchangeSessionHolder(ExchangeContext & exchange) : SessionHolderWithDelegate(exchange) {}
+        void GrabExpiredSession(const SessionHandle & session);
+    };
+
+    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    ExchangeDelegate * mDelegate   = nullptr;
+    ExchangeManager * mExchangeMgr = nullptr;
+
+    ExchangeMessageDispatch & mDispatch;
+
+    ExchangeSessionHolder mSession; // The connection state
+    uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that

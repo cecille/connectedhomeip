@@ -59,8 +59,26 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #undef HAVE_IPV6_MULTICAST
 #endif
 
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type == PBUF_RAM || (pbuf)->type == PBUF_POOL
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type_internal & PBUF_TYPE_FLAG_STRUCT_DATA_CONTIGUOUS
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+
+namespace chip {
+namespace Platform {
+template <>
+struct Deleter<struct pbuf>
+{
+    void operator()(struct pbuf * p) { pbuf_free(p); }
+};
+} // namespace Platform
+} // namespace chip
+
 namespace chip {
 namespace Inet {
+
+EndpointQueueFilter * UDPEndPointImplLwIP::sQueueFilter = nullptr;
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                          InterfaceId interfaceId)
@@ -241,6 +259,22 @@ void UDPEndPointImplLwIP::CloseImpl()
         udp_remove(mUDP);
         mUDP              = nullptr;
         mLwIPEndPointType = LwIPEndPointType::Unknown;
+
+        // If there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
+        // event pending in the event queue (SystemLayer::ScheduleLambda), we
+        // schedule a release call to the end of the queue, to ensure that the
+        // queued pointer to UDPEndPointImplLwIP is not dangling.
+        if (mDelayReleaseCount != 0)
+        {
+            Retain();
+            CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
+                // There is nothing we can do here, accept the chance of racing
+                Release();
+            }
+        }
     }
 
     // Unlock LwIP stack
@@ -253,12 +287,19 @@ void UDPEndPointImplLwIP::Free()
     Release();
 }
 
-void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
+void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
 {
-    if ((mState == State::kListening) && (OnMessageReceived != nullptr))
+    // Process packet filter if needed. May cause packet to get dropped before processing.
+    bool dropPacket = false;
+    if ((pktInfo != nullptr) && (sQueueFilter != nullptr))
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(msg);
+        auto outcome = sQueueFilter->FilterAfterDequeue(this, *pktInfo, msg);
+        dropPacket   = (outcome == EndpointQueueFilter::FilterOutcome::kDropPacket);
+    }
 
+    // Process actual packet if allowed
+    if ((mState == State::kListening) && (OnMessageReceived != nullptr) && !dropPacket)
+    {
         if (pktInfo != nullptr)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
@@ -273,6 +314,7 @@ void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
             }
         }
     }
+    Platform::Delete(pktInfo);
 }
 
 CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
@@ -339,51 +381,102 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
                                                 u16_t port)
 {
-    UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
-    IPPacketInfo * pktInfo         = nullptr;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
-    if (buf->HasChainedBuffer())
+    Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
+    UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
+    System::PacketBufferHandle buf;
+    if (ep->mState == State::kClosed)
     {
-        // Try the simple expedient of flattening in-place.
-        buf->CompactHead();
+        return;
     }
 
-    if (buf->HasChainedBuffer())
+    auto pktInfo = Platform::MakeUnique<IPPacketInfo>();
+    if (pktInfo.get() == nullptr)
     {
-        // Have to allocate a new big-enough buffer and copy.
-        uint16_t messageSize            = buf->TotalLength();
-        System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
-        if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+        ChipLogError(Inet, "Cannot allocate packet info");
+        return;
+    }
+
+    if (PBUF_STRUCT_DATA_CONTIGUOUS(p))
+    {
+        buf = System::PacketBufferHandle::Adopt(p);
+        // Release pbufFreeGuard since the buf has the ownership of the pbuf.
+        pbufFreeGuard.release();
+        if (buf->HasChainedBuffer())
         {
-            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
+            buf->CompactHead();
+        }
+        if (buf->HasChainedBuffer())
+        {
+            // Have to allocate a new big-enough buffer and copy.
+            uint16_t messageSize            = buf->TotalLength();
+            System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
+            if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
+                return;
+            }
+            buf = std::move(copy);
+        }
+    }
+    else
+    {
+        buf = System::PacketBufferHandle::New(p->tot_len, 0);
+        if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
+        {
+            ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
             return;
         }
-        buf = std::move(copy);
+        buf->SetDataLength(p->tot_len);
     }
 
-    pktInfo = GetPacketInfo(buf);
-    if (pktInfo != nullptr)
+    pktInfo->SrcAddress  = IPAddress(*addr);
+    pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
+    pktInfo->Interface   = InterfaceId(ip_current_netif());
+    pktInfo->SrcPort     = port;
+    pktInfo->DestPort    = pcb->local_port;
+
+    auto filterOutcome = EndpointQueueFilter::FilterOutcome::kAllowPacket;
+    if (sQueueFilter != nullptr)
     {
-        pktInfo->SrcAddress  = IPAddress(*addr);
-        pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-        pktInfo->Interface   = InterfaceId(ip_current_netif());
-        pktInfo->SrcPort     = port;
-        pktInfo->DestPort    = pcb->local_port;
+        filterOutcome = sQueueFilter->FilterBeforeEnqueue(ep, *(pktInfo.get()), buf);
     }
 
-    ep->Retain();
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-        ep->Release();
-    });
+    if (filterOutcome != EndpointQueueFilter::FilterOutcome::kAllowPacket)
+    {
+        // Logging, if any, should be at the choice of the filter impl at time of filtering.
+        return;
+    }
+
+    // Increase mDelayReleaseCount to delay release of this UDP EndPoint while the HandleDataReceived call is
+    // pending on it.
+    ep->mDelayReleaseCount++;
+
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
+        [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
+            ep->mDelayReleaseCount--;
+
+            auto handle = System::PacketBufferHandle::Adopt(p);
+            ep->HandleDataReceived(std::move(handle), pktInfo);
+        });
+
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
+        // Similarly, ScheduleLambda now has ownership of pktInfo.
+        pktInfo.release();
     }
     else
     {
-        ep->Release();
+        // On failure to enqueue the processing, we have to tell the filter that
+        // the packet is basically dequeued, if it tries to keep track of the lifecycle.
+        if (sQueueFilter != nullptr)
+        {
+            (void) sQueueFilter->FilterAfterDequeue(ep, *(pktInfo.get()), buf);
+            ChipLogError(Inet, "Dequeue ERROR err = %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        ep->mDelayReleaseCount--;
     }
 }
 
@@ -486,20 +579,6 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
 #endif // defined(NETIF_FOREACH)
 
     return (lRetval);
-}
-
-IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
-{
-    if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
-    {
-        return nullptr;
-    }
-
-    uintptr_t lStart           = (uintptr_t) aBuffer->Start();
-    uintptr_t lPacketInfoStart = lStart - sizeof(IPPacketInfo);
-
-    // Align to a 4-byte boundary
-    return reinterpret_cast<IPPacketInfo *>(lPacketInfoStart & ~(sizeof(uint32_t) - 1));
 }
 
 } // namespace Inet

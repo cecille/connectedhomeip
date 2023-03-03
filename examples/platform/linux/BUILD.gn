@@ -43,6 +43,8 @@ source_set("app-main") {
     "ControllerShellCommands.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
+    "NamedPipeCommands.cpp",
+    "NamedPipeCommands.h",
     "Options.cpp",
     "Options.h",
     "testing/CustomCSRResponse.cpp",
@@ -68,6 +70,7 @@ source_set("app-main") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/shell:shell_core",
+    "${chip_root}/src/platform/logging:force_stdio",
   ]
 
   if (chip_enable_transport_trace) {

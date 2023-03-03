@@ -69,6 +69,18 @@ struct SetupParams
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
 
+    /**
+     * Controls whether we permit multiple DeviceController instances to exist
+     * on the same logical fabric (identified by the tuple of the fabric's
+     * root public key + fabric id).
+     *
+     * Each controller instance will be associated with its own FabricIndex.
+     * This pivots the FabricTable to tracking identities instead of fabrics,
+     * represented by FabricInfo instances that can have colliding logical fabrics.
+     *
+     */
+    bool permitMultiControllerFabrics = false;
+
     //
     // Controls enabling server cluster interactions on a controller. This in turn
     // causes the following to get enabled:
@@ -82,15 +94,16 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage, group data provider, OperationalKeystore
-// and OperationalCertificateStore here should be removed. We're blocked because of the
-// need to support !CHIP_DEVICE_LAYER
+// TODO everything other than the fabric storage, group data provider, OperationalKeystore,
+// OperationalCertificateStore and SessionKeystore here should be removed. We're blocked
+// because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
+    Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;

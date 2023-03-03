@@ -28,9 +28,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
+#include <platform/LockTracker.h>
 
 namespace chip {
 using namespace Credentials;
@@ -85,7 +83,7 @@ CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
     mFabricIndex        = initParams.fabricIndex;
     mCompressedFabricId = initParams.compressedFabricId;
     mRootPublicKey      = initParams.rootPublicKey;
-    mVendorId           = initParams.vendorId;
+    mVendorId           = static_cast<VendorId>(initParams.vendorId);
 
     // Deal with externally injected keys
     if (initParams.operationalKeypair != nullptr)
@@ -127,8 +125,6 @@ void FabricInfo::operator=(FabricInfo && other)
 
 CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage) const
 {
-    DefaultStorageKeyAllocator keyAlloc;
-
     {
         uint8_t buf[MetadataTLVMaxSize()];
         TLV::TLVWriter writer;
@@ -145,8 +141,8 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage) cons
 
         const auto metadataLength = writer.GetLengthWritten();
         VerifyOrReturnError(CanCastTo<uint16_t>(metadataLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(
-            storage->SyncSetKeyValue(keyAlloc.FabricMetadata(mFabricIndex), buf, static_cast<uint16_t>(metadataLength)));
+        ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex).KeyName(), buf,
+                                                      static_cast<uint16_t>(metadataLength)));
     }
 
     // NOTE: Operational Key is never saved to storage here. See OperationalKeystore interface for how it is accessed
@@ -157,8 +153,6 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage) cons
 CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage, FabricIndex newFabricIndex, const ByteSpan & rcac,
                                        const ByteSpan & noc)
 {
-    DefaultStorageKeyAllocator keyAlloc;
-
     mFabricIndex = newFabricIndex;
 
     // Regenerate operational metadata from NOC/RCAC
@@ -182,7 +176,8 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage, Fabr
     {
         uint8_t buf[MetadataTLVMaxSize()];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricMetadata(mFabricIndex), buf, size));
+        ReturnErrorOnFailure(
+            storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex).KeyName(), buf, size));
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
@@ -221,8 +216,7 @@ CHIP_ERROR FabricTable::DeleteMetadataFromStorage(FabricIndex fabricIndex)
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DefaultStorageKeyAllocator keyAlloc;
-    CHIP_ERROR deleteErr = mStorage->SyncDeleteKeyValue(keyAlloc.FabricMetadata(fabricIndex));
+    CHIP_ERROR deleteErr = mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricMetadata(fabricIndex).KeyName());
 
     if (deleteErr != CHIP_NO_ERROR)
     {
@@ -257,11 +251,7 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 
     if (mOperationalKey == nullptr)
     {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-#else
         mOperationalKey = chip::Platform::New<P256Keypair>();
-#endif
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);
@@ -353,6 +343,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
                                           FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                           Crypto::P256PublicKey * outRootPublicKey) const
 {
+    assertChipStackLockedByCurrentThread();
     uint8_t rootCertBuf[kMaxCHIPCertLength];
     MutableByteSpan rootCertSpan{ rootCertBuf };
     ReturnErrorOnFailure(FetchRootCert(fabricIndex, rootCertSpan));
@@ -446,13 +437,25 @@ CHIP_ERROR FabricTable::VerifyCredentials(const ByteSpan & noc, const ByteSpan &
 
 const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const
 {
+    return FindFabricCommon(rootPubKey, fabricId);
+}
+
+const FabricInfo * FabricTable::FindIdentity(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const
+{
+    return FindFabricCommon(rootPubKey, fabricId, nodeId);
+}
+
+const FabricInfo * FabricTable::FindFabricCommon(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId, NodeId nodeId) const
+{
     P256PublicKey candidatePubKey;
 
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate())
     {
         bool pubKeyAvailable = (mPendingFabric.FetchRootPubkey(candidatePubKey) == CHIP_NO_ERROR);
-        if (pubKeyAvailable && rootPubKey.Matches(candidatePubKey) && fabricId == mPendingFabric.GetFabricId())
+        auto matchingNodeId  = (nodeId == kUndefinedNodeId) ? mPendingFabric.GetNodeId() : nodeId;
+        if (pubKeyAvailable && rootPubKey.Matches(candidatePubKey) && fabricId == mPendingFabric.GetFabricId() &&
+            matchingNodeId == mPendingFabric.GetNodeId())
         {
             return &mPendingFabric;
         }
@@ -460,6 +463,8 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
 
     for (auto & fabric : mStates)
     {
+        auto matchingNodeId = (nodeId == kUndefinedNodeId) ? fabric.GetNodeId() : nodeId;
+
         if (!fabric.IsInitialized())
         {
             continue;
@@ -468,7 +473,7 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
         {
             continue;
         }
-        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId())
+        if (rootPubKey.Matches(candidatePubKey) && fabricId == fabric.GetFabricId() && matchingNodeId == fabric.GetNodeId())
         {
             return &fabric;
         }
@@ -552,6 +557,24 @@ CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan &
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kRcac, outCert);
+}
+
+CHIP_ERROR FabricTable::FetchPendingNonFabricAssociatedRootCert(MutableByteSpan & outCert) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!mStateFlags.Has(StateFlags::kIsTrustedRootPending))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (mStateFlags.Has(StateFlags::kIsAddPending))
+    {
+        // The root certificate is already associated with a pending fabric, so
+        // does not exist for purposes of this API.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return FetchRootCert(mFabricIndexWithPendingState, outCert);
 }
 
 CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
@@ -646,7 +669,8 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric, FabricIndex newFabr
                     "Fabric index 0x%x was retrieved from storage. Compressed FabricId 0x" ChipLogFormatX64
                     ", FabricId 0x" ChipLogFormatX64 ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                     static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
-                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
+                    to_underlying(fabric->GetVendorId()));
 
     return CHIP_NO_ERROR;
 }
@@ -770,7 +794,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
 
         VerifyOrReturnError(fabricEntry != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        newFabricInfo.vendorId    = vendorId;
+        newFabricInfo.vendorId    = static_cast<VendorId>(vendorId);
         newFabricInfo.fabricIndex = fabricIndex;
     }
     else
@@ -888,6 +912,18 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
+
+    {
+        FabricTable::Delegate * delegate = mDelegateListRoot;
+        while (delegate)
+        {
+            // It is possible that delegate will remove itself from the list in FabricWillBeRemoved,
+            // so we grab the next delegate in the list now.
+            FabricTable::Delegate * nextDelegate = delegate->next;
+            delegate->FabricWillBeRemoved(*this, fabricIndex);
+            delegate = nextDelegate;
+        }
+    }
 
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     if (fabricInfo == &mPendingFabric)
@@ -1021,9 +1057,8 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
     mLastKnownGoodTime.Init(mStorage);
 
     uint8_t buf[IndexInfoTLVMaxSize()];
-    uint16_t size = sizeof(buf);
-    DefaultStorageKeyAllocator keyAlloc;
-    CHIP_ERROR err = mStorage->SyncGetKeyValue(keyAlloc.FabricIndexInfo(), buf, size);
+    uint16_t size  = sizeof(buf);
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo().KeyName(), buf, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // No fabrics yet.  Nothing to be done here.
@@ -1271,8 +1306,8 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
     const auto indexInfoLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(indexInfoLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    DefaultStorageKeyAllocator keyAlloc;
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(keyAlloc.FabricIndexInfo(), buf, static_cast<uint16_t>(indexInfoLength)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo().KeyName(), buf,
+                                                   static_cast<uint16_t>(indexInfoLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -1377,7 +1412,6 @@ void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 
 CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
 {
-    DefaultStorageKeyAllocator keyAlloc;
     uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
     TLV::TLVWriter writer;
     writer.Init(tlvBuf);
@@ -1391,15 +1425,16 @@ CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
     const auto markerContextTLVLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(markerContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return mStorage->SyncSetKeyValue(keyAlloc.FailSafeCommitMarkerKey(), tlvBuf, static_cast<uint16_t>(markerContextTLVLength));
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf,
+                                     static_cast<uint16_t>(markerContextTLVLength));
 }
 
 CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 {
-    DefaultStorageKeyAllocator keyAlloc;
     uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
     uint16_t tlvSize = sizeof(tlvBuf);
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(keyAlloc.FailSafeCommitMarkerKey(), tlvBuf, tlvSize));
+    ReturnErrorOnFailure(
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf, tlvSize));
 
     // If buffer was too small, we won't reach here.
     TLV::ContiguousBufferTLVReader reader;
@@ -1423,8 +1458,7 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 
 void FabricTable::ClearCommitMarker()
 {
-    DefaultStorageKeyAllocator keyAlloc;
-    mStorage->SyncDeleteKeyValue(keyAlloc.FailSafeCommitMarkerKey());
+    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName());
 }
 
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
@@ -1705,6 +1739,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
 
     // Check for an existing fabric matching RCAC and FabricID. We must find a correct
     // existing fabric that chains to same root. We assume the stored root is correct.
+    if (!mStateFlags.Has(StateFlags::kAreCollidingFabricsIgnored))
     {
         FabricIndex collidingFabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(FindExistingFabricByNocChaining(fabricIndex, noc, collidingFabricIndex));

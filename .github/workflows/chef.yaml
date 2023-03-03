@@ -17,24 +17,24 @@ name: Build Chef CI examples on all platforms
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
-
     chef_linux:
         name: Chef - Linux CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.84
+            image: connectedhomeip/chip-build:0.6.44
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -44,13 +44,21 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: CI Examples Linux
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
@@ -58,11 +66,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.84
+            image: connectedhomeip/chip-build-esp32:0.6.44
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -72,13 +80,21 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform esp32
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: CI Examples ESP32
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t esp32"
 
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
@@ -86,11 +102,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.84
+            image: connectedhomeip/chip-build-nrf-platform:0.6.44
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -100,10 +116,18 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform nrfconnect
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: CI Examples NRFConnect
               shell: bash
               run: |
-                ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t nrfconnect"

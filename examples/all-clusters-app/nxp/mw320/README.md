@@ -11,11 +11,8 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 -   [Introduction](#introduction)
 -   [Building](#building)
 -   [Flashing](#flashing)
--   [Testing the example](#testing-the-example)
 
 <hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -25,22 +22,21 @@ The example targets the
 [NXP MW320 WiFi Micro controller Soc](https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth/88mw32x-802-11n-wi-fi-microcontroller-soc:88MW32X)
 development kit.
 
-<a name="building"></a>
-
 ## Building
 
 Building the example application is quite straightforward. It can be done via
 following commands:
 
 ```
+$ cd examples/all-clusters-app/nxp/mw320/
 $ git submodule update --init
 $ source third_party/connectedhomeip/scripts/activate.sh
 $ gn gen out/debug
 $ ninja -v -C out/debug
 ```
 
-Example application binary file "all-cluster-mw320.bin" will be generated under
-directory "out/debug".
+Example application binary file "chip-mw320-all-clusters-app.bin" will be
+generated under directory "out/debug".
 
 Note:
 
@@ -56,10 +52,8 @@ Note: This solution is temporary.
 In order to use the tinycrypt ecc operations, use the following build arguments:
 
 ```
-$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" mbedtls_use_tinycrypt=true'
+$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" chip_crypto="tinycrypt"'
 ```
-
-<a name="flashdebug"></a>
 
 ## Flashing
 
@@ -74,7 +68,7 @@ Prepare MW320 download firmware image:
 
 ```
 $ ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
-$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
+$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/chip-mw320-all-clusters-app.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
 $ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 ```
 

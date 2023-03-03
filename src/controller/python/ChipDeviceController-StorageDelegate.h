@@ -78,12 +78,10 @@ chip::Controller::Python::StorageAdapter * GetStorageAdapter();
 
 extern "C" {
 
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
+void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                               chip::Controller::Python::SetGetKeyValueCb getCb,
+                                               chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
 
-void pychip_Storage_ShutdownAdapter();
-
-void * pychip_Storage_GetStorageAdapter();
+void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * storageAdapter);
 }

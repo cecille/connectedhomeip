@@ -51,7 +51,7 @@ struct BLEScanConfig
     BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
-    uint16_t mDiscriminator = 0;
+    SetupDiscriminator mDiscriminator;
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
@@ -131,14 +131,13 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnScanComplete() override;
     void OnChipDeviceScanned(char * address) override;
-    void OnChipScanComplete() override;
-
+    void OnScanComplete() override;
+    void OnScanError(CHIP_ERROR err) override;
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr();

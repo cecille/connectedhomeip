@@ -17,7 +17,8 @@
  */
 
 #include <credentials/GroupDataProviderImpl.h>
-#include <lib/core/CHIPTLV.h>
+#include <crypto/DefaultSessionKeystore.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -48,7 +49,7 @@ static const size_t kSize1  = strlen(kValue1) + 1;
 static const size_t kSize2  = strlen(kValue2) + 1;
 
 constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+constexpr uint16_t kMaxGroupKeysPerFabric = 4;
 
 // If test cases covering more than 2 fabrics are added, update `ResetProvider` function.
 constexpr chip::FabricIndex kFabric1 = 1;
@@ -93,6 +94,7 @@ constexpr uint16_t kKeysetId0 = 0x0;
 constexpr uint16_t kKeysetId1 = 0x1111;
 constexpr uint16_t kKeysetId2 = 0x2222;
 constexpr uint16_t kKeysetId3 = 0x3333;
+constexpr uint16_t kKeysetId4 = 0x4444;
 
 static const GroupInfo kGroupInfo1_1(kGroup1, "Group-1.1");
 static const GroupInfo kGroupInfo1_2(kGroup2, "Group-1.2");
@@ -123,6 +125,7 @@ static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kCacheAndSync, 3);
 static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kTrustFirst, 1);
 static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kTrustFirst, 2);
 static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet4(kKeysetId4, SecurityPolicy::kTrustFirst, 1);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
 
@@ -163,16 +166,24 @@ void ResetProvider(GroupDataProvider * provider)
     provider->RemoveFabric(kFabric2);
 }
 
-bool CompareKeySets(const KeySet & keyset1, const KeySet & keyset2)
+bool CompareKeySets(const KeySet & retrievedKeySet, const KeySet & keyset2)
 {
-    VerifyOrReturnError(keyset1.policy == keyset2.policy, false);
-    VerifyOrReturnError(keyset1.num_keys_used == keyset2.num_keys_used, false);
-    VerifyOrReturnError(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time, false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[0].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[1].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[2].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(retrievedKeySet.policy == keyset2.policy, false);
+    VerifyOrReturnError(retrievedKeySet.num_keys_used == keyset2.num_keys_used, false);
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i < retrievedKeySet.num_keys_used)
+        {
+            VerifyOrReturnError(retrievedKeySet.epoch_keys[i].start_time == keyset2.epoch_keys[i].start_time, false);
+        }
+        else
+        {
+            VerifyOrReturnError(retrievedKeySet.epoch_keys[i].start_time == 0, false);
+        }
+
+        VerifyOrReturnError(0 == memcmp(kZeroKey, retrievedKeySet.epoch_keys[i].key, EpochKey::kLengthBytes), false);
+    }
     return true;
 }
 
@@ -673,9 +684,7 @@ void TestGroupKeyIterator(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 2, kGroup3Keyset2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 3, kGroup3Keyset3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 4, kGroup1Keyset0));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 5, kGroup1Keyset1));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 6, kGroup1Keyset2));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric1, 7, kGroup1Keyset3));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR != provider->SetGroupKeyAt(kFabric1, 5, kGroup1Keyset1));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 0, kGroup2Keyset0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupKeyAt(kFabric2, 1, kGroup2Keyset1));
@@ -684,8 +693,7 @@ void TestGroupKeyIterator(nlTestSuite * apSuite, void * apContext)
 
     // Iterate fabric 1
 
-    GroupKey expected_f1[]   = { kGroup3Keyset0, kGroup3Keyset1, kGroup3Keyset2, kGroup3Keyset3,
-                               kGroup1Keyset0, kGroup1Keyset1, kGroup1Keyset2, kGroup1Keyset3 };
+    GroupKey expected_f1[]   = { kGroup3Keyset0, kGroup3Keyset1, kGroup3Keyset2, kGroup3Keyset3, kGroup1Keyset0 };
     size_t expected_f1_count = sizeof(expected_f1) / sizeof(GroupKey);
 
     auto it      = provider->IterateGroupKeys(kFabric1);
@@ -738,6 +746,7 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet3));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR != provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet4));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kCompressedFabricId2, kKeySet2));
@@ -1138,7 +1147,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(
         apSuite,
         CHIP_NO_ERROR ==
-            key_context->EncryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
+            key_context->MessageEncrypt(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
 
     // The ciphertext must be different to the original message
     NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
@@ -1164,13 +1173,13 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
         {
             std::pair<FabricIndex, GroupId> found(session.fabric_index, session.group_id);
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
-            NL_TEST_ASSERT(apSuite, session.key != nullptr);
+            NL_TEST_ASSERT(apSuite, session.keyContext != nullptr);
 
             // Decrypt the ciphertext
             NL_TEST_ASSERT(apSuite,
                            CHIP_NO_ERROR ==
-                               session.key->DecryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
-                                                           tag, plaintext));
+                               session.keyContext->MessageDecrypt(ciphertext, ByteSpan(aad, sizeof(aad)),
+                                                                  ByteSpan(nonce, sizeof(nonce)), tag, plaintext));
 
             // The new plaintext must match the original message
             NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));
@@ -1188,6 +1197,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 namespace {
 
 static chip::TestPersistentStorageDelegate sDelegate;
+static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 static GroupDataProviderImpl sProvider(chip::app::TestGroups::kMaxGroupsPerFabric, chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
 static EpochKey kEpochKeys0[] = {
@@ -1220,6 +1230,7 @@ int Test_Setup(void * inContext)
 
     // Initialize Group Data Provider
     sProvider.SetStorageDelegate(&sDelegate);
+    sProvider.SetSessionKeystore(&sSessionKeystore);
     sProvider.SetListener(&chip::app::TestGroups::sListener);
     VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
     SetGroupDataProvider(&sProvider);

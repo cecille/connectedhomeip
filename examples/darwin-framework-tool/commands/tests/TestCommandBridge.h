@@ -19,7 +19,6 @@
 #pragma once
 
 #include "../common/CHIPCommandBridge.h"
-#include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
@@ -31,21 +30,27 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRDevice_Externs.h"
 #import "MTRError_Utils.h"
 
 class TestCommandBridge;
 
 NS_ASSUME_NONNULL_BEGIN
+namespace {
+const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
+const char * getScriptsFolder() { return basePath; }
+} // namespace
 
-@interface TestPairingDelegate : NSObject <MTRDevicePairingDelegate>
+constexpr const char * kDefaultKey = "default";
+
+@interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)onStatusUpdate:(MTRPairingStatus)status;
-- (void)onPairingComplete:(NSError * _Nullable)error;
-- (void)onPairingDeleted:(NSError * _Nullable)error;
-- (void)onCommissioningComplete:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status;
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithTestCommandBridge:(TestCommandBridge *)commandBridge;
@@ -59,13 +64,12 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
                           public ConstraintsChecker,
                           public PICSChecker,
-                          public DelayCommands,
                           public LogCommands,
                           public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
-        , mPairingDelegate([[TestPairingDelegate alloc] initWithTestCommandBridge:this])
+        , mDeviceControllerDelegate([[TestDeviceControllerDelegate alloc] initWithTestCommandBridge:this])
     {
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
@@ -101,40 +105,71 @@ public:
         SetCommandExitStatus(err);
     }
 
-    /////////// DelayCommands Interface /////////
-    void OnWaitForMs() override
+    /////////// DelayCommands /////////
+    // This function is a modified version of the one in DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR WaitForMs(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_async(mCallbackQueue, ^{
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
+        dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR WaitForCommissionee(const char * _Nullable identity,
-        const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override
+    // This function is identical to DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR WaitForMessage(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type & value)
+    {
+        VerifyOrReturnError(!value.message.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        const char * scriptDir = getScriptsFolder();
+        constexpr const char * scriptName = "WaitForMessage.py";
+        const char * registerKeyValue = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+        const size_t registerKeyLen = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
+
+        char command[128];
+        VerifyOrReturnError(
+            snprintf(command, sizeof(command), "%s%s %.*s %.*s", scriptDir, scriptName, static_cast<int>(registerKeyLen),
+                registerKeyValue, static_cast<int>(value.message.size()), value.message.data())
+                >= 0,
+            CHIP_ERROR_INTERNAL);
+        return RunInternal(command);
+    }
+
+    // This function is identical to DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR RunInternal(const char * _Nonnull command)
+    {
+        VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
+        return ContinueOnChipMainThread(CHIP_NO_ERROR);
+    }
+
+    CHIP_ERROR WaitForCommissionee(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
     {
         MTRDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
 
-        // Invalidate our existing CASE session; otherwise getConnectedDevice
-        // will just hand it right back to us without establishing a new CASE
-        // session.
-        if (GetDevice(identity) != nil) {
-            mConnectedDevices[identity] = nil;
+        // Invalidate our existing CASE session; otherwise trying to work with
+        // our device will just reuse it without establishing a new CASE
+        // session when a reboot is done on the server, and then our next
+        // interaction will time out.
+        if (value.expireExistingSession.ValueOr(true)) {
+            if (GetDevice(identity) != nil) {
+                [GetDevice(identity) invalidateCASESession];
+                mConnectedDevices[identity] = nil;
+            }
         }
 
-        [controller getBaseDevice:value.nodeId
-                            queue:mCallbackQueue
-                completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                    if (error != nil) {
-                        SetCommandExitStatus(error);
-                        return;
-                    }
-
-                    mConnectedDevices[identity] = device;
-                    NextTest();
-                }];
+        mConnectedDevices[identity] = [MTRBaseDevice deviceWithNodeID:@(value.nodeId) controller:controller];
+        dispatch_async(mCallbackQueue, ^{
+            NextTest();
+        });
         return CHIP_NO_ERROR;
     }
 
@@ -146,21 +181,44 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
-
-        [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
-        [mPairingDelegate setDeviceId:value.nodeId];
-        [mPairingDelegate setActive:YES];
+        [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
+        [mDeviceControllerDelegate setDeviceId:value.nodeId];
+        [mDeviceControllerDelegate setActive:YES];
 
         NSString * payloadStr = [[NSString alloc] initWithBytes:value.payload.data()
                                                          length:value.payload.size()
                                                        encoding:NSUTF8StringEncoding];
         NSError * err;
-        BOOL ok = [controller pairDevice:value.nodeId onboardingPayload:payloadStr error:&err];
+        auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payloadStr error:&err];
+        if (err != nil) {
+            return MTRErrorToCHIPErrorCode(err);
+        }
+        BOOL ok = [controller setupCommissioningSessionWithPayload:payload newNodeID:@(value.nodeId) error:&err];
         if (ok == YES) {
             return CHIP_NO_ERROR;
         }
 
         return MTRErrorToCHIPErrorCode(err);
+    }
+
+    CHIP_ERROR GetCommissionerNodeId(const char * _Nullable identity,
+        const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value,
+        void (^_Nonnull OnResponse)(const chip::GetCommissionerNodeIdResponse &))
+    {
+        auto * controller = GetCommissioner(identity);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        auto id = [controller.controllerNodeId unsignedLongLongValue];
+        ChipLogProgress(chipTool, "Commissioner Node Id: %llu", id);
+
+        chip::GetCommissionerNodeIdResponse outValue;
+        outValue.nodeId = id;
+
+        dispatch_async(mCallbackQueue, ^{
+            OnResponse(outValue);
+        });
+
+        return CHIP_NO_ERROR;
     }
 
     /////////// SystemCommands Interface /////////
@@ -176,7 +234,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
+    {
+        MTRDeviceController * controller = GetCommissioner(identity);
+
+        SetIdentity(identity);
+        return mConnectedDevices[identity];
+    }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -192,7 +256,9 @@ public:
         VerifyOrReturn(commissioner != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
-        [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+        [commissioner commissionNodeWithID:@(nodeId)
+                       commissioningParams:[[MTRCommissioningParameters alloc] init]
+                                     error:&commissionError];
         CHIP_ERROR err = MTRErrorToCHIPErrorCode(commissionError);
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
@@ -330,6 +396,30 @@ protected:
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
     }
 
+    using ConstraintsChecker::CheckConstraintMinLength;
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current count], expected);
+    }
+
+    using ConstraintsChecker::CheckConstraintMaxLength;
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current count], expected);
+    }
+
     using ConstraintsChecker::CheckConstraintMinValue;
 
     // Used when the minValue is a saved variable, since ConstraintsChecker does
@@ -455,7 +545,7 @@ protected:
     }
 
 private:
-    TestPairingDelegate * _Nonnull mPairingDelegate;
+    TestDeviceControllerDelegate * _Nonnull mDeviceControllerDelegate;
 
     // Set of our connected devices, keyed by identity.
     std::map<std::string, MTRBaseDevice *> mConnectedDevices;
@@ -463,13 +553,13 @@ private:
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation TestPairingDelegate
-- (void)onStatusUpdate:(MTRPairingStatus)status
+@implementation TestDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     if (_active) {
-        if (status == MTRPairingStatusSuccess) {
+        if (status == MTRCommissioningStatusSuccess) {
             NSLog(@"Secure pairing success");
-        } else if (status == MTRPairingStatusFailed) {
+        } else if (status == MTRCommissioningStatusFailed) {
             _active = NO;
             NSLog(@"Secure pairing failed");
             _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));
@@ -477,7 +567,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (_active) {
         if (error != nil) {
@@ -491,14 +581,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)onPairingDeleted:(NSError * _Nullable)error
-{
-    if (_active) {
-        _commandBridge->PairingDeleted();
-    }
-}
-
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     if (_active) {
         _active = NO;
@@ -515,19 +598,19 @@ NS_ASSUME_NONNULL_BEGIN
     using namespace chip::app::Clusters::OperationalCredentials;
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

@@ -19,9 +19,7 @@
 #include "DeviceInstanceInfoProviderImpl.h"
 
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceError.h>
 #include <platform/android/AndroidConfig.h>
-#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,6 +53,24 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
         productId = static_cast<uint16_t>(u32ProductId);
     }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetPartNumber(char * buf, size_t bufSize)
+{
+    size_t dateLen;
+    return Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_PartNumber, buf, bufSize, dateLen);
+}
+
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductURL(char * buf, size_t bufSize)
+{
+    size_t dateLen;
+    return Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_ProductURL, buf, bufSize, dateLen);
+}
+
+CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductLabel(char * buf, size_t bufSize)
+{
+    size_t dateLen;
+    return Internal::AndroidConfig::ReadConfigValueStr(Internal::AndroidConfig::kConfigKey_ProductLabel, buf, bufSize, dateLen);
 }
 
 CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductName(char * buf, size_t bufSize)

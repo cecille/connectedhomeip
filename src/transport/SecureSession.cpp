@@ -46,6 +46,7 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     mPeerSessionId   = peerSessionId;
     mRemoteMRPConfig = config;
     SetFabricIndex(peerNode.GetFabricIndex());
+    MarkActiveRx(); // Initialize SessionTimestamp and ActiveTimestamp per spec.
 
     Retain(); // This ref is released inside MarkForEviction
     MoveToState(State::kActive);
@@ -119,9 +120,9 @@ void SecureSession::MarkAsDefunct()
 
     case State::kPendingEviction:
         //
-        // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
+        // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct. Let's just
+        // do nothing and return.
         //
-        VerifyOrDie(false);
         return;
     }
 }

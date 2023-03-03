@@ -7,8 +7,8 @@ that generates inputs to [ninja](https://ninja-build.org/).
 Tested on:
 
 -   macOS 10.15
--   Debian 11
--   Ubuntu 20.04 LTS
+-   Debian 11 (64 bit required)
+-   Ubuntu 22.04 LTS
 
 Build system features:
 
@@ -50,40 +50,12 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 
 ### Installing prerequisites on macOS
 
-On macOS, first install Xcode from the Mac App Store. The remaining dependencies
-can be installed and satisfied using [Brew](https://brew.sh/):
-
-```
-brew install openssl pkg-config
-```
-
-However, that does not expose the package to `pkg-config`. To fix that, one
-needs to run something like the following:
-
-Intel:
-
-```
-cd /usr/local/lib/pkgconfig
-ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
-```
-
-where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
-OpenSSL installed by Brew.
-
-Apple Silicon:
-
-```
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
-```
-
-Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
-dependency.
+On macOS, install Xcode from the Mac App Store.
 
 ### Installing prerequisites on Raspberry Pi 4
 
-Using `rpi-imager`, install the Ubuntu _21.04_ 64-bit _server_ OS for arm64
-architectures on a micro SD card. This release will have bluez 5.55 or newer
-which is required for BLE functionality.
+Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+architectures on a micro SD card.
 
 Boot the SD card, login with the default user account "ubuntu" and password
 "ubuntu", then proceed with
@@ -128,6 +100,24 @@ update_config=1
 ```
 
 Finally, reboot your RPi.
+
+## Installing ZAP
+
+`bootstrap.sh` will download a compatible zap version and set it up in `$PATH`.
+If you want to install/use a different version, you may download one from the
+zap project [Releases](https://github.com/project-chip/zap/releases)
+
+### Which ZAP to use
+
+ZAP scripting uses the following detection, in order:
+
+-   `$ZAP_DEVELOPMENT_PATH` to point to a zap checkout. Use this if you are
+    developing zap locally and would like to run zap with your changes
+
+-   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip`/`zap-mac.zip` was
+    unpacked. This allows you to not need to place zap/zap-cli in `$PATH`
+
+-   Otherwise scripts assume `zap-cli` or `zap` is available in `$PATH`
 
 ## Prepare for building
 
@@ -361,6 +351,37 @@ gn desc out/host //src/lib outputs
 # everything as JSON
 gn desc out/host //src/lib --format=json
 ```
+
+## Coverage
+
+Code coverage scripts generate a report that details how much of the Matter SDK
+source code has been executed, it also gives information on how often the Matter
+SDK executes segments of code and produces a copy of the source file, annotated
+with execution frequencies.
+
+```
+./scripts/build_coverage.sh
+```
+
+By default, Code coverage is performed at the unit testing level. Unit tests are
+created by developers, thus giving them the best vantage from which to decide
+what tests to include in unit testing. But you can extend the coverage test by
+scope and ways of execution with the following parameters:
+
+```
+  -c, --code                Specify which scope to collect coverage data.
+                            'core': collect coverage data from core stack in Matter SDK. --default
+                            'clusters': collect coverage data from clusters implementation in Matter SDK.
+                            'all': collect coverage data from Matter SDK.
+  -t, --tests               Specify which tools to run the coverage check.
+                            'unit': Run unit test to drive the coverage check. --default
+                            'yaml': Run yaml test to drive the coverage check.
+                            'all': Run unit & yaml test to drive the coverage check.
+```
+
+Also see the up-to-date unit testing coverage report of the Matter SDK
+(collected daily) at:
+[matter coverage](https://matter-build-automation.ue.r.appspot.com).
 
 ## Maintaining Matter
 

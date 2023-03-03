@@ -18,20 +18,19 @@
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 # The list of src and include dirs must be in sync with that in all-clusters-minimal-app/esp32/main/component.mk
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-minimal-app"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-minimal-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
@@ -73,7 +72,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/switch-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-diagnostics-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic-information"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
@@ -106,7 +105,7 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
-if(("${CONFIG_DEVICE_TYPE_ESP32_DEVKITC}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y"))
+if(("${CONFIG_DEVICE_TYPE_ESP32_DEVKITC}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C2_DEVKITM}" STREQUAL "y"))
     list(APPEND PRIV_INCLUDE_DIRS_LIST
                 "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
     set(PRIV_REQUIRES_LIST chip QRCode bt)
@@ -126,15 +125,20 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
                        PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
 
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+
+chip_app_component_codegen("${CHIP_ROOT}/examples/all-clusters-minimal-app/all-clusters-common/all-clusters-minimal-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/all-clusters-minimal-app/all-clusters-common/all-clusters-minimal-app.zap")
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
 if (CONFIG_ENABLE_PW_RPC)
-
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -236,6 +240,8 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_sys_io
+  pw_trace
   pw_trace_tokenized
   pw_trace_tokenized.trace_buffer
   pw_trace_tokenized.rpc_service

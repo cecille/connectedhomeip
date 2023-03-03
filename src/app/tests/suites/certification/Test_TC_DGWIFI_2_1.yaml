@@ -14,6 +14,9 @@
 
 name: 51.2.1. [TC-DGWIFI-2.1] Attributes with server as DUT
 
+PICS:
+    - DGWIFI.S
+
 config:
     nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
@@ -28,14 +31,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads NetworkInterface structure attribute from DUT"
+    - label: "TH reads BSSID attribute from DUT"
       PICS: DGWIFI.S.A0000
-      cluster: "General Diagnostics"
       command: "readAttribute"
-      attribute: "NetworkInterfaces"
+      attribute: "BSSID"
       response:
           constraints:
-              type: list
+              type: octet_string
 
     #issue #13645
     - label: "Reads SecurityType attribute constraints"
@@ -44,7 +46,7 @@ tests:
       attribute: "SecurityType"
       response:
           constraints:
-              type: enum
+              type: enum8
 
     - label: "Reads WiFiVersion attribute constraints"
       PICS: DGWIFI.S.A0002
@@ -52,7 +54,7 @@ tests:
       attribute: "WiFiVersion"
       response:
           constraints:
-              type: enum
+              type: enum8
               minValue: 0
               maxValue: 5
 
@@ -62,7 +64,9 @@ tests:
       attribute: "ChannelNumber"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads RSSI attribute constraints"
       PICS: DGWIFI.S.A0004
@@ -70,7 +74,7 @@ tests:
       attribute: "RSSI"
       response:
           constraints:
-              type: int8
+              type: int8s
               minValue: -120
               maxValue: 0
 
@@ -80,7 +84,9 @@ tests:
       attribute: "BeaconLostCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads BeaconRxCount attribute constraints"
       PICS: DGWIFI.S.A0006
@@ -88,7 +94,9 @@ tests:
       attribute: "BeaconRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketMulticastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0007
@@ -96,7 +104,9 @@ tests:
       attribute: "PacketMulticastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketMulticastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0008
@@ -104,7 +114,9 @@ tests:
       attribute: "PacketMulticastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketUnicastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0009
@@ -112,7 +124,9 @@ tests:
       attribute: "PacketUnicastRxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketUnicastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000a
@@ -120,7 +134,9 @@ tests:
       attribute: "PacketUnicastTxCount"
       response:
           constraints:
-              type: uint32
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads CurrentMaxRate attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000b
@@ -128,7 +144,7 @@ tests:
       attribute: "CurrentMaxRate"
       response:
           constraints:
-              type: uint64
+              type: int64u
 
     - label: "Reads OverrunCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000c
@@ -136,4 +152,4 @@ tests:
       attribute: "OverrunCount"
       response:
           constraints:
-              type: uint64
+              type: int64u

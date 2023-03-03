@@ -20,10 +20,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
@@ -45,7 +42,6 @@ namespace {
 constexpr EndpointId kLightEndpointId = 1;
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -153,7 +149,7 @@ void AppTask::ButtonPressCallback()
 
 void AppTask::UpdateClusterState()
 {
-    ESP_LOGI(TAG, "Writting to OnOff cluster");
+    ESP_LOGI(TAG, "Writing to OnOff cluster");
     // write the new on/off value
     EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, AppLED.IsTurnedOn());
 
@@ -162,7 +158,7 @@ void AppTask::UpdateClusterState()
         ESP_LOGE(TAG, "Updating on/off cluster failed: %x", status);
     }
 
-    ESP_LOGE(TAG, "Writting to Current Level cluster");
+    ESP_LOGI(TAG, "Writing to Current Level cluster");
     status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, AppLED.GetLevel());
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)

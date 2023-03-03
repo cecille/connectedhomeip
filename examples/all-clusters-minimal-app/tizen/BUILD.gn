@@ -45,13 +45,13 @@ executable("chip-all-clusters-minimal-app") {
 
   deps = [
     ":chip-all-clusters-common",
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
     "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib",
   ]
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/zzz_generated/all-clusters-minimal-app",
     "include",
   ]
 
@@ -59,8 +59,11 @@ executable("chip-all-clusters-minimal-app") {
 }
 
 tizen_sdk_package("chip-all-clusters-minimal-app:tpk") {
-  deps = [ ":chip-all-clusters-minimal-app" ]
-  manifest = rebase_path("tizen-manifest.xml")
+  deps = [
+    ":chip-all-clusters-minimal-app",
+    "${chip_root}/examples/platform/tizen:author-certificate-CHIP",
+  ]
+  manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }
 

@@ -59,6 +59,12 @@
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
 using namespace ::chip;
 using namespace ::chip::Shell;
 using namespace ::chip::Credentials;
@@ -91,8 +97,14 @@ AppCallbacks sCallbacks;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 } // namespace
 
@@ -137,12 +149,14 @@ extern "C" void app_main()
     ThreadStackMgr().InitThreadStack();
 #endif
 
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -160,7 +174,7 @@ extern "C" void app_main()
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));

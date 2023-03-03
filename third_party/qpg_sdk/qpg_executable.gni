@@ -19,6 +19,13 @@ import("${build_root}/toolchain/flashable_executable.gni")
 import("${chip_root}/src/platform/device.gni")
 import("qpg_sdk.gni")
 
+declare_args() {
+  matter_device_vid = ""
+  matter_device_pid = ""
+  matter_device_software_version_string = ""
+  matter_device_software_version = ""
+}
+
 # Run the generator script that takes a .HEX file and adds the OTA header to it.
 #
 # This requires a Python script, given by ota_header_generator,
@@ -66,6 +73,25 @@ template("qpg_executable") {
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
+  defines = []
+  if (defined(invoker.defines)) {
+    defines += invoker.defines
+  }
+
+  # Overrule CHIPProjectConfig.h settings
+  if (matter_device_vid != "") {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${matter_device_vid}" ]
+  }
+  if (matter_device_pid != "") {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}" ]
+  }
+  if (matter_device_software_version_string != "") {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_device_software_version_string}\"" ]
+  }
+  if (matter_device_software_version != "") {
+    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_device_software_version}" ]
+  }
+
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably
   # even if the build and flashing steps take place on different machines
@@ -97,7 +123,7 @@ template("qpg_executable") {
     gen_ota_header("$executable_target_name.ota") {
       ota_header_script_name = "${root_out_dir}/${executable_target_name}.ota"
       out_dir = rebase_path(root_out_dir, root_build_dir)
-      ota_header_generator = "${qpg_sdk_root}/Tools/ota/generate_ota_img.py"
+      ota_header_generator = "${qpg_sdk_root}/Tools/Ota/generate_ota_img.py"
 
       ota_header_options = [
         string_join("=",
@@ -119,11 +145,27 @@ template("qpg_executable") {
                     [
                       "--pem_file_path",
                       rebase_path(qpg_sdk_root, root_build_dir) +
-                          "/Tools/ota/example_private_key.pem.example",
+                          "/Tools/Ota/example_private_key.pem.example",
                     ]),
         "--pem_password=test1234",
         "--sign",
       ]
+
+      # Use build-time overrules in OTA header creation
+      # Normally taken from CHIPProjectConfig.h by scripting
+      if (matter_device_vid != "") {
+        ota_header_options += [ "-vid=${matter_device_vid}" ]
+      }
+      if (matter_device_pid != "") {
+        ota_header_options += [ "-pid=${matter_device_pid}" ]
+      }
+      if (matter_device_software_version != "") {
+        ota_header_options += [ "-vn=${matter_device_software_version}" ]
+      }
+      if (matter_device_software_version_string != "") {
+        ota_header_options +=
+            [ "-vs=\"${matter_device_software_version_string}\"" ]
+      }
       deps = [ ":$executable_target_name" ]
     }
   }

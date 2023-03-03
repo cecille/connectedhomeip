@@ -1,76 +1,23 @@
-from rich import print
-from rich.pretty import pprint
-from rich import pretty
-from rich import inspect
 from rich.console import Console
-import logging
-from chip import ChipDeviceCtrl
-import chip.clusters as Clusters
+from rich import inspect, pretty
 from chip.ChipStack import *
 import coloredlogs
+import chip.native
 import chip.logging
-import argparse
-import builtins
 import chip.FabricAdmin
-from chip.utils import CommissioningBuildingBlocks
-import atexit
+import chip.discovery
+import chip.CertificateAuthority
+import logging
+import builtins
 import chip.dynamic_server.Server as Server
+import argparse
+import atexit
+<< << << < HEAD
+== == == =
+
+>>>>>> > upstream/master
 
 _fabricAdmins = None
-
-
-def LoadFabricAdmins():
-    global _fabricAdmins
-
-    #
-    # Shutdown any fabric admins we had before as well as active controllers. This ensures we
-    # relinquish some resources if this is called multiple times (e.g in a Jupyter notebook)
-    #
-    chip.FabricAdmin.FabricAdmin.ShutdownAll()
-    ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
-
-    _fabricAdmins = []
-    storageMgr = builtins.chipStack.GetStorageManager()
-
-    console = Console()
-
-    try:
-        adminList = storageMgr.GetReplKey('fabricAdmins')
-    except KeyError:
-        console.print(
-            "\n[purple]No previous fabric admins discovered in persistent storage - creating a new one...")
-
-        #
-        # Initialite a FabricAdmin with a VendorID of TestVendor1 (0xfff1)
-        #
-        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(0XFFF1))
-        return _fabricAdmins
-
-    console.print('\n')
-
-    for k in adminList:
-        console.print(
-            f"[purple]Restoring FabricAdmin from storage to manage FabricId {adminList[k]['fabricId']}, FabricIndex {k}...")
-        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(adminList[k]['vendorId']),
-                                                          fabricId=adminList[k]['fabricId'], fabricIndex=int(k)))
-
-    console.print(
-        '\n[blue]Fabric Admins have been loaded and are available at [red]fabricAdmins')
-    return _fabricAdmins
-
-
-def CreateDefaultDeviceController():
-    global _fabricAdmins
-
-    if (len(_fabricAdmins) == 0):
-        raise RuntimeError("Was called before calling LoadFabricAdmins()")
-
-    console = Console()
-
-    console.print('\n')
-    console.print(
-        f"[purple]Creating default device controller on fabric {_fabricAdmins[0]._fabricId}...")
-    return _fabricAdmins[0].NewController()
 
 
 def ReplInit(debug):
@@ -85,14 +32,14 @@ def ReplInit(debug):
     console.rule('Matter REPL')
     console.print('''
             [bold blue]
-    
+
             Welcome to the Matter Python REPL!
-    
+
             For help, please type [/][bold green]matterhelp()[/][bold blue]
-    
+
             To get more information on a particular object/class, you can pass
             that into [bold green]matterhelp()[/][bold blue] as well.
-    
+
             ''')
     console.rule()
 
@@ -105,9 +52,11 @@ def ReplInit(debug):
         logging.getLogger().setLevel(logging.WARN)
 
 
+certificateAuthorityManager = None
+
+
 def StackShutdown():
-    chip.FabricAdmin.FabricAdmin.ShutdownAll()
-    ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
+    certificateAuthorityManager.Shutdown()
     builtins.chipStack.Shutdown()
 
 
@@ -144,6 +93,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+chip.native.Init()
+
 ReplInit(args.debug)
 
 if (args.mode == "controller"):
@@ -154,8 +105,19 @@ if (args.mode == "controller"):
         '\n\n[bold red]>>>> Starting REPL in Controller Mode <<<<\n\n')
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Controller)
-    fabricAdmins = LoadFabricAdmins()
-    devCtrl = CreateDefaultDeviceController()
+    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
+
+    certificateAuthorityManager.LoadAuthoritiesFromStorage()
+
+    if (len(certificateAuthorityManager.activeCaList) == 0):
+        ca = certificateAuthorityManager.NewCertificateAuthority()
+        ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+    elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
+        certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+
+    caList = certificateAuthorityManager.activeCaList
+
+    devCtrl = caList[0].adminList[0].NewController()
     builtins.devCtrl = devCtrl
 
     console.print(

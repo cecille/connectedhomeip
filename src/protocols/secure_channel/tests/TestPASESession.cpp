@@ -111,12 +111,45 @@ public:
     void OnResponseTimeout(ExchangeContext * ec) override {}
 };
 
+class TemporarySessionManager
+{
+public:
+    TemporarySessionManager(nlTestSuite * suite, TestContext & ctx) : mCtx(ctx)
+    {
+        NL_TEST_ASSERT(suite,
+                       CHIP_NO_ERROR ==
+                           mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
+                                                &mStorage, &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
+        // The setup here is really weird: we are using one session manager for
+        // the actual messages we send (the PASE handshake, so the
+        // unauthenticated sessions) and a different one for allocating the PASE
+        // sessions.  Since our Init() set us up as the thing to handle messages
+        // on the transport manager, undo that.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    ~TemporarySessionManager()
+    {
+        mSessionManager.Shutdown();
+        // Reset the session manager on the transport again, just in case
+        // shutdown messed with it.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    operator SessionManager &() { return mSessionManager; }
+
+private:
+    TestContext & mCtx;
+    TestPersistentStorageDelegate mStorage;
+    SessionManager mSessionManager;
+};
+
 using namespace System::Clock::Literals;
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    SessionManager sessionManager;
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
@@ -157,7 +190,7 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    SessionManager sessionManager;
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
@@ -246,7 +279,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
-        chip::test_utils::SleepMillis(85);
+        chip::test_utils::SleepMillis(100);
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();
@@ -257,7 +290,9 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // Let's make sure atleast number is >= than the minimum messages required to complete the
     // handshake.
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount >= sTestPaseMessageCount);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     if (mrpCommissionerConfig.HasValue())
@@ -280,16 +315,38 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
                            mrpAccessoryConfig.Value().mActiveRetransTimeout);
     }
 
+    // Now evict the PASE sessions.
+    auto session = pairingCommissioner.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    session = pairingAccessory.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    // Evicting a session async notifies the PASESession's delegate.  Normally
+    // that notification is what would delete the PASESession, but in our case
+    // that will happen as soon as things come off the stack.  So make sure to
+    // process the async bits before that happens.
+    ctx.DrainAndServiceIO();
+
+    // And check that this did not result in any new notifications.
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+
     loopback.SetLoopbackTransportDelegate(nullptr);
 }
 
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & loopback   = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     loopback.Reset();
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Missing(),
@@ -298,11 +355,12 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 
 void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & loopback   = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     loopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -312,11 +370,12 @@ void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void *
 
 void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & loopback   = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     loopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -326,11 +385,12 @@ void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inCon
 
 void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & loopback   = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     loopback.Reset();
     ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32);
     ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32);
@@ -341,11 +401,12 @@ void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContex
 
 void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & loopback   = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     loopback.Reset();
     loopback.mNumMessagesToDrop = 2;
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -358,7 +419,7 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
 void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    SessionManager sessionManager;
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;

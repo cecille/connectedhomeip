@@ -22,6 +22,7 @@ class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
+    CONTACT = auto()
 
     def ExampleName(self):
         if self == K32WApp.LIGHT:
@@ -30,16 +31,20 @@ class K32WApp(Enum):
             return 'lock-app'
         elif self == K32WApp.SHELL:
             return 'shell'
+        elif self == K32WApp.CONTACT:
+            return "contact-sensor-app"
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == K32WApp.LIGHT:
-            return 'chip-k32w061-light-example'
+            return 'chip-k32w0x-light-example'
         elif self == K32WApp.LOCK:
-            return 'chip-k32w061-lock-example'
+            return 'chip-k32w0x-lock-example'
         elif self == K32WApp.SHELL:
-            return 'chip-k32w061-shell-example'
+            return 'chip-k32w0x-shell-example'
+        elif self == K32WApp.CONTACT:
+            return 'chip-k32w0x-contact-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -58,7 +63,10 @@ class K32WBuilder(GnBuilder):
                  tokenizer: bool = False,
                  disable_ble: bool = False,
                  disable_ota: bool = False,
-                 se05x: bool = False):
+                 disable_logs: bool = False,
+                 se05x: bool = False,
+                 tinycrypt: bool = False,
+                 crypto_platform: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -69,11 +77,14 @@ class K32WBuilder(GnBuilder):
         self.release = release
         self.disable_ble = disable_ble
         self.disable_ota = disable_ota
+        self.disable_logs = disable_logs
         self.se05x = se05x
+        self.tinycrypt = tinycrypt
+        self.crypto_platform = crypto_platform
 
     def GnBuildArgs(self):
         args = [
-            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W061_SDK_ROOT'],
+            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W0_SDK_ROOT'],
         ]
 
         if self.low_power:
@@ -93,8 +104,17 @@ class K32WBuilder(GnBuilder):
         if self.disable_ota:
             args.append('chip_enable_ota_requestor=false')
 
+        if self.disable_logs:
+            args.append('chip_logging=false')
+
         if self.se05x:
             args.append('chip_with_se05x=true')
+
+        if self.tinycrypt:
+            args.append('chip_crypto=\"platform\" chip_crypto_flavor=\"tinycrypt\"')
+
+        if self.crypto_platform:
+            args.append('chip_crypto=\"platform\"')
 
         return args
 

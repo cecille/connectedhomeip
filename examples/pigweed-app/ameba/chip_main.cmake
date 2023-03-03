@@ -64,6 +64,7 @@ target_link_libraries(${chip_main} PUBLIC
     pw_log
     pw_rpc.nanopb.echo_service
     pw_rpc.server
+    pw_sys_io
     PwRpc
 )
 
@@ -81,8 +82,15 @@ list(
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_PW_RPC=1
-    -DMATTER_PIGWEED_APP=1
 )
+
+if (matter_enable_persistentstorage_audit)
+list(
+    APPEND chip_main_flags
+
+    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+)
+endif (matter_enable_persistentstorage_audit)
 
 list(
     APPEND chip_main_cpp_flags

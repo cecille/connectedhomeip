@@ -14,11 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <errno.h>
-#include <pthread.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -93,6 +91,14 @@ static bool EnsureWiFiIsStarted()
     return chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted();
 }
 #endif
+
+void CleanShutdown()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
 
 using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                              uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
@@ -211,18 +217,20 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
         return err.AsInteger();
     }
 
-    return CHIP_NO_ERROR.AsInteger();
+    atexit(CleanShutdown);
+
+    return /*err*/;
 }
 
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
-        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size,
-                                                           value);
+        gPythonServerDelegate.mPostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                           attributePath.mAttributeId, type, size, value);
     }
     else
     {

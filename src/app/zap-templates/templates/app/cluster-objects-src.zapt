@@ -38,7 +38,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_command_arguments}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     {{/zcl_command_arguments}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -99,9 +99,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const{
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_event_fields}}
     {{#if_is_fabric_scoped_struct type}}
-    ReturnErrorOnFailure(DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), GetFabricIndex(), {{asLowerCamelCase name}}));
+    ReturnErrorOnFailure(DataModel::EncodeForRead(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), GetFabricIndex(), {{asLowerCamelCase name}}));
     {{else}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})), {{asLowerCamelCase name}}));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), {{asLowerCamelCase name}}));
     {{/if_is_fabric_scoped_struct}}
     {{/zcl_event_fields}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -170,6 +170,35 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         break;
     }
 
+    return false;
+}
+
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    {{#zcl_clusters}}
+      {{#zcl_commands}}
+      {{#first}}
+      case Clusters::{{asUpperCamelCase parent.name}}::Id:
+      {
+          switch (aCommand) {
+      {{/first}}
+          {{#if isFabricScoped}}
+          case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+              return true;
+          {{/if}}
+      {{#last}}
+          default:
+              return false;
+          }
+      }
+      {{/last}}
+      {{/zcl_commands}}
+    {{/zcl_clusters}}
+    }
     return false;
 }
 

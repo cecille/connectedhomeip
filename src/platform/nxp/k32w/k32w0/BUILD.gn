@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/k32w0_sdk.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 assert(chip_device_platform == "k32w0")
 
@@ -24,8 +26,11 @@ if (chip_enable_openthread) {
 
 static_library("k32w0") {
   sources = [
-    "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
+    "../common/RamStorage.cpp",
+    "../common/RamStorage.h",
+    "../common/RamStorageKey.cpp",
+    "../common/RamStorageKey.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -34,8 +39,8 @@ static_library("k32w0") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
+    "DefaultTestEventTriggerDelegate.cpp",
+    "DefaultTestEventTriggerDelegate.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "K32W0Config.cpp",
@@ -47,10 +52,31 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "RamStorage.cpp",
-    "RamStorage.h",
+    "SystemTimeSupport.cpp",
     "ble_function_mux.c",
   ]
+
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+  ]
+
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "K32W0FactoryDataProvider.cpp",
+      "K32W0FactoryDataProvider.h",
+    ]
+    public += [
+      "${chip_root}/src/credentials/CHIPCert.h",
+      "${chip_root}/src/credentials/CertificationDeclaration.h",
+    ]
+  }
+
+  if (chip_with_low_power != 0) {
+    sources += [ "LowPowerHooks.cpp" ]
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [
@@ -62,6 +88,23 @@ static_library("k32w0") {
   deps = []
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_crypto == "platform") {
+    if (chip_crypto_flavor == "tinycrypt") {
+      sources += [ "${chip_root}/src/platform/nxp/common/crypto/CHIPCryptoPALTinyCrypt.cpp" ]
+
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
+    }
+
+    if (chip_crypto_flavor == "NXP-Ultrafast-P256") {
+      sources += [ "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/CHIPCryptoPALNXPUltrafastP256.cpp" ]
+
+      public_deps += [
+        "${chip_root}/third_party/nxp/k32w0_sdk:k32w0_sdk",
+        "${mbedtls_root}:mbedtls",
+      ]
+    }
+  }
 
   if (chip_enable_openthread) {
     sources += [

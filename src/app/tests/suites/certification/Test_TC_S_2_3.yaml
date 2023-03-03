@@ -15,9 +15,12 @@
 
 name: 123.2.3. [TC-S-2.3] Secondary functionality with server as DUT
 
+PICS:
+    - S.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

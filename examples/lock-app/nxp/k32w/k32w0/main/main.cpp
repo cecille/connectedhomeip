@@ -31,6 +31,16 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#include "fsl_gpio.h"
+#include "fsl_iocon.h"
+#include "gpio_pins.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -38,6 +48,7 @@ using namespace ::chip::Logging;
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "Keyboard.h"
+#include "OtaSupport.h"
 #include "PWR_Configuration.h"
 #include "PWR_Interface.h"
 #include "RNG_Interface.h"
@@ -46,35 +57,19 @@ using namespace ::chip::Logging;
 #include "radio.h"
 #endif
 
+#include "MacSched.h"
+
 typedef void (*InitFunc)(void);
+
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
+extern "C" void sched_enable();
+
 /* low power requirements */
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-extern "C" void vMMAC_IntHandlerBbc();
-extern "C" void vMMAC_IntHandlerPhy();
-extern "C" void BOARD_SetClockForPowerMode(void);
-
-static void dm_switch_wakeupCallBack(void);
-static void dm_switch_preSleepCallBack(void);
-static void ThreadExitSleep();
-static void BOARD_SetClockForWakeup(void);
-
-typedef struct
-{
-    bool_t bleAppRunning;
-    bool_t bleAppStopInprogress;
-    bool_t threadInitialized;
-    uint32_t threadWarmBootInitTime;
-} sDualModeAppStates;
-
-typedef void * appCallbackParam_t;
-typedef void (*appCallbackHandler_t)(appCallbackParam_t param);
-
-static sDualModeAppStates dualModeStates;
-
-#define THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE 4000
+extern "C" void setThreadInitialized(bool isInitialized);
+extern "C" bool isThreadInitialized();
 #endif
 
 /* needed for FreeRtos Heap 4 */
@@ -91,23 +86,12 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
     err = PlatformMgrImpl().InitBoardFwk();
     if (err != CHIP_NO_ERROR)
     {
         return;
     }
-
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-    PWR_Init();
-
-    PWR_vAddRamRetention((uint32_t) &ucHeap[0], sizeof(ucHeap));
-    PWR_RegisterLowPowerExitCallback(dm_switch_wakeupCallBack);
-    PWR_RegisterLowPowerEnterCallback(dm_switch_preSleepCallBack);
-
-    dm_lp_init();
-#endif
-
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     K32W_LOG("Welcome to NXP ELock Demo App");
 
@@ -117,6 +101,12 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
+
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
+#endif
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -132,10 +122,10 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-    dualModeStates.threadWarmBootInitTime = THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE;
-    dualModeStates.threadInitialized      = TRUE;
-#endif
+    /* Enable the MAC scheduler after BLEManagerImpl::_Init() and V2MMAC_Enable().
+     * This is needed to register properly the active protocols.
+     */
+    sched_enable();
 
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
     if (ret != CHIP_NO_ERROR)
@@ -143,12 +133,9 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
-        goto exit;
-    }
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    setThreadInitialized(TRUE);
+#endif
 
     // Start OpenThread task
     ret = ThreadStackMgrImpl().StartThreadTask();
@@ -162,6 +149,13 @@ extern "C" void main_task(void const * argument)
     if (ret != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during GetAppTask().StartAppTask()");
+        goto exit;
+    }
+
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
     }
 
@@ -180,7 +174,7 @@ extern "C" void otSysEventSignalPending(void)
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     /* make sure that 15.4 radio is initialized before waking up the Thread task */
-    if (dualModeStates.threadInitialized == TRUE)
+    if (isThreadInitialized())
 #endif
     {
         BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
@@ -189,136 +183,27 @@ extern "C" void otSysEventSignalPending(void)
 }
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-uint32_t dm_switch_get15_4InitWakeUpTime(void)
+extern "C" void vOptimizeConsumption(void)
 {
-    return dualModeStates.threadWarmBootInitTime;
-}
+    /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */
+    uint32_t u32SkipIO = (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN);
 
-extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, appCallbackParam_t param)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_Lp;
-    event.Handler = handler;
-    event.param   = param;
+    /* Pins are set to GPIO mode (IOCON FUNC0), pulldown and analog mode */
+    uint32_t u32PIOvalue = (IOCON_FUNC0 | IOCON_MODE_PULLDOWN | IOCON_ANALOG_EN);
 
-    GetAppTask().PostEvent(&event);
+    const gpio_pin_config_t pin_config = { .pinDirection = kGPIO_DigitalInput, .outputLogic = 1U };
 
-    return gBleSuccess_c;
-}
-
-static void dm_switch_wakeupCallBack(void)
-{
-    BOARD_SetClockForWakeup();
-
-    RNG_Init();
-    SecLib_Init();
-
-    KBD_PrepareExitLowPower();
-
-    PWR_WakeupReason_t wakeReason = PWR_GetWakeupReason();
-    if (wakeReason.Bits.FromBLE_LLTimer == 1)
+    if (u32PIOvalue != 0)
     {
-        SWITCH_DBG_LOG("woken up from LL");
-    }
-    else if (wakeReason.Bits.FromKeyBoard == 1)
-    {
-        SWITCH_DBG_LOG("woken up from FromKeyBoard");
-    }
-    else if (wakeReason.Bits.FromTMR == 1)
-    {
-        SWITCH_DBG_LOG("woken up from TMR");
-    }
-    dm_lp_wakeup();
-}
-
-static void dm_switch_preSleepCallBack(void)
-{
-    SWITCH_DBG_LOG("sleeping");
-
-    if (dualModeStates.threadInitialized)
-    {
-        otPlatRadioDisable(NULL);
-        dualModeStates.threadInitialized = FALSE;
-    }
-    /* Inform the low power dual mode module that we will sleep */
-    dm_lp_preSleep();
-
-    /* configure pins for power down mode */
-    BOARD_SetPinsForPowerMode();
-    /* DeInitialize application support for drivers */
-    BOARD_DeInitAdc();
-    /* DeInit the necessary clocks */
-    BOARD_SetClockForPowerMode();
-}
-
-void dm_switch_init15_4AfterWakeUp(void)
-{
-    uint32_t tick1 = 0;
-    uint32_t tick2 = 0;
-
-    if (dualModeStates.threadWarmBootInitTime == THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE)
-    {
-        /* Get a 32K tick */
-        PWR_Start32kCounter();
-        tick1 = PWR_Get32kTimestamp();
-    }
-
-    /* Radio must be re-enabled after waking up from sleep.
-     * The module is completely disabled in power down mode */
-    ThreadExitSleep();
-
-    if (dualModeStates.threadWarmBootInitTime == THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE)
-    {
-        tick2                                 = PWR_Get32kTimestamp();
-        dualModeStates.threadWarmBootInitTime = ((tick2 - tick1) * 15625u) >> 9;
-        /* Add a margin of 1 ms */
-        dualModeStates.threadWarmBootInitTime += 1000;
+        for (int i = 0; i < 22; i++)
+        {
+            if (((u32SkipIO >> i) & 0x1) != 1)
+            {
+                /* configure GPIOs to Input mode */
+                GPIO_PinInit(GPIO, 0, i, &pin_config);
+                IOCON_PinMuxSet(IOCON, 0, i, u32PIOvalue);
+            }
+        }
     }
 }
-
-static void ThreadExitSleep()
-{
-    if (!dualModeStates.threadInitialized && ConnectivityMgr().IsThreadEnabled())
-    {
-        /* Install uMac interrupt handlers */
-        OSA_InstallIntHandler(ZIGBEE_MAC_IRQn, vMMAC_IntHandlerBbc);
-        OSA_InstallIntHandler(ZIGBEE_MODEM_IRQn, vMMAC_IntHandlerPhy);
-
-        /* Radio must be re-enabled after waking up from sleep.
-         * The module is completely disabled in power down mode */
-        otPlatRadioEnable(NULL);
-        dualModeStates.threadInitialized = TRUE;
-
-        /* wake up the Thread stack and check if any processing needs to be done */
-        otTaskletsSignalPending(NULL);
-    }
-}
-
-extern "C" void App_NotifyWakeup(void)
-{
-    if ((!dualModeStates.threadInitialized))
-    {
-        /* Notify the dual mode low power mode */
-        (void) App_PostCallbackMessage(dm_lp_processEvent, (void *) e15_4WakeUpEnded);
-    }
-}
-
-extern "C" void App_AllowDeviceToSleep()
-{
-    PWR_PreventEnterLowPower(false);
-}
-
-extern "C" void App_DisallowDeviceToSleep()
-{
-    PWR_PreventEnterLowPower(true);
-}
-
-static void BOARD_SetClockForWakeup(void)
-{
-    /* Enables the clock for the I/O controller block. 0: Disable. 1: Enable.: 0x01u */
-    CLOCK_EnableClock(kCLOCK_Iocon);
-    /* Enables the clock for the GPIO0 module */
-    CLOCK_EnableClock(kCLOCK_Gpio0);
-}
-
 #endif

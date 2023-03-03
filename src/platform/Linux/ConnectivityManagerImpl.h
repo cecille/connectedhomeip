@@ -121,7 +121,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {
@@ -137,7 +136,7 @@ public:
     bool IsWiFiManagementStarted();
     int32_t GetDisconnectReason();
     CHIP_ERROR GetWiFiBssId(ByteSpan & value);
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);

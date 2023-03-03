@@ -23,24 +23,39 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
+/**
+ * Note: Use public include for PlatformManager which includes our local
+ *       platform/<PLATFORM>/PlatformManager.h after defining interface
+ *       class. */
 #include <platform/PlatformManager.h>
-#include <platform/Tizen/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericPlatformManagerImpl.h"
+#include "platform/internal/GenericPlatformManagerImpl.ipp"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.ipp"
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

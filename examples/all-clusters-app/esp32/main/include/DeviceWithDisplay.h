@@ -34,10 +34,7 @@
 #include <string>
 #include <vector>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>

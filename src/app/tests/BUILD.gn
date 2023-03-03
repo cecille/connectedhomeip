@@ -26,12 +26,14 @@ static_library("helpers") {
   sources = [
     "AppTestContext.cpp",
     "AppTestContext.h",
+    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   deps = [
     "${chip_root}/src/access",
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
@@ -48,6 +50,18 @@ source_set("binding-test-srcs") {
 
   public_deps = [
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("client-monitoring-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
+    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -69,17 +83,19 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAclEvent.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestClientMonitoringRegistrationTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
-    "TestEventLogging.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
@@ -99,6 +115,8 @@ chip_test_suite("tests") {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
+  test_sources += [ "TestAclAttribute.cpp" ]
+
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.
@@ -108,10 +126,19 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
+  # On NRF and fake platforms we do not have a realtime clock available, so
+  # TestEventLogging.cpp would be testing the same thing as
+  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
+  # being that low.
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
+    test_sources += [ "TestEventLogging.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":binding-test-srcs",
+    ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
@@ -126,5 +153,9 @@ chip_test_suite("tests") {
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

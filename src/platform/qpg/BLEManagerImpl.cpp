@@ -201,8 +201,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe: {
+        ChipDeviceEvent connClosedEvent;
+
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        connClosedEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEventOrDie(&connClosedEvent);
     }
     break;
 
@@ -221,17 +225,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     // Generic CHIP events
     case DeviceEventType::kServiceProvisioningChange:
-        // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
-        // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
-        // is now fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
         // Force the advertising state to be refreshed to reflect new provisioning state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
 
@@ -299,17 +292,17 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     uint16_t dataLen = data->DataLength();
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
+    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
 
     isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
-    qvCHIP_BleSendNotification(conId, cId, dataLen, data->Start());
+    qvCHIP_BleSendIndication(conId, cId, dataLen, data->Start());
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
         return false;
     }
     return true;
@@ -374,16 +367,6 @@ void BLEManagerImpl::DriveBLEState(void)
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...

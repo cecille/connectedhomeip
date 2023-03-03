@@ -65,20 +65,20 @@ int main(void)
 #endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    EFR32_LOG("Starting App Task");
-    if (GetAppTask().StartAppTask() != CHIP_NO_ERROR)
+    SILABS_LOG("Starting App Task");
+    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     // Should never get here.
     chip::Platform::MemoryShutdown();
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     appError(CHIP_ERROR_INTERNAL);
 }
 
 void sl_button_on_change(const sl_button_t * handle)
 {
-    GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
+    AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }

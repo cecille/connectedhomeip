@@ -14,10 +14,16 @@
 
 name: 19.9.1. [TC-AUDIOOUTPUT-7.1] Select Output Verification
 
+PICS:
+    - AUDIOOUTPUT.S
+
 config:
     nodeId: 0x12344321
     cluster: "Audio Output"
     endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -29,24 +35,24 @@ tests:
                 value: nodeId
 
     - label: "Reads the OutputList attribute"
-      PICS: MC_AUDIOOUTPUT.S.A0000
+      PICS: AUDIOOUTPUT.S.A0000
       command: "readAttribute"
       attribute: "OutputList"
       response:
           constraints:
-              type: OutPutInfo
+              type: list
 
     - label: "Sends a SelectAudioOutput command"
-      PICS: MC_AUDIOOUTPUT.S.C0000
+      PICS: AUDIOOUTPUT.S.C00.Rsp
       command: "SelectOutput"
       arguments:
           values:
               - name: "Index"
-                value: 1
+                value: Index
 
     - label: "Reads the CurrentOutput attribute"
-      PICS: MC_AUDIOOUTPUT.S.A0001
+      PICS: AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentOutput"
       response:
-          value: 1
+          value: Index

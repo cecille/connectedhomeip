@@ -122,6 +122,11 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_NO_ERROR;
 }
 
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+{
+    return true;
+}
+
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
     // Note: This test does not make use of the real attribute metadata.
@@ -192,7 +197,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage,
-                               &gFabricTable);
+                               &gFabricTable, gSessionKeystore);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);

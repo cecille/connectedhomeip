@@ -32,8 +32,9 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 extern "C" {
-#include <bl602_hal/hal_sys.h>
+#include <bl_efuse.h>
 #include <easyflash.h>
+#include <hal_sys.h>
 }
 
 namespace chip {
@@ -64,10 +65,30 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
+    uint32_t rebootCount;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<BL602Config>::Init();
     SuccessOrExit(err);
+
+    if (BL602Config::ConfigValueExists(BL602Config::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        rebootCount = 0;
+    }
+
+    err = StoreRebootCount(rebootCount + 1);
+    SuccessOrExit(err);
+
+    if (!BL602Config::ConfigValueExists(BL602Config::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
@@ -90,6 +111,26 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return BL602Config::ReadConfigValue(BL602Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return BL602Config::WriteConfigValue(BL602Config::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(BL602Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(BL602Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
@@ -172,12 +213,22 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
-
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-    ef_port_erase_all();
+    ef_env_set_default();
     ChipLogProgress(DeviceLayer, "System restarting");
     hal_reboot();
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+    bl_efuse_read_mac(buf);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

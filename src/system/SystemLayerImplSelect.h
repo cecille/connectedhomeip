@@ -90,12 +90,20 @@ protected:
         int mFD;
         SocketEvents mPendingIO;
         SocketWatchCallback mCallback;
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        dispatch_source_t mRdSource;
+        dispatch_source_t mWrSource;
+        void DisableAndClear();
+#endif
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
+    // List of expired timers being processed right now.  Stored in a member so
+    // we can cancel them.
+    TimerList mExpiredTimers;
     timeval mNextTimeout;
 
     // Members for select loop

@@ -14,6 +14,9 @@
 
 name: 7.2.1. [TC-TMP-2.1] Attributes with server as DUT
 
+PICS:
+    - TMP.S
+
 config:
     nodeId: 0x12344321
     cluster: "Temperature Measurement"
@@ -28,41 +31,42 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MeasuredValue"
-      PICS: TM.S.A0000
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: int16
-
-    - label: "read the mandatory attribute: MinMeasuredValue"
-      PICS: TM.S.A0001
+    - label: "Read the mandatory attribute: MinMeasuredValue"
+      PICS: TMP.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27315
-              maxValue: 32766
+              maxValue: 32767
 
-    - label: "read the mandatory attribute: MaxMeasuredValue"
-      PICS: TM.S.A0002
+    - label: "Read the mandatory attribute: MaxMeasuredValue"
+      PICS: TMP.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
               minValue: -27314
               maxValue: 32767
 
-    - label: "read the optional attribute: Tolerance"
-      PICS: TM.S.A0003
-      optional: true
+    - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: TMP.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: -27315
+              maxValue: 32767
+
+    - label: "Read the optional attribute: Tolerance"
+      PICS: TMP.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048

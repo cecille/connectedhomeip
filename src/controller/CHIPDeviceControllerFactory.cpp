@@ -24,7 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -86,6 +86,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.fabricIndependentStorage = mFabricIndependentStorage;
         params.enableServerInteractions = mEnableServerInteractions;
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
+        params.sessionKeystore          = mSystemState->GetSessionKeystore();
         params.fabricTable              = mSystemState->Fabrics();
         params.operationalKeystore      = mOperationalKeystore;
         params.opCertStore              = mOpCertStore;
@@ -129,6 +130,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     // OperationalCertificateStore needs to be provided to init the fabric table if fabric table is
     // not provided wholesale.
     ReturnErrorCodeIf((params.fabricTable == nullptr) && (params.opCertStore == nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(params.sessionKeystore == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -166,6 +168,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
+    stateParams.sessionKeystore           = params.sessionKeystore;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
     stateParams.fabricTable = params.fabricTable;
@@ -198,14 +201,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,
-                                                      stateParams.fabricTable));
+                                                      stateParams.fabricTable, *stateParams.sessionKeystore));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
 
-    InitDataModelHandler(stateParams.exchangeMgr);
-
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable));
+    InitDataModelHandler();
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -244,27 +245,30 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
-    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+    stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
+    stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
-    DeviceProxyInitParams deviceInitParams = {
+    CASEClientInitParams sessionInitParams = {
         .sessionManager           = stateParams.sessionMgr,
         .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
         .exchangeMgr              = stateParams.exchangeMgr,
         .fabricTable              = stateParams.fabricTable,
-        .clientPool               = stateParams.caseClientPool,
         .groupDataProvider        = stateParams.groupDataProvider,
         .mrpLocalConfig           = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
-        .sessionInitParams = deviceInitParams,
-        .devicePool        = stateParams.operationalDevicePool,
+        .sessionInitParams = sessionInitParams,
+        .clientPool        = stateParams.caseClientPool,
+        .sessionSetupPool  = stateParams.sessionSetupPool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
+
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
+                                                                                stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
@@ -281,6 +285,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                        = params.controllerNOC;
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
+    controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -388,13 +393,13 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mCASEClientPool and mDevicePool must be deallocated
+    // mCASEClientPool and mSessionSetupPool must be deallocated
     // after mCASESessionManager, which uses them.
 
-    if (mOperationalDevicePool != nullptr)
+    if (mSessionSetupPool != nullptr)
     {
-        Platform::Delete(mOperationalDevicePool);
-        mOperationalDevicePool = nullptr;
+        Platform::Delete(mSessionSetupPool);
+        mSessionSetupPool = nullptr;
     }
 
     if (mCASEClientPool != nullptr)
@@ -416,19 +421,6 @@ void DeviceControllerSystemState::Shutdown()
         chip::Platform::Delete(mTransportMgr);
         mTransportMgr = nullptr;
     }
-
-#if CONFIG_DEVICE_LAYER
-    //
-    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
-    // expects to be called with external thread synchronization and will not try to acquire the
-    // stack lock.
-    //
-    // Actually stopping the event queue is a separable call that applications will have to sequence.
-    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
-    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
-    //
-    DeviceLayer::PlatformMgr().Shutdown();
-#endif
 
     if (mExchangeMgr != nullptr)
     {
@@ -474,6 +466,7 @@ void DeviceControllerSystemState::Shutdown()
 
     if (mTempFabricTable != nullptr)
     {
+        mTempFabricTable->Shutdown();
         chip::Platform::Delete(mTempFabricTable);
         mTempFabricTable = nullptr;
         // if we created a temp fabric table, then mFabrics points to it.
@@ -481,6 +474,19 @@ void DeviceControllerSystemState::Shutdown()
         // so that SetupController/Commissioner can use it
         mFabrics = nullptr;
     }
+
+#if CONFIG_DEVICE_LAYER
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
+    DeviceLayer::PlatformMgr().Shutdown();
+#endif
 }
 
 } // namespace Controller

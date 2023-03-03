@@ -19,7 +19,7 @@
 #pragma once
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
-#include "../../config/PersistentStorage.h"
+#include <controller/ExamplePersistentStorage.h>
 #endif // CONFIG_USE_LOCAL_STORAGE
 
 #include "Command.h"
@@ -29,6 +29,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <crypto/RawKeySessionKeystore.h>
 
 #pragma once
 
@@ -59,23 +60,32 @@ public:
     static constexpr uint16_t kMaxGroupsPerFabric    = 5;
     static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
-    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
-        Command(commandName), mCredIssuerCmds(credIssuerCmds)
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
+        Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
     {
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
-        AddArgument(
-            "commissioner-name", &mCommissionerName,
-            "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to 4.");
+        AddArgument("cd-trust-store-path", &mCDTrustStorePath,
+                    "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
+                    "directory.");
+        AddArgument("commissioner-name", &mCommissionerName,
+                    "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
+                    "4.  The default if not specified is \"alpha\".");
         AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId,
                     "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
+        AddArgument("use-max-sized-certs", 0, 1, &mUseMaxSizedCerts,
+                    "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
+                    "certificates are generated.");
+        AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
+                    "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
+                    "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-        AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
+        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
     }
 
     /////////// Command Interface /////////
@@ -84,6 +94,14 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;
+        // In interactive mode the stack is not shut down once a command is ended.
+        // That means calling `ErrorStr(err)` from the main thread when command
+        // completion is signaled may race since `ErrorStr` uses a static sErrorStr
+        // buffer for computing the error string.  Call it here instead.
+        if (IsInteractive() && CHIP_NO_ERROR != status)
+        {
+            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(status));
+        }
         StopWaiting();
     }
 
@@ -114,20 +132,29 @@ protected:
     // use member values that Shutdown will normally reset.
     virtual bool DeferInteractiveCleanup() { return false; }
 
+    // If true, the controller will be created with server capabilities enabled,
+    // such as advertising operational nodes over DNS-SD and accepting incoming
+    // CASE sessions.
+    virtual bool NeedsOperationalAdvertising() { return false; }
+
     // Execute any deferred cleanups.  Used when exiting interactive mode.
-    void ExecuteDeferredCleanups();
+    static void ExecuteDeferredCleanups(intptr_t ignored);
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mDefaultStorage;
+    // TODO: It's pretty weird that we re-init mCommissionerStorage for every
+    // identity without shutting it down or something in between...
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
-    chip::Credentials::GroupDataProviderImpl mGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+    static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
+    CHIP_ERROR GetIdentityNodeId(std::string identity, chip::NodeId * nodeId);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
@@ -135,23 +162,46 @@ protected:
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 
-    ChipDeviceCommissioner & GetCommissioner(const char * identity);
+    ChipDeviceCommissioner & GetCommissioner(std::string identity);
 
 private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();
 
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
-                                      const chip::Credentials::AttestationTrustStore * trustStore);
-    void ShutdownCommissioner(std::string key);
+    CHIP_ERROR EnsureCommissionerForIdentity(std::string identity);
+
+    // Commissioners are keyed by name and local node id.
+    struct CommissionerIdentity
+    {
+        bool operator<(const CommissionerIdentity & other) const
+        {
+            return mName < other.mName || (mName == other.mName && mLocalNodeId < other.mLocalNodeId);
+        }
+        std::string mName;
+        chip::NodeId mLocalNodeId;
+    };
+
+    // InitializeCommissioner uses various members, so can't be static.  This is
+    // obviously a little odd, since the commissioners are then shared across
+    // multiple commands in interactive mode...
+    CHIP_ERROR InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId);
+    void ShutdownCommissioner(const CommissionerIdentity & key);
     chip::FabricId CurrentCommissionerId();
-    static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+
+    static std::map<CommissionerIdentity, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;
 
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
+    chip::Optional<char *> mCDTrustStorePath;
+    chip::Optional<bool> mUseMaxSizedCerts;
+    chip::Optional<bool> mOnlyAllowTrustedCdKeys;
+
+    // Cached trust store so commands other than the original startup command
+    // can spin up commissioners as needed.
+    static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

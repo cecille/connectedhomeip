@@ -14,6 +14,9 @@
 
 name: 12.2.2. [TC-TSUIC-2.2] Primary functionality with server as DUT
 
+PICS:
+    - TSUIC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thermostat User Interface Configuration"
@@ -31,14 +34,14 @@ tests:
     - label: "Writes a value of 0 to TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       arguments:
           value: 0
 
     - label: "Verify device temperature displayed in °C"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0000
       arguments:
           values:
               - name: "message"
@@ -49,21 +52,21 @@ tests:
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
-      arguments:
+      attribute: "TemperatureDisplayMode"
+      response:
           value: 0
 
     - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       arguments:
           value: 1
 
     - label: "Verify device temperature displayed in °F"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0000
       arguments:
           values:
               - name: "message"
@@ -74,7 +77,7 @@ tests:
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       response:
           value: 1
 
@@ -83,7 +86,7 @@ tests:
           of DUT"
       PICS: TSUIC.S.A0000
       command: "writeAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       arguments:
           value: 2
       response:
@@ -92,21 +95,21 @@ tests:
     - label: "TH reads the TemperatureDisplayMode attribute of DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       response:
           value: 1
 
     - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 0
 
     - label: "Verify all device functionality available to the user"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -117,21 +120,21 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 0
 
     - label: "Writes a value of 1 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 1
 
     - label: "Verify device operates at Level 1 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -142,21 +145,21 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 1
 
     - label: "Writes a value of 2 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 2
 
     - label: "Verify device operates at Level 2 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -167,21 +170,21 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 2
 
     - label: "Writes a value of 3 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 3
 
     - label: "Verify device operates at Level 3 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -192,21 +195,21 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 3
 
     - label: "Writes a value of 4 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 4
 
     - label: "Verify device operates at Level 4 reduced functionality"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -217,21 +220,21 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 4
 
     - label: "Writes a value of 5 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 5
 
     - label: "Verify device operates at least functionality level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
       arguments:
           values:
               - name: "message"
@@ -242,7 +245,7 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 5
 
@@ -250,7 +253,7 @@ tests:
           "Writes a value of greater than 5 to KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "writeAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       arguments:
           value: 6
       response:
@@ -259,15 +262,15 @@ tests:
     - label: "TH reads the KeypadLockout attribute of DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           value: 5
 
     - label:
           "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
-      PICS: TSUIC.S.A0001
+      PICS: TSUIC.S.A0002
       command: "writeAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       arguments:
           value: 0
 
@@ -276,7 +279,7 @@ tests:
           thermostat"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0002
       arguments:
           values:
               - name: "message"
@@ -287,7 +290,7 @@ tests:
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           value: 0
 
@@ -295,7 +298,7 @@ tests:
           "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       arguments:
           value: 1
 
@@ -304,7 +307,7 @@ tests:
           thermostat"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0002
       arguments:
           values:
               - name: "message"
@@ -315,7 +318,7 @@ tests:
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           value: 1
 
@@ -324,7 +327,7 @@ tests:
           attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "writeAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       arguments:
           value: 2
       response:
@@ -333,6 +336,6 @@ tests:
     - label: "TH reads the ScheduleProgrammingVisibility attribute of DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           value: 1

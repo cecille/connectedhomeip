@@ -48,6 +48,36 @@ OptionDef gCmdOptionDefs[] =
     { "subject-fab-id",      kArgumentRequired, 'f' },
     { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
+    { "subject-cn-p",        kArgumentRequired, 'b' },
+    { "subject-su-u",        kArgumentRequired, 'd' },
+    { "subject-su-p",        kArgumentRequired, 'e' },
+    { "subject-sn-u",        kArgumentRequired, 'g' },
+    { "subject-sn-p",        kArgumentRequired, 'j' },
+    { "subject-co-u",        kArgumentRequired, 'm' },
+    { "subject-co-p",        kArgumentRequired, 'n' },
+    { "subject-ln-u",        kArgumentRequired, 'q' },
+    { "subject-ln-p",        kArgumentRequired, 'r' },
+    { "subject-pn-u",        kArgumentRequired, 's' },
+    { "subject-pn-p",        kArgumentRequired, 'u' },
+    { "subject-on-u",        kArgumentRequired, 'w' },
+    { "subject-on-p",        kArgumentRequired, 'y' },
+    { "subject-un-u",        kArgumentRequired, 'z' },
+    { "subject-un-p",        kArgumentRequired, 'U' },
+    { "subject-ti-u",        kArgumentRequired, 'W' },
+    { "subject-ti-p",        kArgumentRequired, 'S' },
+    { "subject-na-u",        kArgumentRequired, 'T' },
+    { "subject-na-p",        kArgumentRequired, 'A' },
+    { "subject-gn-u",        kArgumentRequired, 'B' },
+    { "subject-gn-p",        kArgumentRequired, 'D' },
+    { "subject-in-u",        kArgumentRequired, 'G' },
+    { "subject-in-p",        kArgumentRequired, 'H' },
+    { "subject-gq-u",        kArgumentRequired, 'J' },
+    { "subject-gq-p",        kArgumentRequired, 'L' },
+    { "subject-dq-u",        kArgumentRequired, 'M' },
+    { "subject-dq-p",        kArgumentRequired, 'N' },
+    { "subject-ps-u",        kArgumentRequired, 'P' },
+    { "subject-ps-p",        kArgumentRequired, 'Q' },
+    { "subject-dc-i",        kArgumentRequired, 'R' },
     { "path-len-constraint", kArgumentRequired, 'p' },
     { "future-ext-sub",      kArgumentRequired, 'x' },
     { "future-ext-info",     kArgumentRequired, '2' },
@@ -93,7 +123,25 @@ const char * const gCmdOptionHelp =
     "       Subject DN CHIP CASE Authentication Tag in hexadecimal format with upto 4 octets with or without '0x' prefix.\n"
     "       The version subfield (lower 16 bits) should be different from 0.\n"
     "\n"
-    "   -c, --subject-cn-u <string>\n"
+    "   Variety of DN attributes are also supported and can be added to the subject DN of the certificate.\n"
+    "   These attributes can be encoded as UTF8String, PrintableString or IA5String as specified below:\n"
+    "\n"
+    "   -<c/b>, --subject-cn-<u/p> <string>  - commonName attribute             <UTF8String/PrintableString>\n"
+    "   -<d/e>, --subject-su-<u/p> <string>  - surname attribute                <UTF8String/PrintableString>\n"
+    "   -<g/j>, --subject-sn-<u/p> <string>  - serialNumber attribute           <UTF8String/PrintableString>\n"
+    "   -<m/n>, --subject-co-<u/p> <string>  - countryName attribute            <UTF8String/PrintableString>\n"
+    "   -<q/r>, --subject-ln-<u/p> <string>  - localityName attribute           <UTF8String/PrintableString>\n"
+    "   -<s/u>, --subject-pn-<u/p> <string>  - stateOrProvinceName attribute    <UTF8String/PrintableString>\n"
+    "   -<w/y>, --subject-on-<u/p> <string>  - organizationName attribute       <UTF8String/PrintableString>\n"
+    "   -<z/U>, --subject-un-<u/p> <string>  - organizationalUnitName attribute <UTF8String/PrintableString>\n"
+    "   -<V/S>, --subject-ti-<u/p> <string>  - title attribute                  <UTF8String/PrintableString>\n"
+    "   -<T/A>, --subject-na-<u/p> <string>  - name attribute                   <UTF8String/PrintableString>\n"
+    "   -<B/D>, --subject-gn-<u/p> <string>  - givenName attribute              <UTF8String/PrintableString>\n"
+    "   -<G/H>, --subject-in-<u/p> <string>  - initials attribute               <UTF8String/PrintableString>\n"
+    "   -<J/L>, --subject-gq-<u/p> <string>  - generationQualifier attribute    <UTF8String/PrintableString>\n"
+    "   -<M/N>, --subject-dq-<u/p> <string>  - dnQualifier attribute            <UTF8String/PrintableString>\n"
+    "   -<P/Q>, --subject-ps-<u/p> <string>  - pseudonym attribute              <UTF8String/PrintableString>\n"
+    "   -R,     --subject-dc-i     <string>  - domainComponent attribute        <IA5String>\n"
     "\n"
     "       Subject DN Common Name attribute encoded as UTF8String.\n"
     "\n"
@@ -110,27 +158,29 @@ const char * const gCmdOptionHelp =
     "\n"
     "       NID_info_access extension to be added to the list of certificate extensions.\n"
     "\n"
-    "   -C, --ca-cert <file>\n"
+    "   -C, --ca-cert <file/str>\n"
     "\n"
-    "       File containing CA certificate to be used to sign the new certificate.\n"
+    "       File or string containing CA certificate to be used to sign the new certificate.\n"
     "\n"
-    "   -K, --ca-key <file>\n"
+    "   -K, --ca-key <file/str>\n"
     "\n"
-    "       File containing CA private key to be used to sign the new certificate.\n"
+    "       File or string containing CA private key to be used to sign the new certificate.\n"
     "\n"
-    "   -k, --key <file>\n"
+    "   -k, --key <file/str>\n"
     "\n"
-    "       File containing the public and private keys for the new certificate.\n"
+    "       File or string containing the public and private keys for the new certificate.\n"
     "       If not specified, a new key pair will be generated.\n"
     "\n"
-    "   -o, --out <file>\n"
+    "   -o, --out <file/stdout>\n"
     "\n"
     "       File to contain the new certificate.\n"
+    "       If specified '-' then output is written to stdout.\n"
     "\n"
-    "   -O, --out-key <file>\n"
+    "   -O, --out-key <file/stdout>\n"
     "\n"
     "       File to contain the public/private key for the new certificate.\n"
     "       This option must be specified if the --key option is not.\n"
+    "       If specified '-' then output is written to stdout.\n"
     "\n"
     "  -F, --out-format <format>\n"
     "\n"
@@ -138,10 +188,11 @@ const char * const gCmdOptionHelp =
     "       If not specified, the default base-64 encoded CHIP format is used.\n"
     "       Supported format parametes are:\n"
     "           x509-pem  - X.509 PEM format\n"
-    "           x509-der  - X.509 DER format\n"
+    "           x509-der  - X.509 DER raw format\n"
+    "           x509-hex  - X.509 DER hex encoded format\n"
     "           chip      - raw CHIP TLV format\n"
-    "           chip-hex  - hex encoded CHIP TLV format\n"
     "           chip-b64  - base-64 encoded CHIP TLV format (default)\n"
+    "           chip-hex  - hex encoded CHIP TLV format\n"
     "\n"
     "   -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]\n"
     "\n"
@@ -179,14 +230,16 @@ const char * const gCmdOptionHelp =
     "           validity-wrong                   - Certificate will have validity not-before and not-after values switched,\n"
     "                                              where not-before will have greater value than not-after.\n"
     "           subject-missing                  - Certificate won't have required Subject field.\n"
-    "           subject-node-id-missing          - Subject won't have NodeId attribute.\n"
+    "           subject-matter-id-missing        - Subject won't have Matter Id (Node, ICAC or RCAC identifier) attribute.\n"
     "           subject-node-id-invalid          - Subject will include invalid NodeId value.\n"
-    "           subject-node-id-twice            - Subject will include two NodeId attributes.\n"
+    "           subject-matter-id-twice          - Subject will include two Matter Id (Node, ICAC or RCAC identifier) attributes.\n"
     "           subject-fabric-id-missing        - Subject won't have FabricId attribute.\n"
     "           subject-fabric-id-invalid        - Subject will include invalid FabricId value.\n"
     "           subject-fabric-id-twice          - Subject will include two FabricId attributes.\n"
     "           subject-fabric-id-mismatch       - The FabricId in the subject won't match FabricId in the issuer field.\n"
     "           subject-cat-invalid              - Subject will include invalid CASE Authenticated Tag (CAT) value.\n"
+    "           subject-cat-twice                - Subject will include two valid CAT attributes with same Value component\n"
+    "                                              but different Version components.\n"
     "           sig-curve                        - Use secp256k1 curve to generate certificate signature instead of\n"
     "                                              required secp256r1 (aka prime256v1).\n"
     "           publickey                        - Error will be injected in one of the bytes of the public key value.\n"
@@ -195,8 +248,8 @@ const char * const gCmdOptionHelp =
     "           ext-basic-critical-missing       - Basic Constraint extension won't have critical field.\n"
     "           ext-basic-critical-wrong         - Basic Constraint extension will be marked as non-critical.\n"
     "           ext-basic-ca-missing             - Basic Constraint extension won't have cA field.\n"
-    "           ext-basic-ca-wrong               - Basic Constraint extension cA field will be set to TRUE for DAC\n"
-    "                                              and to FALSE for PAI and PAA.\n"
+    "           ext-basic-ca-wrong               - Basic Constraint extension cA field will be set to TRUE for NOC\n"
+    "                                              and to FALSE for ICAC/RCAC.\n"
     "           ext-basic-pathlen-presence-wrong - Basic Constraint extension will include pathLen field for NOC.\n"
     "           ext-basic-pathlen0               - Basic Constraint extension pathLen field will be set to 0.\n"
     "           ext-basic-pathlen1               - Basic Constraint extension pathLen field will be set to 1.\n"
@@ -210,8 +263,10 @@ const char * const gCmdOptionHelp =
     "                                              and won't be set for ICAC/RCAC.\n"
     "           ext-key-usage-crl-sign           - Key Usage extension cRLSign flag will be set for NOC\n"
     "                                              and won't set for ICAC/RCAC.\n"
-    "           ext-akid-missing                 - Certificate won't have required Authority Key ID extension.\n"
-    "           ext-skid-missing                 - Certificate won't have required Subject Key ID extension.\n"
+    "           ext-akid-missing                 - Certificate won't have required Authority Key ID (AKID) extension.\n"
+    "           ext-akid-len-invalid             - Authority Key ID (AKID) extension length is 19 bytes instead of required 20.\n"
+    "           ext-skid-missing                 - Certificate won't have required Subject Key ID (SKID) extension.\n"
+    "           ext-skid-len-invalid             - Subject Key ID (SKID) extension length is 19 bytes instead of required 20.\n"
     "           ext-extended-key-usage-missing   - Certificate won't have required Extended Key Usage extension.\n"
     "           signature                        - Error will be injected in one of the bytes of the signature value.\n"
    "\n"
@@ -242,19 +297,19 @@ OptionSet *gCmdOptionSets[] =
 // clang-format on
 
 ToolChipDN gSubjectDN;
-uint8_t gCertType                    = kCertType_NotSpecified;
-int gPathLengthConstraint            = kPathLength_NotSpecified;
-bool gSelfSign                       = false;
-const char * gCACertFileName         = nullptr;
-const char * gCAKeyFileName          = nullptr;
-const char * gInKeyFileName          = nullptr;
-const char * gOutCertFileName        = nullptr;
-const char * gOutKeyFileName         = nullptr;
-CertFormat gOutCertFormat            = kCertFormat_Chip_Base64;
-KeyFormat gOutKeyFormat              = kKeyFormat_Chip_Base64;
-uint32_t gValidDays                  = kCertValidDays_Undefined;
-FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
-uint8_t gFutureExtensionsCount       = 0;
+uint8_t gCertType                           = kCertType_NotSpecified;
+int gPathLengthConstraint                   = kPathLength_NotSpecified;
+bool gSelfSign                              = false;
+const char * gCACertFileNameOrStr           = nullptr;
+const char * gCAKeyFileNameOrStr            = nullptr;
+const char * gInKeyFileNameOrStr            = nullptr;
+const char * gOutCertFileName               = nullptr;
+const char * gOutKeyFileName                = nullptr;
+CertFormat gOutCertFormat                   = kCertFormat_Default;
+KeyFormat gOutKeyFormat                     = kKeyFormat_Default;
+uint32_t gValidDays                         = kCertValidDays_Undefined;
+FutureExtensionWithNID gFutureExtensions[3] = { { 0, nullptr } };
+uint8_t gFutureExtensionsCount              = 0;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -310,7 +365,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 PrintArgError("%s: Invalid value specified for chip node-id attribute: %s\n", progName, arg);
                 return false;
             }
-            if (gCertConfig.IsSubjectNodeIdPresent())
+            if (gCertConfig.IsSubjectMatterIdPresent())
             {
                 if (gCertConfig.IsSubjectNodeIdValid())
                 {
@@ -320,7 +375,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
                 {
                     err = gSubjectDN.AddAttribute_MatterNodeId(chip::kMaxOperationalNodeId + 10);
                 }
-                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectNodeIdRepeatsTwice())
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
                 {
                     err = gSubjectDN.AddAttribute_MatterNodeId(chip64bitAttr + 1);
                 }
@@ -330,10 +385,24 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             err = gSubjectDN.AddAttribute_MatterFirmwareSigningId(chip64bitAttr);
             break;
         case kCertType_ICA:
-            err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
+            if (gCertConfig.IsSubjectMatterIdPresent())
+            {
+                err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr);
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
+                {
+                    err = gSubjectDN.AddAttribute_MatterICACId(chip64bitAttr + 1);
+                }
+            }
             break;
         case kCertType_Root:
-            err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
+            if (gCertConfig.IsSubjectMatterIdPresent())
+            {
+                err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr);
+                if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectMatterIdRepeatsTwice())
+                {
+                    err = gSubjectDN.AddAttribute_MatterRCACId(chip64bitAttr + 1);
+                }
+            }
             break;
         default:
             PrintArgError("%s: Certificate type argument should be specified prior to subject attribute: %s\n", progName, arg);
@@ -414,6 +483,246 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             return false;
         }
         break;
+    case 'b':
+        err = gSubjectDN.AddAttribute_CommonName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'd':
+        err = gSubjectDN.AddAttribute_Surname(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Surname attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'e':
+        err = gSubjectDN.AddAttribute_Surname(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Surname attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'g':
+        err = gSubjectDN.AddAttribute_SerialNumber(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Serial Number attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'j':
+        err = gSubjectDN.AddAttribute_SerialNumber(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Serial Number attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'm':
+        err = gSubjectDN.AddAttribute_CountryName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Country Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'n':
+        err = gSubjectDN.AddAttribute_CountryName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Country Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'q':
+        err = gSubjectDN.AddAttribute_LocalityName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Locality Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'r':
+        err = gSubjectDN.AddAttribute_LocalityName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Locality Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 's':
+        err = gSubjectDN.AddAttribute_StateOrProvinceName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add stateOrProvinceName attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'u':
+        err = gSubjectDN.AddAttribute_StateOrProvinceName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add stateOrProvinceName attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'w':
+        err = gSubjectDN.AddAttribute_OrganizationName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organization Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'y':
+        err = gSubjectDN.AddAttribute_OrganizationName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organization Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'z':
+        err = gSubjectDN.AddAttribute_OrganizationalUnitName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organizational Unit Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'U':
+        err = gSubjectDN.AddAttribute_OrganizationalUnitName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Organizational Unit Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'W':
+        err = gSubjectDN.AddAttribute_Title(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Title attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'S':
+        err = gSubjectDN.AddAttribute_Title(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Title attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'T':
+        err = gSubjectDN.AddAttribute_Name(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'A':
+        err = gSubjectDN.AddAttribute_Name(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'B':
+        err = gSubjectDN.AddAttribute_GivenName(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Given Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'D':
+        err = gSubjectDN.AddAttribute_GivenName(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Given Name attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'G':
+        err = gSubjectDN.AddAttribute_Initials(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Initials attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'H':
+        err = gSubjectDN.AddAttribute_Initials(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Initials attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'J':
+        err = gSubjectDN.AddAttribute_GenerationQualifier(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Generation Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'L':
+        err = gSubjectDN.AddAttribute_GenerationQualifier(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Generation Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'M':
+        err = gSubjectDN.AddAttribute_DNQualifier(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add DN Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'N':
+        err = gSubjectDN.AddAttribute_DNQualifier(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add DN Qualifier attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'P':
+        err = gSubjectDN.AddAttribute_Pseudonym(chip::CharSpan::fromCharString(arg), false);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Pseudonym attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'Q':
+        err = gSubjectDN.AddAttribute_Pseudonym(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Pseudonym attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
+    case 'R':
+        err = gSubjectDN.AddAttribute_DomainComponent(chip::CharSpan::fromCharString(arg), true);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "Failed to add Domain Component attribute to the subject DN: %s\n", chip::ErrorStr(err));
+            return false;
+        }
+        break;
     case 'x':
         gFutureExtensions[gFutureExtensionsCount].nid  = NID_subject_alt_name;
         gFutureExtensions[gFutureExtensionsCount].info = arg;
@@ -425,13 +734,13 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gFutureExtensionsCount++;
         break;
     case 'k':
-        gInKeyFileName = arg;
+        gInKeyFileNameOrStr = arg;
         break;
     case 'C':
-        gCACertFileName = arg;
+        gCACertFileNameOrStr = arg;
         break;
     case 'K':
-        gCAKeyFileName = arg;
+        gCAKeyFileNameOrStr = arg;
         break;
     case 'o':
         gOutCertFileName = arg;
@@ -449,6 +758,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gOutCertFormat = kCertFormat_X509_DER;
             gOutKeyFormat  = kKeyFormat_X509_DER;
+        }
+        else if (strcmp(arg, "x509-hex") == 0)
+        {
+            gOutCertFormat = kCertFormat_X509_Hex;
+            gOutKeyFormat  = kKeyFormat_X509_Hex;
         }
         else if (strcmp(arg, "chip") == 0)
         {
@@ -526,17 +840,17 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCertConfig.SetSubjectMissing();
         }
-        else if (strcmp(arg, "subject-node-id-missing") == 0)
+        else if (strcmp(arg, "subject-matter-id-missing") == 0)
         {
-            gCertConfig.SetSubjectNodeIdMissing();
+            gCertConfig.SetSubjectMatterIdMissing();
         }
         else if (strcmp(arg, "subject-node-id-invalid") == 0)
         {
             gCertConfig.SetSubjectNodeIdInvalid();
         }
-        else if (strcmp(arg, "subject-node-id-twice") == 0)
+        else if (strcmp(arg, "subject-matter-id-twice") == 0)
         {
-            gCertConfig.SetSubjectNodeIdTwice();
+            gCertConfig.SetSubjectMatterIdTwice();
         }
         else if (strcmp(arg, "subject-fabric-id-missing") == 0)
         {
@@ -557,6 +871,10 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         else if (strcmp(arg, "subject-cat-invalid") == 0)
         {
             gCertConfig.SetSubjectCATInvalid();
+        }
+        else if (strcmp(arg, "subject-cat-twice") == 0)
+        {
+            gCertConfig.SetSubjectCATTwice();
         }
         else if (strcmp(arg, "sig-curve") == 0)
         {
@@ -630,9 +948,17 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gCertConfig.SetExtensionAKIDMissing();
         }
+        else if (strcmp(arg, "ext-akid-len-invalid") == 0)
+        {
+            gCertConfig.SetExtensionAKIDLengthInvalid();
+        }
         else if (strcmp(arg, "ext-skid-missing") == 0)
         {
             gCertConfig.SetExtensionSKIDMissing();
+        }
+        else if (strcmp(arg, "ext-skid-len-invalid") == 0)
+        {
+            gCertConfig.SetExtensionSKIDLengthInvalid();
         }
         else if (strcmp(arg, "ext-extended-key-usage-missing") == 0)
         {
@@ -666,7 +992,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     uint8_t certType = kCertType_NotSpecified;
     std::unique_ptr<X509, void (*)(X509 *)> newCert(X509_new(), &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> newKey(EVP_PKEY_new(), &EVP_PKEY_free);
-    std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
     X509 * caCertPtr    = nullptr;
     EVP_PKEY * caKeyPtr = nullptr;
@@ -695,7 +1021,7 @@ bool Cmd_GenCert(int argc, char * argv[])
                 "certificates.\n");
     }
 
-    if (gSubjectDN.IsEmpty())
+    if (gSubjectDN.IsEmpty() && gCertConfig.IsSubjectMatterIdPresent())
     {
         fprintf(stderr, "Please specify the subject DN attributes.\n");
         ExitNow(res = false);
@@ -716,9 +1042,15 @@ bool Cmd_GenCert(int argc, char * argv[])
         }
     }
 
-    if (!gCertConfig.IsSubjectCATValid())
+    if (!gCertConfig.IsSubjectCATValid() || gCertConfig.IsSubjectCATRepeatsTwice())
     {
-        err = gSubjectDN.AddAttribute_MatterCASEAuthTag(0xABCD0000);
+        uint32_t cat = gCertConfig.IsSubjectCATValid() ? 0xABCD0010 : 0xABCD0000;
+
+        err = gSubjectDN.AddAttribute_MatterCASEAuthTag(cat);
+        if ((err == CHIP_NO_ERROR) && gCertConfig.IsSubjectCATRepeatsTwice())
+        {
+            err = gSubjectDN.AddAttribute_MatterCASEAuthTag(cat + 8);
+        }
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Invalid CAT to the Subject DN: %s\n", chip::ErrorStr(err));
@@ -741,18 +1073,18 @@ bool Cmd_GenCert(int argc, char * argv[])
         }
     }
 
-    if (gCACertFileName == nullptr && !gSelfSign)
+    if (gCACertFileNameOrStr == nullptr && !gSelfSign)
     {
-        fprintf(stderr, "Please specify the CA certificate file name using the --ca-cert option.\n");
+        fprintf(stderr, "Please specify the CA certificate using the --ca-cert option.\n");
         ExitNow(res = false);
     }
-    else if (gCACertFileName != nullptr && gSelfSign)
+    else if (gCACertFileNameOrStr != nullptr && gSelfSign)
     {
         fprintf(stderr, "Please don't specify --ca-cert option for the self signed certificate. \n");
         ExitNow(res = false);
     }
 
-    if (gCACertFileName != nullptr && gCAKeyFileName == nullptr)
+    if (gCACertFileNameOrStr != nullptr && gCAKeyFileNameOrStr == nullptr)
     {
         fprintf(stderr, "Please specify the CA key file name using the --ca-key option.\n");
         ExitNow(res = false);
@@ -764,7 +1096,7 @@ bool Cmd_GenCert(int argc, char * argv[])
         ExitNow(res = false);
     }
 
-    if (gInKeyFileName == nullptr && gOutKeyFileName == nullptr)
+    if (gInKeyFileNameOrStr == nullptr && gOutKeyFileName == nullptr)
     {
         fprintf(stderr, "Please specify the file name for the new public/private key using the --out-key option.\n");
         ExitNow(res = false);
@@ -804,9 +1136,9 @@ bool Cmd_GenCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    if (gInKeyFileName != nullptr)
+    if (gInKeyFileNameOrStr != nullptr)
     {
-        res = ReadKey(gInKeyFileName, newKey.get());
+        res = ReadKey(gInKeyFileNameOrStr, newKey);
         VerifyTrueOrExit(res);
     }
     else
@@ -830,10 +1162,10 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
     else
     {
-        res = ReadCert(gCACertFileName, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
-        res = ReadKey(gCAKeyFileName, caKey.get());
+        res = ReadKey(gCAKeyFileNameOrStr, caKey);
         VerifyTrueOrExit(res);
 
         caCertPtr = caCert.get();
@@ -844,14 +1176,13 @@ bool Cmd_GenCert(int argc, char * argv[])
                    gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig);
     VerifyTrueOrExit(res);
 
-    if (gCertConfig.IsErrorTestCaseEnabled() &&
-        (gOutCertFormat == kCertFormat_Chip_Raw || gOutCertFormat == kCertFormat_Chip_Base64))
+    if (gCertConfig.IsErrorTestCaseEnabled() && IsChipCertFormat(gOutCertFormat))
     {
-        static constexpr uint32_t kExtraBufferLengthForOvesizedCert = 300;
-        uint8_t chipCertBuf[kMaxCHIPCertLength + kExtraBufferLengthForOvesizedCert];
-        chip::MutableByteSpan chipCert(chipCertBuf);
-        err = MakeCertChipTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
-                              gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
+        uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
+        std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
+        chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
+        err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
+                          gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
         VerifyTrueOrExit(err == CHIP_NO_ERROR);
 
         res = WriteChipCert(gOutCertFileName, chipCert, gOutCertFormat);
@@ -865,7 +1196,7 @@ bool Cmd_GenCert(int argc, char * argv[])
 
     if (gOutKeyFileName != nullptr)
     {
-        res = WritePrivateKey(gOutKeyFileName, newKey.get(), gOutKeyFormat);
+        res = WriteKey(gOutKeyFileName, newKey.get(), gOutKeyFormat);
         VerifyTrueOrExit(res);
     }
 

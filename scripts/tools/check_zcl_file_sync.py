@@ -23,10 +23,10 @@ Current rule:
     Ensure that the two fies are in sync EXCEPT the extension.
 """
 
-import json
-import sys
-import os
 import difflib
+import json
+import os
+import sys
 
 
 def main():
@@ -48,6 +48,11 @@ def main():
     # is at the end or in the middle
     base_data["xmlFile"].sort()
     ext_data["xmlFile"].sort()
+
+    # remove the description. That is expected to be different, so we
+    # will completely exclude it from the comparison.
+    del base_data["description"]
+    del ext_data["description"]
 
     if base_data == ext_data:
         return 0

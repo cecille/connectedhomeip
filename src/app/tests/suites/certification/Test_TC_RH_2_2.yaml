@@ -14,6 +14,9 @@
 
 name: 9.2.2. [TC-RH-2.2] Primary functionality with server as DUT
 
+PICS:
+    - RH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
@@ -31,31 +34,31 @@ tests:
     - label: "Reads constraints of attribute: MinMeasuredValue"
       PICS: RH.S.A0001
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 9999
 
     - label: "Reads constraints of attribute: MaxMeasuredValue"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: RH.S.A0002
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 1
               maxValue: 10000
 
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       PICS: RH.S.A0000
       response:
           saveAs: ValueBeforeChange
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 10000
 
@@ -72,9 +75,9 @@ tests:
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
-      PICS: RH.S.A0000
+      attribute: "MeasuredValue"
+      PICS: RH.S.A0000 && RH.M.ManuallyControlled
       response:
           constraints:
-              type: uint16
+              type: int16u
               notValue: ValueBeforeChange

@@ -59,7 +59,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate) override;
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate) override;
     CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
     CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;
@@ -85,7 +85,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
     CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
 #endif
 
 private:
@@ -104,6 +104,14 @@ private:
     uint64_t mOverrunCount           = 0;
 #endif
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

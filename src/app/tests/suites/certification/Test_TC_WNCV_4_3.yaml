@@ -16,6 +16,9 @@ name:
     Window Covering [TC-WNCV-4.3] GoToLiftPercentage Limits Verification with
     server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
@@ -71,10 +74,8 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 0x3000
-              - name: "LiftPercentageValue"
-                value: 0x3F
       response:
           error: CONSTRAINT_ERROR
 
@@ -85,10 +86,8 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 10001
-              - name: "LiftPercentageValue"
-                value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -99,9 +98,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 0xFFFF
-              - name: "LiftPercentageValue"
-                value: 0xFF
       response:
           error: CONSTRAINT_ERROR

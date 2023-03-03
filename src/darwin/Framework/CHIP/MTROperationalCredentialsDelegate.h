@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
+#import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
+#import "MTROperationalCertificateIssuer.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 
+#include <controller/CHIPDeviceController.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
@@ -35,6 +38,7 @@ class MTROperationalCredentialsDelegate : public chip::Controller::OperationalCr
 public:
     using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
+    MTROperationalCredentialsDelegate(MTRDeviceController * deviceController);
     ~MTROperationalCredentialsDelegate() {}
 
     CHIP_ERROR Init(MTRPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert,
@@ -55,10 +59,27 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
+    void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * _Nullable cppCommissioner)
+    {
+        mCppCommissioner = cppCommissioner;
+    }
+
+    chip::Optional<chip::Controller::CommissioningParameters> GetCommissioningParameters()
+    {
+        return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
+    }
+
+    void SetOperationalCertificateIssuer(
+        id<MTROperationalCertificateIssuer> operationalCertificateIssuer, dispatch_queue_t operationalCertificateIssuerQueue)
+    {
+        mOperationalCertificateIssuer = operationalCertificateIssuer;
+        mOperationalCertificateIssuerQueue = operationalCertificateIssuerQueue;
+    }
+
     CHIP_ERROR GenerateNOC(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & noc);
 
-    const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
+    const chip::Crypto::IdentityProtectionKeySpan GetIPK() { return mIPK.Span(); }
 
     // Get the root/intermediate X.509 DER certs as a ByteSpan.
     chip::ByteSpan RootCertSpan() const;
@@ -87,8 +108,8 @@ public:
     // signing certificate and operational public key, using the given fabric
     // id, node id, and CATs.
     static CHIP_ERROR GenerateOperationalCertificate(id<MTRKeypair> signingKeypair, NSData * signingCertificate,
-        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
-        NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
+        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId, NSSet<NSNumber *> * _Nullable caseAuthenticatedTags,
+        NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
 
 private:
     static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
@@ -97,9 +118,22 @@ private:
         chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
         chip::MutableByteSpan & noc);
 
+    // Called asynchronously in response to the MTROperationalCertificateIssuer
+    // calling the completion we passed it when asking it to generate a NOC
+    // chain.
+    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error);
+
+    CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion);
+
     ChipP256KeypairPtr mIssuerKey;
 
-    chip::Crypto::AesCcm128Key mIPK;
+    chip::Crypto::IdentityProtectionKey mIPK;
 
     static const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
 
@@ -115,6 +149,12 @@ private:
     // have a root cert, and at that point it gets initialized to nil.
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
+
+    MTRDeviceController * __weak mWeakController;
+    chip::Controller::DeviceCommissioner * _Nullable mCppCommissioner = nullptr;
+    id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
+    dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * _Nullable mOnNOCCompletionCallback = nullptr;
 };
 
 NS_ASSUME_NONNULL_END

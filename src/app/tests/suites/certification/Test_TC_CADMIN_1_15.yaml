@@ -11,35 +11,58 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.15. [TC-CADMIN-1.15] Open commissioning window twice on DUT using BCM
-    then ECM [DUT - Commissionee]
+    30.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
+    enumeration using ECM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
 
 config:
     nodeId: 0x12344321
-    timeout: 500
-    nodeIdForDuplicateCommissioning:
-        type: NODE_ID
-        defaultValue: 0x11
     nodeId2:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xCAFE
     nodeId3:
-        type: NODE_ID
+        type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
 
 tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       identity: "alpha"
+      PICS: CADMIN.S
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -47,59 +70,48 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
 
-    - label: "Commission from gamma"
-      identity: "gamma"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId3
-              - name: "payload"
-                value: payload
-
-    - label: "TH_CR3 starts a commissioning process with DUT_CE"
-      identity: "gamma"
+    - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
-      command: "WaitForCommissionee"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "nodeId"
-                value: nodeId3
-
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-
-    - label: "Commission from beta"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-              - name: "payload"
-                value: payload
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned to TH_CR2"
+      identity: "beta"
+      PICS: CADMIN.S
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -107,156 +119,228 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-
-    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
-      identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
-              - name: "discriminator"
-                value: 3840
-              - name: "iterations"
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
                 value: 1000
-              - name: "salt"
+              - name: "Salt"
                 value: "SPAKE2P Key Salt"
-      response:
-          error: FAILURE
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      identity: "alpha"
-      command: "readAttribute"
-      cluster: "Operational Credentials"
-      attribute: "Fabrics"
-      fabricFiltered: false
-      response:
-          value:
-              [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
-              ]
-          constraints:
-              type: list
-
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 180000
+                value: waitAfterCommissioning
 
-    - label: "TH_CR1 re-opens new commissioning window on DUT_CE"
-      identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-              - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
-              - name: "discriminator"
-                value: 3840
-              - name: "iterations"
-                value: 1000
-              - name: "salt"
-                value: "SPAKE2P Key Salt"
-
-    - label: "TH_CR3 opens a new commissioning window on DUT_CE"
+    - label: "TH_CR3 Commissions with DUT_CE"
+      PICS: CADMIN.S
       identity: "gamma"
-      cluster: "AdministratorCommissioning"
-      command: "OpenCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
       arguments:
           values:
-              - name: "CommissioningTimeout"
-                value: 180
-              - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
-              - name: "discriminator"
-                value: 3840
-              - name: "iterations"
-                value: 1000
-              - name: "salt"
-                value: "SPAKE2P Key Salt"
-      response:
-          error: FAILURE
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      identity: "alpha"
-      command: "readAttribute"
+    - label: "DUT_CE is commissioned to TH_CR3"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+
+    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+      identity: "beta"
       cluster: "Operational Credentials"
+      PICS: OPCREDS.S.A0001
+      command: "readAttribute"
       attribute: "Fabrics"
       fabricFiltered: false
       response:
           value:
               [
-                  { Label: "", nodeId: nodeId },
-                  { Label: "", nodeId: nodeId2 },
-                  { Label: "", nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
 
-    - label: "Wait for the expiration of PIXIT_COMM_WIN seconds"
+    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
+      PICS: OPCREDS.S.C0a.Rsp
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: 2
+
+    - label:
+          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic Information"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/21999
+    - label:
+          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
+          attribute of DUT_CE"
+      PICS: BINFO.S.A0005 && PICS_USER_PROMPT
+      verification: |
+          Using TH_CR2 read attribute
+
+          Verify read command fail as expected since the DUT_CE is no longer on the network on TH_CR2 (chip-tool) side
+
+          ./chip-tool  basicinformation read node-label 2 0  --commissioner-name beta
+
+          Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
+          [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
+          [1651819620.929700][4359:4364] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter at ../../commands/clusters/ModelCommand.cpp:53
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
+
+    #Check for DNS-SD advertisement is not possible in YAML
+    - label:
+          "Verify DUT_CE is now discoverable over DNS-SD with 2 Operational
+          service records (_matter._tcp SRV records)."
+      verification: |
+          Execute the below command in any linux platform or in TH_CR1
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
+      identity: "alpha"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 180000
+                value: waitAfterCommissioning
 
-    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
-      identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-              - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
-              - name: "discriminator"
-                value: 3840
-              - name: "iterations"
-                value: 1000
-              - name: "salt"
-                value: "SPAKE2P Key Salt"
-
-    - label: "TH_CR2 opens a new commissioning window on DUT_CE"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
-      command: "OpenCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
       arguments:
           values:
-              - name: "CommissioningTimeout"
-                value: 180
-              - name: "PAKEVerifier"
-                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
-              - name: "discriminator"
-                value: 3840
-              - name: "iterations"
-                value: 1000
-              - name: "salt"
-                value: "SPAKE2P Key Salt"
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
       response:
-          error: FAILURE
+          value:
+              [
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+              ]
+          constraints:
+              type: list

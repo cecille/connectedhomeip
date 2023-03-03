@@ -285,7 +285,7 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
     PosixConfig::RunConfigUnitTest();
 }
@@ -388,6 +388,11 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

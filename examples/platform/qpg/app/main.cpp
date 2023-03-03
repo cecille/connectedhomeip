@@ -28,6 +28,12 @@
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "task.h"
+#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#include "powercycle_counting.h"
+#endif
+#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
+#include "clearbox_testing_hooks.h"
+#endif
 
 // Qorvo CHIP library
 #include "qvCHIP.h"
@@ -48,6 +54,7 @@
 
 // Application level logic
 #include "AppTask.h"
+#include "ota.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -55,8 +62,9 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
-constexpr int extDiscTimeoutSecs = 20;
-}
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
+constexpr int extDiscTimeoutSecs             = 20;
+} // namespace
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -69,11 +77,26 @@ constexpr int extDiscTimeoutSecs = 20;
 /*****************************************************************************
  *                    Application Function Definitions
  *****************************************************************************/
+
 CHIP_ERROR CHIP_Init(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    InitializeOTARequestor();
+}
+#endif
 
 void Application_Init(void)
 {
     CHIP_ERROR error;
+
+#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
+    GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
+#endif
+#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+    gpAppFramework_Reset_Init();
+#endif
 
     /* Initialize CHIP stack */
     error = CHIP_Init();
@@ -88,11 +111,36 @@ void Application_Init(void)
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    CHIP_ERROR ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    error = GetAppTask().Init();
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
         return;
+    }
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
+        return;
+    }
+}
+
+void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
+{
+    switch (aEvent->Type)
+    {
+    case DeviceEventType::kThreadConnectivityChange:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+        }
+#endif
+        break;
+    default:
+        break;
     }
 }
 
@@ -163,6 +211,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -177,7 +226,6 @@ exit:
 /*****************************************************************************
  * --- Main
  *****************************************************************************/
-
 int main(void)
 {
     int result;

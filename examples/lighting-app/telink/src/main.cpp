@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,13 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
-LOG_MODULE_REGISTER(app);
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -33,51 +37,54 @@ int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
+
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
+        LOG_ERR("MemoryInit fail");
         goto exit;
     }
 
-    LOG_INF("Init CHIP stack");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        LOG_ERR("InitChipStack fail");
         goto exit;
     }
 
-    LOG_INF("Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+        LOG_ERR("StartEventLoopTask fail");
         goto exit;
     }
 
-    LOG_INF("Init Thread stack");
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
+        LOG_ERR("InitThreadStack fail");
         goto exit;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #endif
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
+        LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
 
     err = GetAppTask().StartApp();
 
 exit:
-    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
+    LOG_ERR("Exit err %" CHIP_ERROR_FORMAT, err.Format());
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

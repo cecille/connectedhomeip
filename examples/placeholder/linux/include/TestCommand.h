@@ -56,8 +56,10 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-        exit(CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
+        mExitCode = (CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
     }
+
+    int GetCommandExitCode() { return mExitCode; }
 
     template <typename T>
     size_t AddArgument(const char * name, chip::Optional<T> * value)
@@ -87,7 +89,21 @@ public:
     void Exit(std::string message, CHIP_ERROR err) override
     {
         LogEnd(message, err);
-        SetCommandExitStatus(err);
+
+        if (CHIP_NO_ERROR == err)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(AsyncExit, reinterpret_cast<intptr_t>(this));
+        }
+        else
+        {
+            SetCommandExitStatus(err);
+        }
+    }
+
+    static void AsyncExit(intptr_t context)
+    {
+        TestCommand * command = reinterpret_cast<TestCommand *>(context);
+        command->SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
     static void ScheduleNextTest(intptr_t context)
@@ -160,7 +176,10 @@ public:
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<chip::EndpointId> mEndpointId;
+    int mExitCode = EXIT_SUCCESS;
+
     void SetIdentity(const char * name){};
 
     /////////// DelayCommands Interface /////////

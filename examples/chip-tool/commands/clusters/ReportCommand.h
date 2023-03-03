@@ -37,6 +37,8 @@ public:
         CHIP_ERROR error = status.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
+            ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
+
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
             mError = error;
             return;
@@ -48,6 +50,8 @@ public:
             mError = CHIP_ERROR_INTERNAL;
             return;
         }
+
+        ReturnOnFailure(RemoteDataModelLogger::LogAttributeAsJSON(path, data));
 
         error = DataModelLogger::LogAttribute(path, data);
         if (CHIP_NO_ERROR != error)
@@ -66,6 +70,8 @@ public:
             CHIP_ERROR error = status->ToChipError();
             if (CHIP_NO_ERROR != error)
             {
+                ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(eventHeader, *status));
+
                 ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
                 mError = error;
                 return;
@@ -78,6 +84,8 @@ public:
             mError = CHIP_ERROR_INTERNAL;
             return;
         }
+
+        ReturnOnFailure(RemoteDataModelLogger::LogEventAsJSON(eventHeader, data));
 
         CHIP_ERROR error = DataModelLogger::LogEvent(eventHeader, data);
         if (CHIP_NO_ERROR != error)
@@ -94,10 +102,16 @@ public:
         mError = error;
     }
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        InteractionModelReports::OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
+
     void Shutdown() override
     {
         // We don't shut down InteractionModelReports here; we leave it for
         // Cleanup to handle.
+        mError = CHIP_NO_ERROR;
         ModelCommand::Shutdown();
     }
 
@@ -143,15 +157,14 @@ protected:
 
     void OnDone(chip::app::ReadClient * aReadClient) override
     {
+        InteractionModelReports::CleanupReadClient(aReadClient);
+
         if (!mSubscriptionEstablished)
         {
-            InteractionModelReports::CleanupReadClient(aReadClient);
             SetCommandExitStatus(mError);
         }
-
         // else we must be getting here from Cleanup(), which means we have
-        // already done our exit status thing, and have done the ReadClient
-        // cleanup.
+        // already done our exit status thing.
     }
 
     void Shutdown() override
@@ -160,7 +173,10 @@ protected:
         ReportCommand::Shutdown();
     }
 
-    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
+    // For subscriptions we always defer interactive cleanup.  Either our
+    // ReadClients will terminate themselves (in which case they will be removed
+    // from our list anyway), or they should hang around until shutdown.
+    bool DeferInteractiveCleanup() override { return true; }
 
 private:
     bool mSubscriptionEstablished = false;
@@ -201,7 +217,7 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReadCommand::ReadAttribute(device, endpointIds, mClusterIds, mAttributeIds, mFabricFiltered, mDataVersion);
+        return ReadCommand::ReadAttribute(device, endpointIds, mClusterIds, mAttributeIds);
     }
 
 private:
@@ -216,14 +232,12 @@ private:
     {
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
                     "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersions,
                     "Comma-separated list of data versions for the clusters being read.");
     }
 
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
-    chip::Optional<bool> mFabricFiltered;
-    chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
 };
 
 class SubscribeAttribute : public SubscribeCommand
@@ -261,8 +275,7 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds, mMinInterval, mMaxInterval,
-                                                    mFabricFiltered, mDataVersion, mKeepSubscriptions);
+        return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds);
     }
 
 private:
@@ -281,20 +294,16 @@ private:
                     "Server must send a report if this number of seconds has elapsed since the last report.");
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
                     "Boolean indicating whether to do a fabric-filtered subscription. Defaults to true.");
-        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion,
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersions,
                     "Comma-separated list of data versions for the clusters being subscribed to.");
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "Boolean indicating whether to keep existing subscriptions when creating the new one. Defaults to false.");
+        AddArgument("auto-resubscribe", 0, 1, &mAutoResubscribe,
+                    "Boolean indicating whether the subscription should auto-resubscribe.  Defaults to false.");
     }
 
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::AttributeId> mAttributeIds;
-
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    chip::Optional<bool> mFabricFiltered;
-    chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
-    chip::Optional<bool> mKeepSubscriptions;
 };
 
 class ReadEvent : public ReadCommand
@@ -333,14 +342,12 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReadCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds, mFabricFiltered, mEventNumber);
+        return ReadCommand::ReadEvent(device, endpointIds, mClusterIds, mEventIds);
     }
 
 private:
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::EventId> mEventIds;
-    chip::Optional<bool> mFabricFiltered;
-    chip::Optional<chip::EventNumber> mEventNumber;
 };
 
 class SubscribeEvent : public SubscribeCommand
@@ -390,26 +397,20 @@ public:
             "  This argument takes a comma separated list of true/false values.\n"
             "  If the number of paths exceeds the number of entries provided to is-urgent, then isUrgent will be false for the "
             "extra paths.");
+        AddArgument("auto-resubscribe", 0, 1, &mAutoResubscribe,
+                    "Boolean indicating whether the subscription should auto-resubscribe.  Defaults to false.");
     }
 
     ~SubscribeEvent() {}
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds, mMinInterval, mMaxInterval,
-                                                mFabricFiltered, mEventNumber, mKeepSubscriptions, mIsUrgents);
+        return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds);
     }
 
 private:
     std::vector<chip::ClusterId> mClusterIds;
     std::vector<chip::EventId> mEventIds;
-
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    chip::Optional<bool> mFabricFiltered;
-    chip::Optional<chip::EventNumber> mEventNumber;
-    chip::Optional<bool> mKeepSubscriptions;
-    chip::Optional<std::vector<bool>> mIsUrgents;
 };
 
 class ReadAll : public ReadCommand
@@ -417,7 +418,20 @@ class ReadAll : public ReadCommand
 public:
     ReadAll(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-all", credsIssuerConfig)
     {
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to read from (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF to "
+                    "indicate a wildcard cluster.");
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to read (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+        AddArgument("event-ids", 0, UINT32_MAX, &mEventIds,
+                    "Comma-separated list of event ids to read (e.g. \"0\" or \"1,2,3\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard event.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("data-versions", 0, UINT32_MAX, &mDataVersions,
+                    "Comma-separated list of data versions for the clusters being read.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReadCommand::AddArguments();
     }
 
@@ -431,9 +445,50 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReadCommand::ReadAll(device, endpointIds, mFabricFiltered);
+        return ReadCommand::ReadAll(device, endpointIds, mClusterIds, mAttributeIds, mEventIds);
     }
 
 private:
-    chip::Optional<bool> mFabricFiltered;
+    std::vector<chip::ClusterId> mClusterIds;
+    std::vector<chip::AttributeId> mAttributeIds;
+    std::vector<chip::EventId> mEventIds;
+};
+
+class SubscribeAll : public SubscribeCommand
+{
+public:
+    SubscribeAll(CredentialIssuerCommands * credsIssuerConfig) : SubscribeCommand("subscribe-all", credsIssuerConfig)
+    {
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to read from (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF to "
+                    "indicate a wildcard cluster.");
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to read (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+        AddArgument("event-ids", 0, UINT32_MAX, &mEventIds,
+                    "Comma-separated list of event ids to read (e.g. \"0\" or \"1,2,3\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard event.");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
+                    "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
+                    "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
+        SubscribeCommand::AddArguments();
+    }
+
+    ~SubscribeAll() {}
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        return SubscribeCommand::SubscribeAll(device, endpointIds, mClusterIds, mAttributeIds, mEventIds);
+    }
+
+private:
+    std::vector<chip::ClusterId> mClusterIds;
+    std::vector<chip::AttributeId> mAttributeIds;
+    std::vector<chip::EventId> mEventIds;
 };

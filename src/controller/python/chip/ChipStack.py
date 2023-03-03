@@ -24,30 +24,28 @@
 """Chip Stack interface
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-import sys
-import os
-import time
-import glob
-import platform
-import logging
-from threading import Lock, Event, Condition
-from ctypes import *
-from .ChipUtility import ChipUtility
-from .storage import *
-from .exceptions import *
-import builtins
+from __future__ import absolute_import, print_function
 
-from .interaction_model import InteractionModelError, delegate as im
-from .clusters import Command as ClusterCommand
-from .clusters import Attribute as ClusterAttribute
-from .clusters import ClusterObjects as ClusterObjects
-from .clusters import Objects as GeneratedObjects
-from .clusters.CHIPClusters import *
+import builtins
+import logging
+import os
+import sys
+import time
+from ctypes import *
+from threading import Condition, Event, Lock
 
 import chip.native
+
 from enum import Enum
+from chip.native import PyChipError
+
+from .ChipUtility import ChipUtility
+from .clusters import Attribute as ClusterAttribute
+from .clusters import Command as ClusterCommand
+from .clusters.CHIPClusters import *
+from .exceptions import *
+from .interaction_model import delegate as im
+from .storage import *
 
 __all__ = [
     "DeviceStatusStruct",
@@ -152,10 +150,17 @@ class AsyncCallableHandle:
             self._cv.notify_all()
         pythonapi.Py_DecRef(py_object(self))
 
-    def Wait(self):
+    def Wait(self, timeoutMs: int = None):
+        timeout = None
+        if timeoutMs is not None:
+            timeout = float(timeoutMs) / 1000
+
         with self._cv:
             while self._finish is False:
-                self._cv.wait()
+                res = self._cv.wait(timeout)
+                if res is False:
+                    raise TimeoutError("Timed out waiting for task to finish executing on the Matter thread")
+
             if self._exc is not None:
                 raise self._exc
             return self._res
@@ -176,7 +181,7 @@ class StackInitType(Enum):
 
 @_singleton
 class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, stackInitType: StackInitType, installDefaultLogHandler=True, bluetoothAdapter=None):
+    def __init__(self, persistentStoragePath: str, stackInitType: StackInitType, installDefaultLogHandler=True, bluetoothAdapter=None, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
         self.networkLock = Lock()
@@ -187,8 +192,10 @@ class ChipStack(object):
         self.devMgr = None
         self.callbackRes = None
         self.commissioningEventRes = None
+        self.openCommissioningWindowPincode = {}
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
+        self._enableServerInteractions = enableServerInteractions
 
         #
         # Locate and load the chip shared library.
@@ -269,14 +276,13 @@ class ChipStack(object):
 
         if (stackInitType == StackInitType.Controller):
             # Initialize the chip stack.
-            res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
-            if res != 0:
-                raise self.ErrorToException(res)
+            res = self._ChipStackLib.pychip_DeviceController_StackInit(
+                self._persistentStorage.GetSdkStorageObject(), enableServerInteractions)
+            res.raise_on_error()
         else:
             res = self._ChipStackLib.pychip_Server_StackInit(ctypes.c_void_p(
-                self._persistentStorage.GetUnderlyingStorageAdapter()), bluetoothAdapter)
-            if res != 0:
-                raise self.ErrorToException(res)
+                self._persistentStorage.GetSdkStorageObject()), bluetoothAdapter)
+            res.raise_on_error()
 
         self._stackInitType = stackInitType
 
@@ -288,6 +294,10 @@ class ChipStack(object):
 
     def GetStorageManager(self):
         return self._persistentStorage
+
+    @property
+    def enableServerInteractions(self):
+        return self._enableServerInteractions
 
     @property
     def defaultLogFunct(self):
@@ -332,8 +342,16 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        # Make sure PersistentStorage is destructed before chipStack
-        # to avoid accessing builtins.chipStack after destruction.
+        #
+        # Terminate Matter thread and shutdown the stack.
+        #
+        self._ChipStackLib.pychip_DeviceController_StackShutdown()
+
+        #
+        # We only shutdown the persistent storage layer AFTER we've shut down the stack,
+        # since there is a possibility of interactions with the storage layer during shutdown.
+        #
+        self._persistentStorage.Shutdown()
         self._persistentStorage = None
 
         if (self._stackInitType == StackInitType.Controller):
@@ -353,7 +371,9 @@ class ChipStack(object):
         self.devMgr = None
         self.callbackRes = None
 
-    def Call(self, callFunct):
+        delattr(builtins, "chipStack")
+
+    def Call(self, callFunct, timeoutMs: int = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
@@ -362,7 +382,7 @@ class ChipStack(object):
         self.callbackRes = None
         self.completeEvent.clear()
         with self.networkLock:
-            res = self.PostTaskOnChipThread(callFunct).Wait()
+            res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
         if res == 0 and self.callbackRes != None:
             return self.callbackRes
@@ -379,9 +399,9 @@ class ChipStack(object):
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait()
 
-        if res != 0:
+        if not res.is_success:
             self.completeEvent.set()
-            raise self.ErrorToException(res)
+            raise res.to_exception()
         while not self.completeEvent.isSet():
             if self.blockingCB:
                 self.blockingCB()
@@ -400,9 +420,9 @@ class ChipStack(object):
         pythonapi.Py_IncRef(py_object(callObj))
         res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
             self.cbHandleChipThreadRun, py_object(callObj))
-        if res != 0:
+        if not res.is_success:
             pythonapi.Py_DecRef(py_object(callObj))
-            raise self.ErrorToException(res)
+            raise res.to_exception()
         return callObj
 
     def ErrorToException(self, err, devStatusPtr=None):
@@ -451,10 +471,10 @@ class ChipStack(object):
             self._ChipStackLib = chip.native.GetLibraryHandle()
             self._chipDLLPath = chip.native.FindNativeLibraryPath()
 
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_uint32]
-            self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
+            self._ChipStackLib.pychip_DeviceController_StackInit.restype = PyChipError
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
-            self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32
+            self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = PyChipError
             self._ChipStackLib.pychip_Stack_StatusReportToString.argtypes = [
                 c_uint32,
                 c_uint16,
@@ -464,8 +484,8 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
             self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [
                 _LogMessageFunct]
-            self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
+            self._ChipStackLib.pychip_Stack_SetLogFunct.restype = PyChipError
 
             self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [
                 _ChipThreadTaskRunnerFunct, py_object]
-            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.restype = c_uint32
+            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.restype = PyChipError

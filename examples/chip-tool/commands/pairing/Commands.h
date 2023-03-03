@@ -18,10 +18,12 @@
 
 #pragma once
 
-#include "CloseSessionCommand.h"
-#include "CommissionedListCommand.h"
-#include "OpenCommissioningWindowCommand.h"
-#include "PairingCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/pairing/CloseSessionCommand.h"
+#include "commands/pairing/CommissionedListCommand.h"
+#include "commands/pairing/GetCommissionerNodeIdCommand.h"
+#include "commands/pairing/OpenCommissioningWindowCommand.h"
+#include "commands/pairing/PairingCommand.h"
 
 #include <app/server/Dnssd.h>
 #include <commands/common/CredentialIssuerCommands.h>
@@ -171,11 +173,11 @@ public:
     {}
 };
 
-class Ethernet : public PairingCommand
+class PairAlreadyDiscovered : public PairingCommand
 {
 public:
-    Ethernet(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet, credsIssuerConfig)
+    PairAlreadyDiscovered(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered", PairingMode::AlreadyDiscovered, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
@@ -205,7 +207,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
-        make_unique<Ethernet>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
         make_unique<PairOnNetwork>(credsIssuerConfig),
         make_unique<PairOnNetworkShort>(credsIssuerConfig),
         make_unique<PairOnNetworkLong>(credsIssuerConfig),
@@ -213,13 +215,13 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkCommissioningMode>(credsIssuerConfig),
         make_unique<PairOnNetworkCommissioner>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
-        make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
         // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
         make_unique<CloseSessionCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

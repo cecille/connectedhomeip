@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "DiscoverCommand.h"
-#include "DiscoverCommissionablesCommand.h"
-#include "DiscoverCommissionersCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/discover/DiscoverCommand.h"
+#include "commands/discover/DiscoverCommissionablesCommand.h"
+#include "commands/discover/DiscoverCommissionersCommand.h"
 #include <lib/address_resolve/AddressResolve.h>
 
 class Resolve : public DiscoverCommand, public chip::AddressResolve::NodeListener
@@ -73,6 +74,11 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
     commands_list clusterCommands = {
         make_unique<Resolve>(credsIssuerConfig),
         make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByShortDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByLongDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByCommissioningModeCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByVendorIdCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByDeviceTypeCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 
