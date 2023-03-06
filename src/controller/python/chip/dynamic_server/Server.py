@@ -56,8 +56,6 @@ def AttributeGetterCallback(serverObj, endpointId: int, clusterId: int, attribut
 class Server():
     ''' Class that handles the management of the server side of a Python REPL instance.
     '''
-    _handle = chip.native.GetLibraryHandle()
-
     attributeState = {}
     endpointConfig = {}
 
@@ -68,6 +66,7 @@ class Server():
     maxEndpoints = 20
 
     def __init__(self):
+        self._handle = chip.native.GetLibraryHandle()
         res = self._handle.pychip_Server_InitializeServer()
         if res != 0:
             raise self.ErrorToException(res)
