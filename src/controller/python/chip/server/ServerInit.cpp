@@ -35,6 +35,8 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
+#include "controller/python/chip/native/PyChipError.h"
+
 // #include <support/CHIPMem.h>
 // #include <support/ErrorStr.h>
 
@@ -127,7 +129,7 @@ void pychip_Server_StackShutdown()
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
-ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
+PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -135,14 +137,14 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: memory init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
@@ -163,7 +165,7 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to configure BLE as peripheral: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -195,7 +197,7 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to init the server instance: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     ConfigurationMgr().LogDeviceConfig();
@@ -208,10 +210,17 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
+<<<<<<< HEAD
     return CHIP_NO_ERROR.AsInteger();
+=======
+    atexit(CleanShutdown);
+
+    return ToPyChipError(err);
+}
+>>>>>>> 31dd431a4e (Fix up a couple of merge conflicts)
 }
 
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
@@ -229,4 +238,3 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
         // ChipLogProgress(NotSpecified, "callback nullptr");
     }
 }
-};
