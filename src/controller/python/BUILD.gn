@@ -288,6 +288,7 @@ chip_python_wheel_action("chip-core") {
     "chip.crypto",
     "chip.utils",
     "chip.discovery",
+    "chip.dynamic_server",
     "chip.exceptions",
     "chip.internal",
     "chip.interaction_model",
