@@ -4,6 +4,7 @@ import os
 import platform
 
 from chip.server.types import PostAttributeChangeCallback
+from chip.native import PyChipError
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipServer.so"
 
@@ -81,7 +82,7 @@ def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
 
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_Server_StackInit", None, [c_void_p])
+        setter.Set("pychip_Server_StackInit", PyChipError, [c_void_p])
         setter.Set("pychip_Server_SetCallbacks",
                    None, [PostAttributeChangeCallback])
 
