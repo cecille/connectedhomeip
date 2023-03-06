@@ -285,6 +285,7 @@ def getGlobalTemplatesTargets():
         targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
     targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap'))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/python/data-model/repl.zap'))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.
