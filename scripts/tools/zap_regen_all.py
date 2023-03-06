@@ -329,6 +329,7 @@ def getGlobalTemplatesTargets():
         targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
     targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap', client_side=True))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/python/data-model/repl.zap'))
 
     return targets
 
