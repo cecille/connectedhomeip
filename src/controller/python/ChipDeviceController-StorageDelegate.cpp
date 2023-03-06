@@ -29,10 +29,10 @@
 
 extern "C" {
 
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
-                                             chip::Controller::Python::SetGetKeyValueCb getCb,
-                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
+void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                               chip::Controller::Python::SetGetKeyValueCb getCb,
+                                               chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
 {
     auto ptr = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
     return ptr;
@@ -151,11 +151,6 @@ CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
     ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", StringOrNullMarker(key));
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
-}
-
-chip::Controller::Python::StorageAdapter * GetStorageAdapter()
-{
-    return gStorageAdapter;
 }
 
 } // namespace Python

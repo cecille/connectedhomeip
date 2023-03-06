@@ -12,10 +12,6 @@ import builtins
 import chip.dynamic_server.Server as Server
 import argparse
 import atexit
-<< << << < HEAD
-== == == =
-
->>>>>> > upstream/master
 
 _fabricAdmins = None
 

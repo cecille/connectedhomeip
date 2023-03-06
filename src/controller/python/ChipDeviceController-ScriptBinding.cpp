@@ -210,13 +210,6 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 {
     VerifyOrDie(storageAdapter != nullptr);
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    CHIP_ERROR err =
-        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-#endif
-
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = storageAdapter;
     factoryParams.sessionKeystore          = &sSessionKeystore;

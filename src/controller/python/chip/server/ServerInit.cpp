@@ -33,6 +33,8 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
+#include "controller/python/chip/native/PyChipError.h"
+
 // #include <support/CHIPMem.h>
 // #include <support/ErrorStr.h>
 
@@ -100,8 +102,8 @@ void CleanShutdown()
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
-using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                             uint16_t size, uint8_t * value);
 
 class PythonServerDelegate // : public ServerDelegate
 {
@@ -133,7 +135,7 @@ void pychip_Server_StackShutdown()
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
-ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
+PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -141,14 +143,14 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: memory init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
@@ -169,7 +171,7 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to configure BLE as peripheral: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -201,7 +203,7 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to init the server instance: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     ConfigurationMgr().LogDeviceConfig();
@@ -214,12 +216,13 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * stora
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
+        return ToPyChipError(err);
     }
 
     atexit(CleanShutdown);
 
-    return /*err*/;
+    return ToPyChipError(err);
+}
 }
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
@@ -237,4 +240,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // ChipLogProgress(NotSpecified, "callback nullptr");
     }
 }
-};
