@@ -433,6 +433,8 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
+    "mobly",
+    "lark",
   ]
 
   if (current_os == "mac") {
@@ -451,6 +453,7 @@ chip_python_wheel_action("chip-repl") {
   data_deps = [
     ":chip-clusters",
     ":chip-core",
+    "${chip_root}/scripts/py_matter_idl:matter_idl.wheel",
   ]
 
   output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"

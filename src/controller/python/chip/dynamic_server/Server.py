@@ -26,6 +26,7 @@ from .AfTypes import *
 import builtins
 import inspect
 import logging
+from matter_idl import matter_idl_parser
 
 _AttributeGetterCbFunct = ctypes.CFUNCTYPE(
     None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_char), ctypes.POINTER(ctypes.c_uint16))
@@ -76,6 +77,15 @@ class Server():
 >>>>>>> 3391bf71a5 (Move native lib initialization for python server)
         self._handle.pychip_Server_RegisterAttributeGetterCallback(ctypes.py_object(self), AttributeGetterCallback)
 
+    def CreateNodeFromMatterIdl(self, filename:str):
+        with open(filename, 'r') as matter_file:
+            parsed = matter_idl_parser.CreateParser().parse(matter_file.read(), filename)
+        for e in parsed.endpoints:
+            clusters = [getattr(Clusters, s.name) for s in e.server_clusters]
+            device_types = [d.code for d in e.device_types]
+            self.CreateEndpoint(endpointId=e.number, clusterList=clusters, deviceTypeList=device_types)
+            self.FinalizeEndpoint(endpointId=e.number)
+
     def SetCommissioningParams(self, discriminator: int = 3840):
         ''' Updates the commissioning parameters and re-advertises those details over mDNS
         '''
@@ -90,7 +100,7 @@ class Server():
 
     def FinalizeEndpoint(self, endpointId):
         ''' Finalizes the supported attributes on a given endpoint and commits that the endpoint to the SDK. At this point,
-            the endpoint is live. 
+            the endpoint is live.
 
             This looks at the value of an attribute to see if it has a value of 'None' (which is the default for an optional value) to decide 
             if it is indeed implemented or not. If the value is 'None', it will signal that attribute as an optional attribute that isn't implemented to the SDK.
@@ -171,11 +181,13 @@ class Server():
 
             CreateEndpoint(10, [ Clusters.OnOff, Clusters.Basic ] )
         '''
+        print('Create endpoint {}'.format(endpointId))
+        print(self.attributeState)
         if (endpointId in self.attributeState):
             raise ValueError(f"{endpointId} already exists on this node!")
 
-        if (endpointId == 0):
-            raise ValueError("EP0 is reserved by the SDK for the root node!")
+        #if (endpointId == 0):
+        #    raise ValueError("EP0 is reserved by the SDK for the root node!")
 
         candidateEndpointIndex = None
         for targetEndpointIndex in range(0, self.maxEndpoints - 1):
