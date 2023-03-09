@@ -52,13 +52,17 @@ certificateAuthorityManager = None
 
 
 def StackShutdown():
-    certificateAuthorityManager.Shutdown()
+    if certificateAuthorityManager is not None:
+        certificateAuthorityManager.Shutdown()
     builtins.chipStack.Shutdown()
 
 
 def matterhelp(classOrObj=None):
     if (classOrObj is None):
-        inspect(builtins.devCtrl, methods=True, help=True, private=False)
+        if hasattr(builtins, 'devCtrl'):
+            inspect(builtins.devCtrl, methods=True, help=True, private=False)
+        if hasattr(builtins, 'server'):
+            inspect(builtins.server, methods=True, help=True, private=False)
         inspect(mattersetlog)
         inspect(mattersetdebug)
     else:
@@ -127,6 +131,7 @@ else:
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Server)
     server = Server.Server()
+    builtins.server = server
 
     console.print(
         '\n\n[blue]Default CHIP Server instance has been initialized and is available as [bold red]server')

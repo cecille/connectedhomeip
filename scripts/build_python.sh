@@ -172,11 +172,14 @@ if [ "$install_wheel" = "no" ]; then
     exit 0
 elif [ "$install_wheel" = "separate" ]; then
     # Create a virtual environment that has access to the built python tools
-    virtualenv --clear "$ENVIRONMENT_ROOT"
+    python3 -m venv --clear "$ENVIRONMENT_ROOT"
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
     "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall "${WHEEL[@]}"
+    # Add the matter idl parser wheel required for chip-repl server
+    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall "$OUTPUT_ROOT"/python/obj/scripts/py_matter_idl/matter_idl._build_wheel/matter_idl-0.0.1-py3-none-any.whl
+
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
