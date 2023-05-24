@@ -146,9 +146,24 @@ public:
     void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
 
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override {
+        if (LinuxDeviceOptions::GetInstance().payload.vendorID != 0)
+        {
+            vendorId = LinuxDeviceOptions::GetInstance().payload.vendorID;
+            return CHIP_NO_ERROR;
+        }
+        return mDefaultProvider->GetVendorId(vendorId);
+    }
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
-    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetProductId(uint16_t & productId) override
+    {
+        if (LinuxDeviceOptions::GetInstance().payload.productID != 0)
+        {
+            productId = LinuxDeviceOptions::GetInstance().payload.productID;
+            return CHIP_NO_ERROR;
+        }
+        return mDefaultProvider->GetProductId(productId);
+    }
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
