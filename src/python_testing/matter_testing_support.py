@@ -26,6 +26,7 @@ import re
 import sys
 import typing
 import uuid
+from aenum import Enum
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -235,6 +236,12 @@ class MatterTestConfig:
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: pathlib.Path = None
 
+    # Test timeout in seconds
+    timeout: int = None
+
+    # endpoint
+    endpoint: int = 0
+
 
 class MatterStackState:
     def __init__(self, config: MatterTestConfig):
@@ -319,8 +326,23 @@ def hex_from_bytes(b: bytes) -> str:
 
 
 class MatterBaseTest(base_test.BaseTestClass):
+    @dataclass
+    class StepResolution(Enum):
+        PASS = 'PASS',
+        SKIPPED = 'SKIPPED',
+        FAILED = 'FAILED',
+        NOT_RUN = "NOT RUN",
+
+    @dataclass
+    class StepRecord:
+        description: str = None
+        resolution: 'MatterBaseTest.StepResolution' = 0
+
     def __init__(self, *args):
         super().__init__(*args)
+        self.current_step: typing.Union[None, int, str] = None
+        self.current_description: str = None
+        self.step_record: Dict[typing.Union[int, str], MatterBaseTest.StepRecord] = {}
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -355,11 +377,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
@@ -373,11 +397,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
@@ -390,7 +416,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0,
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -400,8 +426,42 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def print_step(self, stepnum: int, title: str) -> None:
-        logging.info('***** Test Step %d : %s', stepnum, title)
+    def record_step_result(self, res: 'MatterBaseTest.StepResolution'):
+        if self.current_step is not None:
+            desc = self.current_description if self.current_description is not None else ""
+            self.step_record[self.current_step] = MatterBaseTest.StepRecord(description=desc, resolution=res)
+        self.current_step = None
+        self.current_description = None
+
+    def on_fail(self, record):
+        self.record_step_result(MatterBaseTest.StepResolution.FAILED)
+        self.summary()
+
+    def on_pass(self, record):
+        self.record_step_result(MatterBaseTest.StepResolution.PASS)
+        self.summary()
+
+    def pics_guard(self, pics_condition: bool):
+        if not pics_condition:
+            # skip this test - log and set the resolution as skipped
+            if self.current_step is not None:
+                logging.info('“**** Skipping: {}'.format(self.current_step))
+            self.record_step_result(MatterBaseTest.StepResolution.SKIPPED)
+
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        # If we've reached the next step, no assert was thrown, so the previous step passed
+        self.record_step_result(MatterBaseTest.StepResolution.PASS)
+        self.current_step = stepnum
+        self.current_description = title
+        logging.info('***** Test Step {} : {}'.format(stepnum, title))
+
+    def summary(self):
+        # TODO: Can the TH hook into the mobly logger? If so we should add this there.
+        # Printing for now, but it would be good if we could just hook this into
+        # the TH somehow without going through a structured log system
+        logging.info('Test Summary:')
+        for step, record in self.step_record.items():
+            logging.info('{}: {} - {}'.format(step, record.description, record.resolution))
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -664,6 +724,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
+    config.timeout = 90 if args.timeout is None else args.timeout
 
     config.controller_node_id = args.controller_node_id
 
@@ -709,10 +770,12 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
-    basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
+    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+    basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--timeout', type=int, default=90, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
@@ -801,8 +864,10 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
-    def async_runner(*args, **kwargs):
-        return asyncio.run(body(*args, **kwargs))
+
+    def async_runner(self: MatterBaseTest, *args, **kwargs):
+        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=self.matter_test_config.timeout)
+        return asyncio.run(runner_with_timeout)
 
     return async_runner
 
@@ -929,6 +994,8 @@ def default_matter_test_main(argv=None, **kwargs):
         try:
             runner.run()
             ok = runner.results.is_all_pass and ok
+        except TimeoutError:
+            ok = False
         except signals.TestAbortAll:
             ok = False
         except Exception:

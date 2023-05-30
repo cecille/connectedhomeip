@@ -32,7 +32,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_2(self):
 
-        endpoint = self.user_params.get("endpoint", 0)
+        endpoint = self.matter_test_config.endpoint
 
         time_cluster = Clusters.Objects.TimeSynchronization
 
