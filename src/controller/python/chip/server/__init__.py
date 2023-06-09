@@ -4,7 +4,6 @@ import os
 import platform
 
 from chip.server.types import PostAttributeChangeCallback
-from chip.native import PyChipError
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipServer.so"
 

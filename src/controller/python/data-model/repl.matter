@@ -1489,7 +1489,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    callback attribute supportedLocales default = en-US;
+    callback attribute supportedLocales default = "en-US";
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1685,5 +1685,3 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
-
-

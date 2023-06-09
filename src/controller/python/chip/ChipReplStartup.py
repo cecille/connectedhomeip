@@ -1,6 +1,5 @@
 import argparse
 import atexit
-<<<<<<< HEAD
 import builtins
 import logging
 
@@ -14,8 +13,6 @@ import chip.dynamic_server.Server as Server
 from chip.ChipStack import *
 from rich import inspect, pretty
 from rich.console import Console
-=======
->>>>>>> 31dd431a4e (Fix up a couple of merge conflicts)
 
 _fabricAdmins = None
 

@@ -14,11 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <errno.h>
-#include <pthread.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -29,13 +27,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CommissionableDataProvider.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
-
-#include "controller/python/chip/native/PyChipError.h"
 
 // #include <support/CHIPMem.h>
 // #include <support/ErrorStr.h>
@@ -96,8 +89,16 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+void CleanShutdown()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
+
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                             uint16_t size, uint8_t * value);
 
 class PythonServerDelegate // : public ServerDelegate
 {
@@ -116,17 +117,6 @@ void pychip_Server_SetCallbacks(PostAttributeChangeCallback cb)
 {
     // ChipLogProgress(NotSpecified, "setting cb");
     gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
-}
-
-void pychip_Server_StackShutdown()
-{
-    //
-    // Let's stop the Matter thread, and wait till the event loop has stopped.
-    //
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-
-    chip::Server::GetInstance().Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
@@ -150,6 +140,10 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
 
+    ConfigurationMgr().LogDeviceConfig();
+
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+
 #if defined(PW_RPC_ENABLED)
     chip::rpc::Init();
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
@@ -159,15 +153,7 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
 
 #if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("RpiMatterDali"); // Use default device name (CHIP-XXXX)
-
-    err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(
-        bleDevice != -1 ? bleDevice : LinuxDeviceOptions::GetInstance().mBleDevice, false);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to configure BLE as peripheral: %s", chip::ErrorStr(err));
-        return ToPyChipError(err);
-    }
-
+    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
@@ -186,9 +172,9 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
 
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    initParams.persistentStorageDelegate = storageDelegate;
-
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
     initParams.operationalServicePort        = 0;
     initParams.userDirectedCommissioningPort = 0;
@@ -200,9 +186,6 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
         return ToPyChipError(err);
     }
 
-    ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
@@ -213,25 +196,19 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
         return ToPyChipError(err);
     }
 
-<<<<<<< HEAD
-    return CHIP_NO_ERROR.AsInteger();
-=======
-    atexit(CleanShutdown);
-
     return ToPyChipError(err);
 }
->>>>>>> 31dd431a4e (Fix up a couple of merge conflicts)
 }
 
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
-        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size,
-                                                           value);
+        gPythonServerDelegate.mPostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                           attributePath.mAttributeId, type, size, value);
     }
     else
     {

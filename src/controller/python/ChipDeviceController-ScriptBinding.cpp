@@ -44,7 +44,6 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
-
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -268,7 +267,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     // the same bits linked in and used for both controller and server modalities.
     //
     static app::DefaultAttributePersistenceProvider defaultPersistenceProvider;
-    ReturnErrorOnFailure(defaultPersistenceProvider.Init(storageAdapter).AsInteger());
+    PyReturnErrorOnFailure(ToPyChipError(defaultPersistenceProvider.Init(storageAdapter)));
     SetAttributePersistenceProvider(&defaultPersistenceProvider);
 
     PyReturnErrorOnFailure(ToPyChipError(DeviceControllerFactory::GetInstance().Init(factoryParams)));
@@ -799,5 +798,4 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return ToPyChipError(CHIP_NO_ERROR);
-}
 }

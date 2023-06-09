@@ -14,7 +14,6 @@
    limitations under the License.
 '''
 
-import construct
 import ctypes
 import chip.native
 import chip.exceptions
@@ -26,6 +25,9 @@ from .AfTypes import *
 import builtins
 import inspect
 import logging
+import sys
+import os
+
 from matter_idl import matter_idl_parser
 
 _AttributeGetterCbFunct = ctypes.CFUNCTYPE(
@@ -67,17 +69,14 @@ class Server():
     maxEndpoints = 20
 
     def __init__(self):
-<<<<<<< HEAD
-=======
         self._handle = chip.native.GetLibraryHandle()
         res = self._handle.pychip_Server_InitializeServer()
         if res != 0:
             raise self.ErrorToException(res)
 
->>>>>>> 3391bf71a5 (Move native lib initialization for python server)
         self._handle.pychip_Server_RegisterAttributeGetterCallback(ctypes.py_object(self), AttributeGetterCallback)
 
-    def CreateNodeFromMatterIdl(self, filename:str):
+    def CreateNodeFromMatterIdl(self, filename: str):
         with open(filename, 'r') as matter_file:
             parsed = matter_idl_parser.CreateParser().parse(matter_file.read(), filename)
         for e in parsed.endpoints:
@@ -186,7 +185,7 @@ class Server():
         if (endpointId in self.attributeState):
             raise ValueError(f"{endpointId} already exists on this node!")
 
-        #if (endpointId == 0):
+        # if (endpointId == 0):
         #    raise ValueError("EP0 is reserved by the SDK for the root node!")
 
         candidateEndpointIndex = None

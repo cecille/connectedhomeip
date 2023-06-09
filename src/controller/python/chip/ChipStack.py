@@ -265,27 +265,10 @@ class ChipStack(object):
         #
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
-<<<<<<< HEAD
         # Initialize the chip stack.
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
             self._persistentStorage.GetSdkStorageObject(), enableServerInteractions)
         res.raise_on_error()
-=======
-        if (bluetoothAdapter is None):
-            bluetoothAdapter = 0
-
-        if (stackInitType == StackInitType.Controller):
-            # Initialize the chip stack.
-            res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
-            if res != 0:
-                raise self.ErrorToException(res)
-        else:
-            res = self._ChipStackLib.pychip_Server_StackInit(ctypes.c_void_p(
-                self._persistentStorage.GetUnderlyingStorageAdapter()), bluetoothAdapter)
-            if res != 0:
-                raise self.ErrorToException(res)
-
->>>>>>> 755f87e94e (WIP)
 
         im.InitIMDelegate()
         ClusterAttribute.Init()
@@ -343,8 +326,16 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        # Make sure PersistentStorage is destructed before chipStack
-        # to avoid accessing builtins.chipStack after destruction.
+        #
+        # Terminate Matter thread and shutdown the stack.
+        #
+        self._ChipStackLib.pychip_DeviceController_StackShutdown()
+
+        #
+        # We only shutdown the persistent storage layer AFTER we've shut down the stack,
+        # since there is a possibility of interactions with the storage layer during shutdown.
+        #
+        self._persistentStorage.Shutdown()
         self._persistentStorage = None
 
         #
@@ -352,7 +343,6 @@ class ChipStack(object):
         # #20437 tracks consolidating these.
         #
         self._ChipStackLib.pychip_CommonStackShutdown()
-
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
