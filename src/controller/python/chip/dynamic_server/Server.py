@@ -70,9 +70,9 @@ class Server():
 
     def __init__(self):
         self._handle = chip.native.GetLibraryHandle()
-        res = self._handle.pychip_Server_InitializeServer()
-        if res != 0:
-            raise self.ErrorToException(res)
+        # res = self._handle.pychip_Server_InitializeServer()
+        # if res != 0:
+        #    raise self.ErrorToException(res)
 
         self._handle.pychip_Server_RegisterAttributeGetterCallback(ctypes.py_object(self), AttributeGetterCallback)
 
