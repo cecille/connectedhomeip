@@ -91,9 +91,10 @@ class Server():
         curLogLevel = logging.getLogger().level
         logging.getLogger().setLevel(logging.INFO)
 
-        res = self._handle.pychip_Server_SetCommissioningParams(discriminator)
-        if res != 0:
-            raise self.ErrorToException(res)
+
+        builtins.chipStack.Call(
+            lambda: self._handle.pychip_Server_SetCommissioningParams(discriminator)
+        )
 
         logging.getLogger().setLevel(curLogLevel)
 

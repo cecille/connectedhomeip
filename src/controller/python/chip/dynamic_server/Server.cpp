@@ -24,9 +24,11 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/reporting/reporting.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPDeviceController.h>
@@ -129,7 +131,9 @@ ChipError::StorageType pychip_Server_SetCommissioningParams(uint16_t discriminat
 {
     gCommissionableDataProvider.SetSetupDiscriminator(discriminator);
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
-    app::DnssdServer::Instance().StartServer();
+    SetCommissionableDataProvider(&gCommissionableDataProvider);
+    // app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
+    Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 
     return CHIP_NO_ERROR.AsInteger();
 }
