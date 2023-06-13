@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import inspect
 import json
 import logging
 import os
@@ -51,6 +52,13 @@ from chip.storage import PersistentStorage
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+try:
+    from matter_yamltests.hooks import TestRunnerHooks
+except:
+    class TestRunnerHooks(typing.types.NoneType):
+        pass
+
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -194,6 +202,42 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
     asserts.assert_less(delta, tolerance, "Received time is out of tolerance")
 
 
+class InternalTestRunnerHooks(TestRunnerHooks):
+
+    def start(self, count: int):
+        logging.info(f'Starting test set, running {count} tests')
+
+    def stop(self, duration: int):
+        logging.info(f'Finished test set, ran for {duration}ms')
+
+    def test_start(self, filename: str, name: str, count: int):
+        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+
+    def test_stop(self, exception: Exception, duration: int):
+        logging.info(f'Finished test in {duration}ms')
+
+    def step_skipped(self, name: str, expression: str):
+        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
+        logging.info(f'\t\t**** Skipping: {name}')
+
+    def step_start(self, name: str):
+        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name}')
+
+    def step_success(self, logger, logs, duration: int, request):
+        pass
+
+    def step_failure(self, logger, logs, duration: int, request, received):
+        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
+        logging.info(f'\t\t***** Test Failure : ')
+
+    def step_unknown(self):
+        """
+        This method is called when the result of running a step is unknown. For example during a dry-run.
+        """
+        pass
+
+
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = None
@@ -325,24 +369,45 @@ def hex_from_bytes(b: bytes) -> str:
     return hexlify(b).decode("utf-8")
 
 
-class MatterBaseTest(base_test.BaseTestClass):
-    @dataclass
-    class StepResolution(Enum):
-        PASS = 'PASS',
-        SKIPPED = 'SKIPPED',
-        FAILED = 'FAILED',
-        NOT_RUN = "NOT RUN",
+@dataclass
+class TestStep:
+    test_plan_number: typing.Union[int, str]
+    description: str
+    is_commissioning: bool = False
 
-    @dataclass
-    class StepRecord:
-        description: str = None
-        resolution: 'MatterBaseTest.StepResolution' = 0
+
+class MatterBaseTest(base_test.BaseTestClass):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.current_step: typing.Union[None, int, str] = None
-        self.current_description: str = None
-        self.step_record: Dict[typing.Union[int, str], MatterBaseTest.StepRecord] = {}
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
+
+    # ---- Functions that the derived classes should implement
+    def get_test_steps(self) -> list[TestStep]:
+        ''' Returns a list of test steps that will be called in order
+
+            Test that derive from this base class should call each step
+            in order using self.step(number), where number is the test_plan_numer
+            from each TestStep.
+        '''
+        pass
+
+    def get_test_desc(self) -> str:
+        ''' Returns a description of this test
+
+            Format:
+            <Test plan reference> [<test plan number>] <test plan name>
+
+            ex:
+            133.1.1. [TC-ACL-1.1] Global attributes            
+        '''
+        return self.__class__.__name__
+
+    @property
+    def runner_hook(self) -> TestRunnerHooks:
+        return unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -426,42 +491,96 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def record_step_result(self, res: 'MatterBaseTest.StepResolution'):
-        if self.current_step is not None:
-            desc = self.current_description if self.current_description is not None else ""
-            self.step_record[self.current_step] = MatterBaseTest.StepRecord(description=desc, resolution=res)
-        self.current_step = None
-        self.current_description = None
-
     def on_fail(self, record):
-        self.record_step_result(MatterBaseTest.StepResolution.FAILED)
-        self.summary()
+        ''' Called by Mobly on test failure
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook:
+            exception = record.termination_signal.exception
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            # This isn't QUITE the test duration because the commissioning is handled separately, but it's clsoe enough for now
+            # This is already given in milliseconds
+            test_duration = record.end_time - record.begin_time
+            # TODO: I have no idea what logger, logs, request or received are. Hope None works becuase I have nothing to give
+            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
 
     def on_pass(self, record):
-        self.record_step_result(MatterBaseTest.StepResolution.PASS)
-        self.summary()
+        ''' Called by Mobly on test pass
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook:
+            # What is request? This seems like an implementation detail for the runner
+            # TODO: As with failure, I have no idea what loger, logs or request are meant to be
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = record.end_time - record.begin_time
+            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+        # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
+        try:
+            steps = self.get_test_steps()
+            all_steps_run = len(steps) == self.current_step_index
+        except:
+            # if we don't have a list of steps, assume they were all run
+            all_steps_run = True
+
+        if not all_steps_run:
+            # The test is done, but we didn't execute all the steps
+            asserts.fail("Test script error: Not all required steps were run")
+
+        if self.runner_hook:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
         if not pics_condition:
-            # skip this test - log and set the resolution as skipped
-            if self.current_step is not None:
-                logging.info('“**** Skipping: {}'.format(self.current_step))
-            self.record_step_result(MatterBaseTest.StepResolution.SKIPPED)
+            try:
+                steps = self.get_test_steps()
+                num = steps[self.current_step_index].test_plan_number
+            except:
+                num = self.current_step_index
+
+            if self.runner_hook:
+                # TODO: what does name represent here? The wordy test name? The test plan number? The nnumber and name?
+                # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+                #       as a string? Does it get used by the TH?
+                self.runner_hook.step_skipped(name=str(num), expression="")
+            else:
+                logging.info(f'**** Skipping: {num}')
+            self.step_skipped = True
+
+    def step(self, step: typing.Union[int, str]):
+        try:
+            steps = self.get_test_steps()
+        except:
+            asserts.fail("Test script failure: test steps not provided")
+
+        if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
+            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
+        if self.current_step_index == 0 and self.runner_hook:
+            filename = inspect.getfile(self.__class__)
+            self.runner_hook.test_start(filename=filename, name=self.get_test_desc, count=len(steps))
+
+        if self.runner_hook:
+            # If we've reached the next step with no assertion and the step wasn't skipped, it passed
+            if not self.step_skipped:
+                # TODO: As with failure, I have no idea what loger, logs or request are meant to be
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+            # TODO: it seems like the step start should take a number and a name
+            name = f'{step} : {steps[self.current_step_index].description}'
+            self.runner_hook.step_start(name=name)
+        else:
+            self.print_step(step, steps[self.current_step_index].description)
+
+        self.step_start_time = utc_native = datetime.now(tz=timezone.utc)
+        self.current_step_index = self.current_step_index + 1
+        self.step_skipped = False
 
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
-        # If we've reached the next step, no assert was thrown, so the previous step passed
-        self.record_step_result(MatterBaseTest.StepResolution.PASS)
-        self.current_step = stepnum
-        self.current_description = title
         logging.info('***** Test Step {} : {}'.format(stepnum, title))
-
-    def summary(self):
-        # TODO: Can the TH hook into the mobly logger? If so we should add this there.
-        # Printing for now, but it would be good if we could just hook this into
-        # the TH somehow without going through a structured log system
-        logging.info('Test Summary:')
-        for step, record in self.step_record.items():
-            logging.info('{}: {} - {}'.format(step, record.description, record.resolution))
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -936,6 +1055,7 @@ def default_matter_test_main(argv=None, **kwargs):
     Args:
       argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
+
     matter_test_config = parse_matter_test_args(argv)
 
     # Allow override of command line from optional arguments
@@ -945,6 +1065,20 @@ def default_matter_test_main(argv=None, **kwargs):
     # Find the test class in the test script.
     test_class = _find_test_class()
 
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
+
+    hooks = InternalTestRunnerHooks()
+
+    run_tests(test_class, matter_test_config, hooks)
+
+
+def run_tests(test_class: typing.Type[MatterBaseTest], matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
 
@@ -952,13 +1086,6 @@ def default_matter_test_main(argv=None, **kwargs):
     tests = None
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
     test_config.user_params["matter_stack"] = stash_globally(stack)
@@ -977,6 +1104,8 @@ def default_matter_test_main(argv=None, **kwargs):
 
     test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
+    test_config.user_params["hooks"] = stash_globally(hooks)
+
     # Execute the test class with the config
     ok = True
 
@@ -991,6 +1120,14 @@ def default_matter_test_main(argv=None, **kwargs):
         if not matter_test_config.commission_only:
             runner.add_test_class(test_config, test_class, tests)
 
+        if hooks:
+            # Right now, we only support running a single test class at once,
+            # but it's relatively easy to exapand that to make the test process faster
+            # TODO: support a list of tests
+            hooks.start(count=1)
+            # Mobly gives the test run time in seconds, lets be a bit more precise
+            runner_start_time = datetime.now(timezone.utc)
+
         try:
             runner.run()
             ok = runner.results.is_all_pass and ok
@@ -1001,6 +1138,10 @@ def default_matter_test_main(argv=None, **kwargs):
         except Exception:
             logging.exception('Exception when executing %s.', test_config.testbed_name)
             ok = False
+
+    if hooks:
+        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
+        hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
     stack.Shutdown()
