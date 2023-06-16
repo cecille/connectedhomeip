@@ -452,7 +452,7 @@ class ChipStack(object):
 
             self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = PyChipError
-            self._ChipStackLib.pychip_Server_StackInit.argtypes = [c_void_p]
+            self._ChipStackLib.pychip_Server_StackInit.argtypes = []
             self._ChipStackLib.pychip_Server_StackInit.restype = PyChipError
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = PyChipError

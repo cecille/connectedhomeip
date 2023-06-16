@@ -119,7 +119,7 @@ void pychip_Server_SetCallbacks(PostAttributeChangeCallback cb)
     gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
 }
 
-PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
+PyChipError pychip_Server_StackInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -175,9 +175,6 @@ PyChipError pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate,
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-
-    initParams.operationalServicePort        = 0;
-    initParams.userDirectedCommissioningPort = 0;
 
     err = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)

@@ -81,11 +81,11 @@ def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
 
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_Server_StackInit", PyChipError, [c_void_p])
-        setter.Set("pychip_Server_SetCallbacks",
-                   None, [PostAttributeChangeCallback])
+        # setter.Set("pychip_Server_StackInit", PyChipError, [c_void_p])
+        # setter.Set("pychip_Server_SetCallbacks",
+        #           None, [PostAttributeChangeCallback])
 
-        _nativeLibraryHandle.pychip_Server_StackInit(c_void_p(0), c_int32(-1))
-        _nativeLibraryHandle.pychip_Server_SetCallbacks(cb)
+       # _nativeLibraryHandle.pychip_Server_StackInit(c_void_p(0), c_int32(-1))
+       # _nativeLibraryHandle.pychip_Server_SetCallbacks(cb)
 
     return _nativeLibraryHandle

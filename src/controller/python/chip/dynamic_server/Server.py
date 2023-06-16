@@ -70,27 +70,31 @@ class Server():
 
     def __init__(self):
         self._handle = chip.native.GetLibraryHandle()
-        # res = self._handle.pychip_Server_InitializeServer()
-        # if res != 0:
-        #    raise self.ErrorToException(res)
-
+        builtins.chipStack.Call(
+            lambda: self._handle.pychip_Server_StackInit()
+        )
         self._handle.pychip_Server_RegisterAttributeGetterCallback(ctypes.py_object(self), AttributeGetterCallback)
 
     def CreateNodeFromMatterIdl(self, filename: str):
+        self.RemoveAllEndpoints()
         with open(filename, 'r') as matter_file:
             parsed = matter_idl_parser.CreateParser().parse(matter_file.read(), filename)
+            print(parsed.clusters)
         for e in parsed.endpoints:
             clusters = [getattr(Clusters, s.name) for s in e.server_clusters]
             device_types = [d.code for d in e.device_types]
             self.CreateEndpoint(endpointId=e.number, clusterList=clusters, deviceTypeList=device_types)
             self.FinalizeEndpoint(endpointId=e.number)
 
+    def RemoveAllEndpoints(self):
+        for id in self.attributeState.keys():
+            self.RemoveEndpoint(id)
+
     def SetCommissioningParams(self, discriminator: int = 3840):
         ''' Updates the commissioning parameters and re-advertises those details over mDNS
         '''
         curLogLevel = logging.getLogger().level
         logging.getLogger().setLevel(logging.INFO)
-
 
         builtins.chipStack.Call(
             lambda: self._handle.pychip_Server_SetCommissioningParams(discriminator)

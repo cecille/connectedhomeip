@@ -130,9 +130,8 @@ extern "C" {
 ChipError::StorageType pychip_Server_SetCommissioningParams(uint16_t discriminator)
 {
     gCommissionableDataProvider.SetSetupDiscriminator(discriminator);
-    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
     SetCommissionableDataProvider(&gCommissionableDataProvider);
-    // app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
     Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 
     return CHIP_NO_ERROR.AsInteger();
