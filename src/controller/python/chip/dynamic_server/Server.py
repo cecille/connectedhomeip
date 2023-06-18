@@ -79,8 +79,10 @@ class Server():
         self.RemoveAllEndpoints()
         with open(filename, 'r') as matter_file:
             parsed = matter_idl_parser.CreateParser().parse(matter_file.read(), filename)
-            print(parsed.clusters)
         for e in parsed.endpoints:
+            if e.number == 0:
+                logging.warn('Skipping endpoint 0 as it is already in use for commissioing')
+                continue
             clusters = [getattr(Clusters, s.name) for s in e.server_clusters]
             device_types = [d.code for d in e.device_types]
             self.CreateEndpoint(endpointId=e.number, clusterList=clusters, deviceTypeList=device_types)
@@ -186,7 +188,6 @@ class Server():
             CreateEndpoint(10, [ Clusters.OnOff, Clusters.Basic ] )
         '''
         print('Create endpoint {}'.format(endpointId))
-        print(self.attributeState)
         if (endpointId in self.attributeState):
             raise ValueError(f"{endpointId} already exists on this node!")
 
