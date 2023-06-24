@@ -336,8 +336,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -1379,13 +1379,21 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
 
 bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
 {
+    app::AttributeAccessInterface * prev = nullptr;
     for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*attrOverride))
         {
-            ChipLogError(Zcl, "Duplicate attribute override registration failed");
-            return false;
+            // ChipLogWarn(Zcl, "Duplicate attribute override registration - replacing previous override");
+            //  For now, we allow overwriting these for the purpose of the server
+            if (prev != nullptr)
+            {
+                prev->SetNext(cur->GetNext());
+            }
+            cur->SetNext(nullptr);
+            break;
         }
+        prev = cur;
     }
     attrOverride->SetNext(gAttributeAccessOverrides);
     gAttributeAccessOverrides = attrOverride;

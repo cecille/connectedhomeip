@@ -33,6 +33,23 @@ from matter_idl import matter_idl_parser
 _AttributeGetterCbFunct = ctypes.CFUNCTYPE(
     None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_char), ctypes.POINTER(ctypes.c_uint16))
 
+_AttributeReadCbFunct = ctypes.CFUNCTYPE(None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32)
+
+_AttributeWriteCbFunct = ctypes.CFUNCTYPE(None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32)
+
+_CommandReceivedCbFunct = ctypes.CFUNCTYPE(None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32)
+
+@_AttributeReadCbFunct    
+def AttributeReadCallback(serverObj, endpointId:int, clusterId:int, attributeId:int):
+    print(f'Attribute read:  endpoint {endpointId} cluster {clusterId} attribute {attributeId}')
+
+@_AttributeWriteCbFunct
+def AttributeWriteCallback(serverObj, endpointId:int, clusterId:int, attributeId:int):
+    print(f'Attribute write: endpoint {endpointId} cluster {clusterId} attribute {attributeId}')
+
+@_CommandReceivedCbFunct
+def CommandReceivedCallback(serverObj, endpointId:int, clusterId:int, commandId:int):
+    print(f'Command:         endpoint {endpointId} cluster {clusterId} attribute {commandId}')
 
 @_AttributeGetterCbFunct
 def AttributeGetterCallback(serverObj, endpointId: int, clusterId: int, attributeId: int, value: bytes, size):
@@ -73,7 +90,12 @@ class Server():
         builtins.chipStack.Call(
             lambda: self._handle.pychip_Server_StackInit()
         )
+        self._handle.pychip_Server_RegisterAttributeReadCallback.restype = ctypes.c_uint32
+
         self._handle.pychip_Server_RegisterAttributeGetterCallback(ctypes.py_object(self), AttributeGetterCallback)
+        self._handle.pychip_Server_RegisterAttributeReadCallback(ctypes.py_object(self), AttributeReadCallback)
+        self._handle.pychip_Server_RegisterAttributeWriteCallback(ctypes.py_object(self), AttributeWriteCallback)
+        self._handle.pychip_Server_RegisterCommandReceivedCallback(ctypes.py_object(self), CommandReceivedCallback)
 
     def CreateNodeFromMatterIdl(self, filename: str):
         self.RemoveAllEndpoints()

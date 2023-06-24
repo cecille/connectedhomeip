@@ -78,10 +78,42 @@ struct PyEmberAfEndpointType
 using GetAttributeValueCb = void (*)(void * appContext, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                      char * value, uint16_t * size);
 
+using AttributeReadCb = void (*)(void * appContext, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId);
+
+using AttributeWriteCb = void (*)(void * appContext, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId);
+
+using CommandReceivedCb = void (*)(void * appContext, EndpointId endpointId, ClusterId clusterId, CommandId commandId);
+
 GetAttributeValueCb gGetValueCb;
 void * gGetAttributeContext = nullptr;
 
+AttributeReadCb gAttributeReadCb;
+void * gAttributeReadContext = nullptr;
+
+AttributeWriteCb gAttributeWriteCb;
+void * gAttributeWriteContext = nullptr;
+
+CommandReceivedCb gCommandReceivedCb;
+void * gCommandReceivedContext = nullptr;
+
 } // extern "C"
+
+// These functions are hooks into the read, write and command callbacks
+// TODO: We can use the pre-commands here to do error injection in a generalized way
+void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor)
+{
+    gCommandReceivedCb(gCommandReceivedContext, commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
+}
+
+void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    gAttributeWriteCb(gAttributeWriteContext, attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+}
+void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    gAttributeReadCb(gAttributeReadContext, attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+}
 
 Controller::Python::CommissionableDataProvider gCommissionableDataProvider;
 chip::app::DefaultAclStorage gAclStorage;
@@ -141,6 +173,24 @@ void pychip_Server_RegisterAttributeGetterCallback(void * appContext, GetAttribu
 {
     gGetAttributeContext = appContext;
     gGetValueCb          = getValueCb;
+}
+
+void pychip_Server_RegisterAttributeReadCallback(void * appContext, AttributeReadCb readCb)
+{
+    gAttributeReadContext = appContext;
+    gAttributeReadCb      = readCb;
+}
+
+void pychip_Server_RegisterAttributeWriteCallback(void * appContext, AttributeWriteCb writeCb)
+{
+    gAttributeWriteContext = appContext;
+    gAttributeWriteCb      = writeCb;
+}
+
+void pychip_Server_RegisterCommandReceivedCallback(void * appContext, CommandReceivedCb commandCb)
+{
+    gCommandReceivedContext = appContext;
+    gCommandReceivedCb      = commandCb;
 }
 
 void pychip_Server_RemoveEndpoint(uint16_t endpointIndex)
