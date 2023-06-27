@@ -269,6 +269,7 @@ class ChipDeviceControllerBase():
 
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
                                      setupQRCode: str, err: PyChipError) -> None:
+            print("handle commissioning window open complete")
             if err.is_success:
                 print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
                 self._ChipStack.openCommissioningWindowPincode[nodeid] = CommissioningParameters(
