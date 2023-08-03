@@ -27,9 +27,9 @@ from mobly import asserts
 # This needs to be run using --commissioning-method flag to get the first python fabric loaded.
 
 
-class FillNMinus1Fabrics(MatterBaseTest):
+class FillAllFabrics(MatterBaseTest):
     @async_test_body
-    async def test_FillNMinus1Fabrics(self):
+    async def test_FillAllFabrics(self):
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
 
@@ -37,7 +37,7 @@ class FillNMinus1Fabrics(MatterBaseTest):
         ret = await dev_ctrl.ReadAttribute(nodeid=node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.SupportedFabrics), (0, Clusters.OperationalCredentials.Attributes.CommissionedFabrics)])
         supported_fabrics = ret[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.SupportedFabrics]
         initial_commissioned_fabric_count = ret[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CommissionedFabrics]
-        num_to_commission = supported_fabrics - initial_commissioned_fabric_count - 1
+        num_to_commission = supported_fabrics - initial_commissioned_fabric_count
 
         commissioned_fabric_count = initial_commissioned_fabric_count
         for i in range(num_to_commission):
@@ -53,7 +53,7 @@ class FillNMinus1Fabrics(MatterBaseTest):
             asserts.assert_equal(commissioned_fabric_count, initial_commissioned_fabric_count +
                                  i + 1, f'Unsuccessful commissioning of fabric {i}')
 
-        asserts.assert_equal(commissioned_fabric_count, supported_fabrics - 1, 'Incorrect number of fabrics commissioned')
+        asserts.assert_equal(commissioned_fabric_count, supported_fabrics, 'Incorrect number of fabrics commissioned')
 
 
 if __name__ == "__main__":
