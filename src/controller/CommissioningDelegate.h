@@ -25,21 +25,8 @@
 #include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
-    
-
 namespace chip {
-    struct aaa
-    {
-        int32_t offset         = static_cast<int32_t>(0);
-        uint64_t validStarting = static_cast<uint64_t>(0);
-        app::DataModel::Nullable<uint64_t> validUntil;
 
-        CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-        static constexpr bool kIsFabricScoped = false;
-
-        CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    };
 namespace Controller {
 
 class DeviceCommissioner;
@@ -333,7 +320,8 @@ public:
     CommissioningParameters &
     SetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone)
     {
-        for (size_t i = 0; i < kMaxTimeZoneListSize; ++i) {
+        for (size_t i = 0; i < kMaxTimeZoneListSize; ++i)
+        {
             mTimeZoneNameBuf[i].Free();
         }
         if (timeZone.size() == 0)
@@ -342,12 +330,15 @@ public:
             return *this;
         }
         size_t listSize = timeZone.size() <= kMaxTimeZoneListSize ? timeZone.size() : kMaxTimeZoneListSize;
-        for (size_t i = 0; i < listSize; ++i) {
-            mTimeZoneInternal[i].offset = timeZone[i].offset;
+        for (size_t i = 0; i < listSize; ++i)
+        {
+            mTimeZoneInternal[i].offset  = timeZone[i].offset;
             mTimeZoneInternal[i].validAt = timeZone[i].validAt;
-            if (timeZone.name.HasValue() && timeZone.name.Get().size() > 0) {
-                mTimeZoneNameBuf[i].Calloc(timeZone.name.Get().size());
-                mTimeZoneInternal[i].name = MakeOptional(CharSpan(mTimeZoneNameBuf[i], timeZone.name.Get().size()));
+            if (timeZone[i].name.HasValue() && timeZone[i].name.Value().size() > 0)
+            {
+                mTimeZoneNameBuf[i].Calloc(timeZone[i].name.Value().size());
+                CharSpan span = CharSpan(mTimeZoneNameBuf[i].Get(), timeZone[i].name.Value().size());
+                mTimeZoneInternal[i].name.SetValue(span);
             }
         }
         mTimeZone.SetValue(
@@ -359,7 +350,7 @@ public:
     CommissioningParameters &
     SetDSTOffsetsZeroCopy(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> dstOffsets)
     {
-        //mDstOffsetsBuf.Free();
+        // mDstOffsetsBuf.Free();
         mDSTOffsets.SetValue(dstOffsets);
         return *this;
     }
@@ -370,7 +361,6 @@ public:
     CommissioningParameters &
     SetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> dstOffsets)
     {
-        Platform::ScopedBuffer<aaa> test;
 #if 0
         mDstOffsetBuf.Free();
         if (dstOffsets.size() == 0)
@@ -588,9 +578,9 @@ private:
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mDeviceRegulatoryLocation;
     Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>> mTimeZone;
     Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>> mDSTOffsets;
-    //Platform::ScopedMemoryBuffer<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDstOffsetBuf;
-    // This is a relatively small struct with a limited number of elements and it's not trivially destructible.
-    // Just carry the static copies, it's not that big. The name portion is dynamically allocated.
+    // Platform::ScopedMemoryBuffer<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> mDstOffsetBuf;
+    //  This is a relatively small struct with a limited number of elements and it's not trivially destructible.
+    //  Just carry the static copies, it's not that big. The name portion is dynamically allocated.
     static constexpr size_t kMaxTimeZoneListSize = 2;
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type mTimeZoneInternal[kMaxTimeZoneListSize];
     Platform::ScopedMemoryBuffer<char> mTimeZoneNameBuf[kMaxTimeZoneListSize];
