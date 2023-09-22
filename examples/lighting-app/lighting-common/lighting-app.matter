@@ -1908,6 +1908,7 @@ server cluster ColorControl = 768 {
   readonly attribute int16u remainingTime = 2;
   readonly attribute int16u currentX = 3;
   readonly attribute int16u currentY = 4;
+  readonly attribute enum8 driftCompensation = 5;
   readonly attribute int16u colorTemperatureMireds = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
@@ -2494,6 +2495,7 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     persist  attribute currentX default = 0x616B;
     persist  attribute currentY default = 0x607D;
+    ram      attribute driftCompensation default = 2;
     persist  attribute colorTemperatureMireds default = 0x00FA;
     persist  attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
