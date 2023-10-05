@@ -167,6 +167,19 @@ class {{asUpperCamelCase name}}(Cluster):
             {{else}}
             value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
             {{/if}}
+            {{#if defaultValue}}
+            {{#if entryType}}
+            defaultValue: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{defaultValue}}
+            {{else}}
+            defaultValue: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{defaultValue}}
+            {{/if}}
+            {{else}}
+            {{#if entryType}}
+            defaultValue: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = value
+            {{else}}
+            defaultValue: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = value
+            {{/if}}
+            {{/if}}
 
 {{/zcl_attributes_server}}
 {{#zcl_events}}

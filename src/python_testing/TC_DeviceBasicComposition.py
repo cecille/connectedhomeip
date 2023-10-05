@@ -36,6 +36,13 @@ from matter_testing_support import (AttributePathLocation, ClusterPathLocation, 
 from mobly import asserts
 
 
+ATTRIBUTE_LIST_ID = 0xFFFB
+ACCEPTED_COMMAND_LIST_ID = 0xFFF9
+GENERATED_COMMAND_LIST_ID = 0xFFF8
+FEATURE_MAP_ID = 0xFFFC
+CLUSTER_REVISION_ID = 0xFFFD
+
+
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     """Given TLV data for a specific cluster instance, convert to the Matter JSON format."""
 
@@ -452,12 +459,6 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             name: str
             validators: list[Callable]
 
-        ATTRIBUTE_LIST_ID = 0xFFFB
-        ACCEPTED_COMMAND_LIST_ID = 0xFFF9
-        GENERATED_COMMAND_LIST_ID = 0xFFF8
-        FEATURE_MAP_ID = 0xFFFC
-        CLUSTER_REVISION_ID = 0xFFFD
-
         ATTRIBUTES_TO_CHECK = [
             RequiredMandatoryAttribute(id=CLUSTER_REVISION_ID, name="ClusterRevision", validators=[check_int_in_range(1, 0xFFFF)]),
             RequiredMandatoryAttribute(id=FEATURE_MAP_ID, name="FeatureMap", validators=[check_int_in_range(0, 0xFFFF_FFFF)]),
@@ -733,6 +734,24 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         if not success:
             self.fail_current_test(
                 "At least one cluster has failed the global attribute range and support checks")
+
+    def test_IDM_10_2(self):
+        success = True
+        for endpoint_id, endpoint in self.endpoints_tlv.items():
+            for cluster_id, cluster in endpoint.items():
+                if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
+                    continue
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=CLUSTER_REVISION_ID)
+                if CLUSTER_REVISION_ID not in cluster:
+                    self.record_error(self.get_test_name(
+                    ), location=location, problem=f'Standard cluster {cluster_id:02x} with no Cluster Revision attribute', spec_location='Global attributes')
+                    success = False
+                    continue
+                expected_revision = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][CLUSTER_REVISION_ID].defaultValue
+                if expected_revision != cluster[CLUSTER_REVISION_ID]:
+                    self.record_error(self.get_test_name(
+                    ), location=location, problem=f"Unexpected cluster revision for cluster {cluster_id:02x} - expected {expected_revision}, received {cluster[CLUSTER_REVISION_ID]}")
+                    success = False
 
     def test_IDM_11_1(self):
         success = True
