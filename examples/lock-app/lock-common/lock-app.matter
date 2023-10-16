@@ -47,55 +47,6 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
-/** Attributes and commands for switching devices between 'On' and 'Off' states. */
-server cluster OnOff = 6 {
-  enum DelayedAllOffEffectVariantEnum : ENUM8 {
-    kDelayedOffFastFade = 0;
-    kNoFade = 1;
-    kDelayedOffSlowFade = 2;
-  }
-
-  enum DyingLightEffectVariantEnum : ENUM8 {
-    kDyingLightFadeOff = 0;
-  }
-
-  enum EffectIdentifierEnum : ENUM8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  enum StartUpOnOffEnum : ENUM8 {
-    kOff = 0;
-    kOn = 1;
-    kToggle = 2;
-  }
-
-  bitmap Feature : BITMAP32 {
-    kLighting = 0x1;
-    kDeadFrontBehavior = 0x2;
-  }
-
-  bitmap OnOffControlBitmap : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   bitmap Feature : BITMAP32 {
@@ -2708,20 +2659,6 @@ endpoint 1 {
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster OnOff {
-    ram      attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime default = 0;
-    ram      attribute offWaitTime default = 0;
-    ram      attribute startUpOnOff;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
-
-    handle command Off;
-    handle command On;
-    handle command Toggle;
   }
 
   server cluster Descriptor {
