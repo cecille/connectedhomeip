@@ -18,6 +18,7 @@
 import glob
 import logging
 import os
+import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
@@ -32,6 +33,13 @@ from matter_testing_support import (AttributePathLocation, ClusterPathLocation, 
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 
+class Access(Enum):
+    VIEW = auto()
+    OPERATE = auto()
+    MANAGE = auto()
+    ADMIN = auto()
+
+
 @dataclass
 class XmlFeature:
     code: str
@@ -44,6 +52,8 @@ class XmlAttribute:
     name: str
     datatype: str
     conformance: Callable[[uint], ConformanceDecision]
+    read_access: typing.Union[Access, None]
+    write_access: typing.Union[Access, None]
 
 
 @dataclass
@@ -121,7 +131,13 @@ class ClusterParser:
         for sub in element:
             if sub.tag == OTHERWISE_CONFORM or sub.tag == MANDATORY_CONFORM or sub.tag == OPTIONAL_CONFORM or sub.tag == PROVISIONAL_CONFORM or sub.tag == DEPRECATE_CONFORM or sub.tag == DISALLOW_CONFORM:
                 return sub
+        location = get_location(element)
+        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
 
+        return ElementTree.Element(OPTIONAL_CONFORM)
+
+    def get_location(element: ElementTree.Element):
         # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
         if element.tag == 'feature':
             location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
@@ -133,10 +149,7 @@ class ClusterParser:
             location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
         else:
             location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
-        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
-
-        return ElementTree.Element(OPTIONAL_CONFORM)
+        return location
 
     def get_all_type(self, type_container: str, type_name: str, key_name: str) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
         ret = []
@@ -199,6 +212,41 @@ class ClusterParser:
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
+    def parse_attribute_access(self, access_xml: ElementTree.Element) -> tuple[typing.Union[Access, None], typing.Union[Access, None]]:
+        def to_enum(attrib) -> Access:
+            if attrib.lower() == 'view':
+                return Access.VIEW
+            if attrib.lower() == 'operate':
+                return Access.OPERATE
+            if attrib.lower() == 'manage':
+                return Access.MANAGE
+            if attrib.lower() == 'admin':
+                return Access.ADMIN
+            
+        read_access = None
+        write_access = None
+        for sub in element:
+            if sub.tag == 'access'
+                try:
+                    read_attrib = sub.attrib['read']
+                    read_priviledge_attrib = sub.attrib['readPrivilege']
+                    if read_attrib.lower() == 'true':
+                        read_access = to_enum(read_priviledge_attrib)
+                except KeyError:
+                    pass
+                try:
+                    write_attrib = sub.attrib['write']
+                    write_priviledge_attrib = sub.attrib['writePrivilege']
+                    if write_attrib.lower() == 'true':
+                        write_access = to_enum(write_priviledge_attrib)
+                except KeyError:
+                    pass
+        location = get_location(element)
+        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
+
+        return None, None
+
     def parse_features(self) -> dict[uint, XmlFeature]:
         features = {}
         for element, conformance_xml in self.feature_elements:
@@ -219,6 +267,7 @@ class ClusterParser:
                 datatype = element.attrib['type']
             except KeyError:
                 datatype = 'UNKNOWN'
+            read_access, write_access = self.parse_access(element)
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
