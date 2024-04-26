@@ -149,6 +149,19 @@ class feature:
         return f'{self.code}'
 
 
+class device_feature:
+    ''' This is different than element feature because device types use "features" that aren't reported anywhere'''
+
+    def __init__(self, feature: str):
+        self.feature = feature
+
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
+        return ConformanceDecision.OPTIONAL
+
+    def __str__(self):
+        return f'{self.feature}'
+
+
 class attribute:
     def __init__(self, requiredAttribute: uint, name: str):
         self.requiredAttribute = requiredAttribute
