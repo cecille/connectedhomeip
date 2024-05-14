@@ -655,15 +655,20 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
     device = root.iter('deviceType')
     for d in device:
         name = d.attrib['name']
+        location = DeviceTypePathLocation(device_type_id=0)
 
         str_id = d.attrib['id']
         if not str_id:
-            location = DeviceTypePathLocation(device_type_id=0)
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING, problem=f"Device type {name} does not have an ID listed"))
             break
-        id = int(str_id, 0)
-        revision = int(d.attrib['revision'], 0)
+        try:
+            id = int(str_id, 0)
+            revision = int(d.attrib['revision'], 0)
+        except ValueError:
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING,
+                            problem=f"Device type {name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
         try:
             classification = next(d.iter('classification'))
             scope = classification.attrib['scope']
