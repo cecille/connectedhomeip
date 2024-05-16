@@ -42,79 +42,12 @@ def generate_controller_name(fabric_index: int, controller_index: int):
 
 
 class TC_RR_1_1(MatterBaseTest):
-    def setup_class(self):
-        self._pseudo_random_generator = random.Random(1234)
-        self._subscriptions = []
-
-    def teardown_class(self):
-        logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
-        for subscription in self._subscriptions:
-            subscription.Shutdown()
-
-    @async_test_body
-    async def test_TC_RR_1_1(self):
+    def create_controllers(self, num_controllers_per_fabric: int, cat_tags: list[int], maximize_cert_chains: bool = True):
         dev_ctrl = self.default_controller
 
-        # Debug/test arguments
+        dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = maximize_cert_chains
 
-        # Get overrides for debugging the test
-        num_fabrics_to_commission = self.user_params.get("num_fabrics_to_commission", 5)
-        num_controllers_per_fabric = self.user_params.get("num_controllers_per_fabric", 3)
-        # Immediate reporting
-        min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
-        # 10 minutes max reporting interval --> We don't care about keep-alives per-se and
-        # want to avoid resubscriptions
-        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
-        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependant
-        # on MRP params of subscriber and on actual min_report_interval.
-        # TODO: Determine the correct max value depending on target. Test plan doesn't say!
-        timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
-        # Whether to skip filling the UserLabel clusters
-        skip_user_label_cluster_steps = self.user_params.get("skip_user_label_cluster_steps", False)
-        # Whether to do the local session ID comparison checks to prove new sessions have not been established.
-        check_local_session_id_unchanged = self.user_params.get("check_local_session_id_unchanged", False)
-        # Whether to check heap statistics. Add `--bool-arg check_heap_watermarks:true` to command line to enable
-        check_heap_watermarks = self.user_params.get("check_heap_watermarks", False)
-
-        BEFORE_LABEL = "Before Subscriptions 12345678912"
-        AFTER_LABEL = "After Subscriptions 123456789123"
-
-        # Pre-conditions
-
-        # Do a read-out of heap statistics before the test begins
-        if check_heap_watermarks:
-            logging.info("Read Heap info before stress test")
-            high_watermark_before, current_usage_before = await self.read_heap_statistics(dev_ctrl)
-
-        # Make sure all certificates are installed with maximal size
-        dev_ctrl.fabricAdmin.certificateAuthority.maximizeCertChains = True
-
-        # TODO: Do from PICS list. The reflection approach here what a real client would do,
-        #       and it respects what the test says: "TH writes 4 entries per endpoint where LabelList is supported"
-        logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
-        endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
-        has_user_labels = len(endpoints_with_user_label_list) > 0
-        if has_user_labels:
-            logging.info("--> User label cluster present on endpoints %s" %
-                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list.keys()]))
-        else:
-            logging.info("--> User label cluster not present on any endpoitns")
-
-        # Generate list of all clients names
         client_list = []
-
-        # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
-        logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
-
-        capability_minima = await self.read_single_attribute(dev_ctrl,
-                                                             node_id=self.dut_node_id,
-                                                             endpoint=0,
-                                                             attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
-        asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
-
-        # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
-        logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
-
         # Generate Node IDs for subsequent controllers start at 200, follow 200, 300, ...
         node_ids = [200 + (i * 100) for i in range(num_controllers_per_fabric - 1)]
 
@@ -129,7 +62,7 @@ class TC_RR_1_1(MatterBaseTest):
                 adminDevCtrl=dev_ctrl,
                 controllerNodeIds=node_ids,
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                targetNodeId=self.dut_node_id, catTags=[0x0001_0001]
+                targetNodeId=self.dut_node_id, catTags=cat_tags
             )
             for idx, controller in enumerate(new_controllers):
                 controller.name = generate_controller_name(fabric_index, idx+1)
@@ -184,7 +117,7 @@ class TC_RR_1_1(MatterBaseTest):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
             new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=admin_index)
 
-            new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId, catTags=[0x0001_0001])
+            new_admin_ctrl = new_fabric_admin.NewController(nodeId=dev_ctrl.nodeId, catTags=cat_tags)
             await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(commissionerDevCtrl=dev_ctrl,
                                                                              newFabricDevCtrl=new_admin_ctrl,
                                                                              existingNodeId=self.dut_node_id,
@@ -199,7 +132,7 @@ class TC_RR_1_1(MatterBaseTest):
                     controllerNodeIds=node_ids,
                     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                     targetNodeId=self.dut_node_id,
-                    catTags=[0x0001_0001]
+                    catTags=cat_tags
                 )
                 for idx, controller in enumerate(new_controllers):
                     controller.name = generate_controller_name(fabric_index, idx+1)
@@ -221,6 +154,73 @@ class TC_RR_1_1(MatterBaseTest):
         client_by_name = {client.name: client for client in client_list}
         local_session_id_by_client_name = {client.name: client.GetConnectedDeviceSync(
             self.dut_node_id).localSessionId for client in client_list}
+
+    def setup_class(self):
+        self._pseudo_random_generator = random.Random(1234)
+        self._subscriptions = []
+
+    def teardown_class(self):
+        logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
+        for subscription in self._subscriptions:
+            subscription.Shutdown()
+
+    @async_test_body
+    async def test_TC_RR_1_1(self):
+        dev_ctrl = self.default_controller
+
+        # Debug/test arguments
+
+        # Get overrides for debugging the test
+        num_fabrics_to_commission = self.user_params.get("num_fabrics_to_commission", 5)
+        num_controllers_per_fabric = self.user_params.get("num_controllers_per_fabric", 3)
+        # Immediate reporting
+        min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
+        # 10 minutes max reporting interval --> We don't care about keep-alives per-se and
+        # want to avoid resubscriptions
+        max_report_interval_sec = self.user_params.get("max_report_interval_sec", 10 * 60)
+        # Time to wait after changing NodeLabel for subscriptions to all hit. This is dependant
+        # on MRP params of subscriber and on actual min_report_interval.
+        # TODO: Determine the correct max value depending on target. Test plan doesn't say!
+        timeout_delay_sec = self.user_params.get("timeout_delay_sec", max_report_interval_sec * 2)
+        # Whether to skip filling the UserLabel clusters
+        skip_user_label_cluster_steps = self.user_params.get("skip_user_label_cluster_steps", False)
+        # Whether to do the local session ID comparison checks to prove new sessions have not been established.
+        check_local_session_id_unchanged = self.user_params.get("check_local_session_id_unchanged", False)
+        # Whether to check heap statistics. Add `--bool-arg check_heap_watermarks:true` to command line to enable
+        check_heap_watermarks = self.user_params.get("check_heap_watermarks", False)
+
+        BEFORE_LABEL = "Before Subscriptions 12345678912"
+        AFTER_LABEL = "After Subscriptions 123456789123"
+
+        # Pre-conditions
+
+        # Do a read-out of heap statistics before the test begins
+        if check_heap_watermarks:
+            logging.info("Read Heap info before stress test")
+            high_watermark_before, current_usage_before = await self.read_heap_statistics(dev_ctrl)
+
+        # TODO: Do from PICS list. The reflection approach here what a real client would do,
+        #       and it respects what the test says: "TH writes 4 entries per endpoint where LabelList is supported"
+        logging.info("Pre-condition: determine whether any endpoints have UserLabel cluster (ULABEL.S.A0000(LabelList))")
+        endpoints_with_user_label_list = await dev_ctrl.ReadAttribute(self.dut_node_id, [Clusters.UserLabel.Attributes.LabelList])
+        has_user_labels = len(endpoints_with_user_label_list) > 0
+        if has_user_labels:
+            logging.info("--> User label cluster present on endpoints %s" %
+                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list.keys()]))
+        else:
+            logging.info("--> User label cluster not present on any endpoitns")
+
+        # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
+        logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
+
+        capability_minima = await self.read_single_attribute(dev_ctrl,
+                                                             node_id=self.dut_node_id,
+                                                             endpoint=0,
+                                                             attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
+        asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
+
+        # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
+        logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
 
         # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel to 32 characters
         logging.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
