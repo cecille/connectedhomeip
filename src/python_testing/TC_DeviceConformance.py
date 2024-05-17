@@ -21,7 +21,7 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
-from global_attribute_ids import GlobalAttributeIds
+from global_attribute_ids import GlobalAttributeIds, standard_device_type_range, valid_device_type_range, standard_cluster_range
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                     MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
 from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
@@ -251,19 +251,37 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         warn_on_extra_clusters = self.user_params.get("warn_on_extra_clusters", True)
         test_name = self.get_test_name()
 
+        def error(location, problem):
+            nonlocal success
+            self.record_error(test_name=test_name, location=location, problem=problem)
+            success = False
+
         for endpoint_id, endpoint in self.endpoints.items():
-            device_types = [x for x in endpoint[Clusters.Descriptor]
-                            [Clusters.Descriptor.Attributes.DeviceTypeList] if x.deviceType <= 0xBFFF]
+            device_type_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            invalid_device_types = [x for x in device_type_list if not valid_device_type_range(x.deviceType)]
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
+                                     [Clusters.Descriptor.Attributes.DeviceTypeList] if standard_device_type_range(x.deviceType)]
             endpoint_clusters = []
-            for device_type in device_types:
+            server_clusters = []
+            for device_type in invalid_device_types:
+                location = DeviceTypePathLocation(device_type_id=device_type.deviceType)
+                error(location=location, problem='Invalid device type ID (out of valid range)')
+
+            print(standard_device_types)
+            for device_type in standard_device_types:
                 device_type_id = device_type.deviceType
+                location = DeviceTypePathLocation(device_type_id=device_type_id)
                 if device_type_id not in self.xml_device_types.keys():
-                    # TODO: report a problem here
+                    error(location=location, problem='Unknown device type ID in standard range')
                     continue
-                # TODO: check revision
+
+                # TODO: check revision. Possibly in another test?
+
                 xml_device = self.xml_device_types[device_type_id]
+                # IDM 10.1 checks individual clusters for validity,
+                # so here we can ignore checks for invalid and manufacturer clusters.
                 server_clusters = [x for x in endpoint[Clusters.Descriptor]
-                                   [Clusters.Descriptor.Attributes.ServerList] if x <= 0x7FFF]
+                                   [Clusters.Descriptor.Attributes.ServerList] if standard_cluster_range(x)]
                 for cluster_id, cluster_requirement in xml_device.clusters.items():
                     # Device type cluster conformances do not include any conformances based on cluster elements
                     print(

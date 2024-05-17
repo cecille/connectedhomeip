@@ -323,7 +323,7 @@ class otherwise:
 
 
 def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
-    if len(list(element)) != 0:
+    if list(element):
         raise ConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
     try:
@@ -363,7 +363,7 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Call
 
 def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callable:
     ''' Only allows basic, or wrappers over things that degrade to basic.'''
-    if len(list(element)) == 0:
+    if not list(element):
         try:
             return parse_basic_callable_from_xml(element)
         # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
@@ -384,7 +384,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callabl
 
 
 def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
-    if len(list(element)) == 0:
+    if not list(element):
         try:
             return parse_basic_callable_from_xml(element)
         except ConformanceException:
