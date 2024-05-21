@@ -111,9 +111,15 @@ class XmlCluster:
     pics: str
 
 
+class ClusterSide(Enum):
+    SERVER = auto()
+    CLIENT = auto()
+
+
 @dataclass
 class XmlDeviceTypeClusterRequirements:
     name: str
+    side: ClusterSide
     conformance: Callable[[uint, list[uint], list[uint]], ConformanceDecision]
     # TODO: add element requirements
 
@@ -158,6 +164,9 @@ ALIAS_PICS = {0x040C: 'CMOCONC',
               0x0071: 'HEPAFREMON',
               0x0072: 'ACFREMON',
               0x0405: 'RH'}
+
+CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentration Measurement', 0x0006: 'On/Off'}
+DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
 
 
 def get_conformance(element: ElementTree.Element, cluster_id: int) -> ElementTree.Element:
@@ -669,6 +678,9 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                             severity=ProblemSeverity.WARNING,
                             problem=f"Device type {name} does not a valid ID or revision. ID: {str_id} revision: {d.get('revision', 'UNKNOWN')}"))
+            break
+        if id in DEVICE_TYPE_NAME_FIXES:
+            name = DEVICE_TYPE_NAME_FIXES[id]
         try:
             classification = next(d.iter('classification'))
             scope = classification.attrib['scope']
@@ -687,8 +699,16 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
                 tmp_problems, conformance_xml = get_conformance(c, cid)
                 problems += tmp_problems
                 conformance = parse_device_type_callable_from_xml(conformance_xml)
+                side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
+                side = side_dict[c.attrib['side']]
+                if side == ClusterSide.CLIENT:
+                    # For now, let's just look at server clusters, we can do client separately after
+                    continue
+                name = c.attrib['name']
+                if cid in CLUSTER_NAME_FIXES:
+                    name = CLUSTER_NAME_FIXES[cid]
                 device_types[id].clusters[cid] = XmlDeviceTypeClusterRequirements(
-                    name=c.attrib['name'], conformance=conformance)
+                    name=name, side=side, conformance=conformance)
             except ConformanceException:
                 location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
