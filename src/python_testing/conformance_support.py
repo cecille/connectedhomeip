@@ -18,7 +18,7 @@
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable
+from typing import Callable, Optional
 
 from chip.tlv import uint
 
@@ -49,6 +49,28 @@ class ConformanceException(Exception):
     def __str__(self):
         return f"ConformanceException({self.msg})"
 
+class ChoiceConformanceException(ConformanceException):
+    def __str__(self):
+        return f'ChoiceExceptions({self.msg})'
+
+class BasicConformanceException(ConformanceException):
+    pass
+
+
+@dataclass
+class Choice:
+    choice: str
+    more: bool
+    def __str__(self):
+        more_str = '+' if self.more else ''
+        return '.' + self.choice + more_str
+
+def parse_choice(element:ElementTree.Element) -> Optional[Choice]:
+    choice = element.get('choice', '')
+    more = element.get('more', 'false') == 'true'
+    if choice and element.tag != OPTIONAL_CONFORM:
+        raise ChoiceConformanceException('Choice conformance on non-optional attribute')
+    return Choice(choice, more) if choice else None
 
 class ConformanceDecision(Enum):
     MANDATORY = auto()
@@ -56,6 +78,9 @@ class ConformanceDecision(Enum):
     NOT_APPLICABLE = auto()
     DISALLOWED = auto()
     PROVISIONAL = auto()
+
+    def set_choice(choice: Choice):
+        self.choice = choice
 
 
 @dataclass
@@ -78,7 +103,16 @@ def is_disallowed(conformance: Callable):
     return conformance(0, [], []) == ConformanceDecision.DISALLOWED
 
 
-class zigbee:
+def evaluate_choice_conformance():
+    pass
+
+@dataclass
+class Conformance(Callable):
+    def __call__(self, feature_map:uint, attribute_list: list[uint], all_command_list:list[uint]) -> ConformanceDecision:
+        raise ConformanceException('Base conformance called')
+    choice: Optional[Choice] = None
+
+class zigbee(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.NOT_APPLICABLE
 
@@ -86,7 +120,7 @@ class zigbee:
         return "Zigbee"
 
 
-class mandatory:
+class mandatory(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.MANDATORY
 
@@ -94,15 +128,18 @@ class mandatory:
         return 'M'
 
 
-class optional:
+class optional(Conformance):
+    def __init__(self, choice: Optional[Choice] = None):
+        self.choice = choice
+
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.OPTIONAL
 
     def __str__(self):
-        return 'O'
+        return 'O' + (str(self.choice) if self.choice else '')
 
 
-class deprecated:
+class deprecated(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
@@ -110,7 +147,7 @@ class deprecated:
         return 'D'
 
 
-class disallowed:
+class disallowed(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
@@ -118,7 +155,7 @@ class disallowed:
         return 'X'
 
 
-class provisional:
+class provisional(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.PROVISIONAL
 
@@ -126,7 +163,7 @@ class provisional:
         return 'P'
 
 
-class literal:
+class literal(Conformance):
     def __init__(self, value: str):
         self.value = int(value)
 
@@ -148,7 +185,7 @@ BASIC_CONFORMANCE: dict[str, Callable] = {
 }
 
 
-class feature:
+class feature(Conformance):
     def __init__(self, requiredFeature: uint, code: str):
         self.requiredFeature = requiredFeature
         self.code = code
@@ -162,7 +199,7 @@ class feature:
         return self.code
 
 
-class device_feature:
+class device_feature(Conformance):
     ''' This is different than element feature because device types use "features" that aren't reported anywhere'''
 
     def __init__(self, feature: str):
@@ -175,7 +212,7 @@ class device_feature:
         return self.feature
 
 
-class attribute:
+class attribute(Conformance):
     def __init__(self, requiredAttribute: uint, name: str):
         self.requiredAttribute = requiredAttribute
         self.name = name
@@ -189,7 +226,7 @@ class attribute:
         return self.name
 
 
-class command:
+class command(Conformance):
     def __init__(self, requiredCommand: uint, name: str):
         self.requiredCommand = requiredCommand
         self.name = name
@@ -209,9 +246,10 @@ def strip_outer_parentheses(inner: str) -> str:
     return inner
 
 
-class optional_wrapper:
-    def __init__(self, op: Callable):
+class optional_wrapper(Conformance):
+    def __init__(self, op: Callable, choice: Optional[Choice] = None):
         self.op = op
+        self.choice = choice
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         decision = self.op(feature_map, attribute_list, all_command_list)
@@ -223,10 +261,10 @@ class optional_wrapper:
             raise ConformanceException(f'Optional wrapping invalid op {decision}')
 
     def __str__(self):
-        return f'[{strip_outer_parentheses(str(self.op))}]'
+        return f'[{strip_outer_parentheses(str(self.op))}]' + (str(self.choice) if self.choice else '')
 
 
-class mandatory_wrapper:
+class mandatory_wrapper(Conformance):
     def __init__(self, op: Callable):
         self.op = op
 
@@ -237,8 +275,10 @@ class mandatory_wrapper:
         return strip_outer_parentheses(str(self.op))
 
 
-class not_operation:
+class not_operation(Conformance):
     def __init__(self, op: Callable):
+        if op.choice:
+            raise ChoiceConformanceException('NOT operation called on choice conformance')
         self.op = op
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
@@ -262,8 +302,11 @@ class not_operation:
         return f'!{str(self.op)}'
 
 
-class and_operation:
+class and_operation(Conformance):
     def __init__(self, op_list: list[Callable]):
+        for op in op_list:
+            if op.choice:
+                raise ChoiceConformanceException('AND operation with internal choice conformance')
         self.op_list = op_list
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
@@ -285,8 +328,11 @@ class and_operation:
         return f'({" & ".join(op_strs)})'
 
 
-class or_operation:
+class or_operation(Conformance):
     def __init__(self, op_list: list[Callable]):
+        for op in op_list:
+            if op.choice:
+                raise ChoiceConformanceException('AND operation with internal choice conformance')
         self.op_list = op_list
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
@@ -309,7 +355,7 @@ class or_operation:
         return f'({" | ".join(op_strs)})'
 
 
-class greater_operation:
+class greater_operation(Conformance):
     def _type_ok(self, op: Callable):
         return type(op) == attribute or type(op) == literal
 
@@ -329,7 +375,7 @@ class greater_operation:
         return f'{str(self.op1)} > {str(self.op2)}'
 
 
-class otherwise:
+class otherwise(Conformance):
     def __init__(self, op_list: list[Callable]):
         self.op_list = op_list
 
@@ -354,9 +400,12 @@ class otherwise:
 
 def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
     if list(element):
-        raise ConformanceException("parse_basic_callable_from_xml called for XML element with children")
+        raise BasicConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
     try:
+        choice = parse_choice(element)
+        if choice and element.tag == OPTIONAL_CONFORM:
+                return optional(choice)
         return BASIC_CONFORMANCE[element.tag]
     except KeyError:
         if element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONDITION:
@@ -364,17 +413,18 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
         elif element.tag == LITERAL_TAG:
             return literal(element.get('value'))
         else:
-            raise ConformanceException(
+            raise BasicConformanceException(
                 f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
 
 
 def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Callable]) -> Callable:
     # optional can be a wrapper as well as a standalone
     # This can be any of the boolean operations, optional or otherwise
+    choice = parse_choice(element)
     if element.tag == OPTIONAL_CONFORM:
         if len(ops) > 1:
             raise ConformanceException(f'OPTIONAL term found with more than one subelement {list(element)}')
-        return optional_wrapper(ops[0])
+        return optional_wrapper(ops[0], choice)
     elif element.tag == MANDATORY_CONFORM:
         if len(ops) > 1:
             raise ConformanceException(f'MANDATORY term found with more than one subelement {list(element)}')
@@ -407,7 +457,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callabl
         # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
         # as just optional, because it's optional to implement any device type feature.
         # Device types also have some marked as "condition" that are similarly optional
-        except ConformanceException:
+        except BasicConformanceException:
             if element.tag == ATTRIBUTE_TAG or element.tag == CONDITION_TAG or element.tag == FEATURE_TAG:
                 return device_feature(element.attrib['name'])
             raise
@@ -423,7 +473,7 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
     if not list(element):
         try:
             return parse_basic_callable_from_xml(element)
-        except ConformanceException:
+        except BasicConformanceException:
             pass
         if element.tag == FEATURE_TAG:
             try:

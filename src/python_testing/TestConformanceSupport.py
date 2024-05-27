@@ -749,7 +749,161 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_device_type_callable_from_xml(et)
         asserts.assert_equal(str(xml_callable), 'CD, testy', msg)
         asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.OPTIONAL)
+    
 
+    def test_choice_conformance(self):
+        # Choice conformances can appear on:
+        # - base optional O.a
+        # - base optional feature [AB].a
+        # - base optional attribute [attr1].a
+        # - base optional command [cmd1].a
+        # - optional wrapper of complex feature [AB | CD].a, [!attr1].a
+        # - otherwise conformance attr1, [AB], O.a / attr1, [AB].a, O
+        # - multiple in otherwise [AB].a, [CD].b
+        #
+        # Choice conformances are disallowed on:
+        # - mandatory M.a
+        # - mandatory feature AB.a
+        # - mandatory attribute attr1.a
+        # - mandatory command cmd1.a
+        # - AND expressions (attr1 & O.a)
+        # - OR expressions (attr1 | O.a)
+        # - NOT expressions (!O.a)
+        # - internal expressions [AB.a], [attr1.a], [cmd1.a]
+        # - provisional P.a
+        # - disallowed X.a
+        # - deprecated D.a
+
+        choices = [('a+', 'choice="a" more="true"'), ('a', 'choice="a"')]
+        for suffix, xml_attrs in choices:
+            def check_good_choice(xml: str, conformance_str: str):
+                msg = 'Bad choice conformance string'
+                et = ElementTree.fromstring(xml)
+                xml_callable = parse_callable_from_xml(et, self.params)
+                asserts.assert_equal(str(xml_callable), conformance_str, msg)
+
+            xml = f'<optionalConform {xml_attrs} />'
+            check_good_choice(xml, f'O.{suffix}')
+
+            xml = (f'<optionalConform {xml_attrs}>'
+                   '<feature name="AB" />'
+                   '</optionalConform>')
+            check_good_choice(xml, f'[AB].{suffix}')
+
+            xml = (f'<optionalConform {xml_attrs}>'
+                   '<attribute name="attr1" />'
+                   '</optionalConform>')
+            check_good_choice(xml, f'[attr1].{suffix}')
+
+            xml = (f'<optionalConform {xml_attrs}>'
+                   '<command name="cmd1" />'
+                   '</optionalConform>')
+            check_good_choice(xml, f'[cmd1].{suffix}')
+
+            xml = (f'<optionalConform {xml_attrs}>'
+                   '<orTerm>'
+                   '<feature name="AB" />'
+                   '<feature name="CD" />'
+                   '</orTerm>'
+                   '</optionalConform>')
+            check_good_choice(xml, f'[AB | CD].{suffix}')
+
+            xml = (f'<optionalConform {xml_attrs}>'
+                   '<notTerm>'
+                   '<attribute name="attr1" />'
+                   '</notTerm>'
+                   '</optionalConform>')
+            check_good_choice(xml, f'[!attr1].{suffix}')
+
+            xml = ('<otherwiseConform>'
+                   '<attribute name="attr1" />'
+                   f'<optionalConform>'
+                   '<feature name="AB" />'
+                   '</optionalConform>'
+                   f'<optionalConform {xml_attrs} />'
+                   '</otherwiseConform>')
+            check_good_choice(xml, f'attr1, [AB], O.{suffix}')
+
+            # - multiple in otherwise [AB].a, [CD].b
+            xml = ('<otherwiseConform>'
+                   '<attribute name="attr1" />'
+                   f'<optionalConform {xml_attrs}>'
+                   '<feature name="AB" />'
+                   '</optionalConform>'
+                   f'<optionalConform choice="b">'
+                   '<feature name="CD" />'
+                   '</optionalConform>'
+                   '</otherwiseConform>')
+            check_good_choice(xml, f'attr1, [AB].{suffix}, [CD].b')
+
+            # Ones that should throw exceptions
+            def check_bad_choice(xml: str):
+                msg = f'Choice conformance string should cause exception, but did not: {xml}'
+                et = ElementTree.fromstring(xml)
+                try:
+                    xml_callable = parse_callable_from_xml(et, self.params)
+                    asserts.fail(msg)
+                except ConformanceException:
+                    pass
+            xml = f'<mandatoryConform {xml_attrs} />'
+            check_bad_choice(xml)
+
+            xml = f'<feature name="AB" {xml_attrs} />'
+            check_bad_choice(xml)
+
+            xml = f'<attribute name="attr1" {xml_attrs} />'
+            check_bad_choice(xml)
+
+            xml = f'<command name="cmd1" {xml_attrs} />'
+            check_bad_choice(xml)
+
+            xml = ('<mandatoryConform>'
+                   '<andTerm>'
+                   '<attribute name="attr1"/>'
+                   f'<optionalConform {xml_attrs} />'
+                   '</andTerm>'
+                   '</mandatoryConform>')
+            check_bad_choice(xml)
+
+            xml = ('<mandatoryConform>'
+                   '<orTerm>'
+                   '<attribute name="attr1"/>'
+                   f'<optionalConform {xml_attrs} />'
+                   '</orTerm>'
+                   '</mandatoryConform>')
+            check_bad_choice(xml)
+
+
+            xml = ('<mandatoryConform>'
+                   '<notTerm>'
+                   f'<optionalConform {xml_attrs} />'
+                   '</notTerm>'
+                   '</mandatoryConform>')
+            check_bad_choice(xml)
+
+            xml = ('<optionalConform>'
+                   f'<feature name="AB" {xml_attrs}/>'
+                   '</optionalConform>')
+            check_bad_choice(xml)
+
+            xml = ('<optionalConform>'
+                   f'<attribute name="attr1" {xml_attrs}/>'
+                   '</optionalConform>')
+            check_bad_choice(xml)
+
+            xml = ('<optionalConform>'
+                   f'<command name="cmd1" {xml_attrs}/>'
+                   '</optionalConform>')
+            check_bad_choice(xml)
+
+            xml = (f'<provisionalConform {xml_attrs}/>')
+            check_bad_choice(xml)
+
+            xml = (f'<disallowConform {xml_attrs}/>')
+            check_bad_choice(xml)
+
+            xml = (f'<deprecateConform {xml_attrs}/>')
+            check_bad_choice(xml)
 
 if __name__ == "__main__":
     default_matter_test_main()
