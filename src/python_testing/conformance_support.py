@@ -79,8 +79,14 @@ class ConformanceDecision(Enum):
     DISALLOWED = auto()
     PROVISIONAL = auto()
 
-    def set_choice(choice: Choice):
+    def set_choice(self, choice: Choice):
         self.choice = choice
+        return self
+    def get_choice(self) -> Optional[Choice]:
+        try:
+            return self.choice
+        except AttributeError:
+            return None
 
 
 @dataclass
@@ -133,7 +139,7 @@ class optional(Conformance):
         self.choice = choice
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
-        return ConformanceDecision.OPTIONAL
+        return ConformanceDecision.OPTIONAL.set_choice(self.choice)
 
     def __str__(self):
         return 'O' + (str(self.choice) if self.choice else '')
@@ -253,8 +259,9 @@ class optional_wrapper(Conformance):
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         decision = self.op(feature_map, attribute_list, all_command_list)
-        if decision == ConformanceDecision.MANDATORY or decision == ConformanceDecision.OPTIONAL:
-            return ConformanceDecision.OPTIONAL
+
+        if decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
+            return ConformanceDecision.OPTIONAL.set_choice(self.choice)
         elif decision == ConformanceDecision.NOT_APPLICABLE:
             return ConformanceDecision.NOT_APPLICABLE
         else:
@@ -342,10 +349,8 @@ class or_operation(Conformance):
                 raise ConformanceException('OR operation on optional or disallowed item')
             elif decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
-            elif decision == ConformanceDecision.MANDATORY:
-                return ConformanceDecision.MANDATORY
-            elif decision == ConformanceDecision.OPTIONAL:
-                return ConformanceDecision.OPTIONAL
+            elif decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
+                return decision
             else:
                 raise ConformanceException('Oplist item returned non-conformance value')
         return ConformanceDecision.NOT_APPLICABLE

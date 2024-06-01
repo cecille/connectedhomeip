@@ -18,7 +18,9 @@
 from typing import Callable
 import xml.etree.ElementTree as ElementTree
 
-from conformance_support import (ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
+from chip.tlv import uint
+
+from conformance_support import (Choice, Conformance, ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
                                  mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
                                  parse_device_type_callable_from_xml, provisional, zigbee)
 from matter_testing_support import MatterBaseTest, default_matter_test_main
@@ -774,31 +776,50 @@ class TestConformanceSupport(MatterBaseTest):
         # - disallowed X.a
         # - deprecated D.a
 
-        choices = [('a+', 'choice="a" more="true"'), ('a', 'choice="a"')]
-        for suffix, xml_attrs in choices:
-            def check_good_choice(xml: str, conformance_str: str):
+        choices = [('a+', 'choice="a" more="true"', True), ('a', 'choice="a"', False)]
+        for suffix, xml_attrs, more in choices:
+            def check_good_choice(xml: str, conformance_str: str) -> Conformance:
                 msg = 'Bad choice conformance string'
                 et = ElementTree.fromstring(xml)
                 xml_callable = parse_callable_from_xml(et, self.params)
                 asserts.assert_equal(str(xml_callable), conformance_str, msg)
+                return xml_callable
 
+            def check_decision(conformance: Conformance, feature_map: uint, attr_list: list[uint], cmd_list: list[uint]):
+                decision = conformance(feature_map, attr_list, cmd_list)
+                asserts.assert_true(decision.get_choice(), 'Expected choice conformance on decision, but did not get one')
+                asserts.assert_equal(decision.get_choice().choice, 'a', 'Unexpected conformance string returned')
+                asserts.assert_equal(decision.get_choice().more, more, "Unexpected more on choice")
+
+            AB = self.feature_names_to_bits['AB']
+            attr1 = [self.attribute_names_to_values['attr1']]
+            cmd1 = [self.command_names_to_values['cmd1']]
+
+            msg_not_applicable = "Expected NOT_APPLICABLE conformance"
             xml = f'<optionalConform {xml_attrs} />'
-            check_good_choice(xml, f'O.{suffix}')
+            conformance = check_good_choice(xml, f'O.{suffix}')
+            check_decision(conformance, 0, [], [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<feature name="AB" />'
                    '</optionalConform>')
-            check_good_choice(xml, f'[AB].{suffix}')
+            conformance = check_good_choice(xml, f'[AB].{suffix}')
+            asserts.assert_equal(conformance(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            check_decision(conformance, AB, [], [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<attribute name="attr1" />'
                    '</optionalConform>')
-            check_good_choice(xml, f'[attr1].{suffix}')
+            conformance = check_good_choice(xml, f'[attr1].{suffix}')
+            asserts.assert_equal(conformance(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            check_decision(conformance, 0, attr1, [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<command name="cmd1" />'
                    '</optionalConform>')
-            check_good_choice(xml, f'[cmd1].{suffix}')
+            conformance = check_good_choice(xml, f'[cmd1].{suffix}')
+            asserts.assert_equal(conformance(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            check_decision(conformance, 0, [], cmd1)
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<orTerm>'
@@ -806,14 +827,18 @@ class TestConformanceSupport(MatterBaseTest):
                    '<feature name="CD" />'
                    '</orTerm>'
                    '</optionalConform>')
-            check_good_choice(xml, f'[AB | CD].{suffix}')
+            conformance = check_good_choice(xml, f'[AB | CD].{suffix}')
+            asserts.assert_equal(conformance(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            check_decision(conformance, AB, [], [])
 
             xml = (f'<optionalConform {xml_attrs}>'
                    '<notTerm>'
                    '<attribute name="attr1" />'
                    '</notTerm>'
                    '</optionalConform>')
-            check_good_choice(xml, f'[!attr1].{suffix}')
+            conformance = check_good_choice(xml, f'[!attr1].{suffix}')
+            asserts.assert_equal(conformance(0, attr1, []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            check_decision(conformance, 0, [], [])
 
             xml = ('<otherwiseConform>'
                    '<attribute name="attr1" />'
@@ -822,7 +847,15 @@ class TestConformanceSupport(MatterBaseTest):
                    '</optionalConform>'
                    f'<optionalConform {xml_attrs} />'
                    '</otherwiseConform>')
-            check_good_choice(xml, f'attr1, [AB], O.{suffix}')
+            conformance = check_good_choice(xml, f'attr1, [AB], O.{suffix}')
+            # with no features or attributes, this should end up as O.a, so there should be a choice
+            check_decision(conformance, 0, [], [])
+            # when we have this attribute, we should not have a choice
+            asserts.assert_equal(conformance(0, attr1, []), ConformanceDecision.MANDATORY, 'Unexpected conformance')
+            asserts.assert_equal(conformance(0, attr1, []).get_choice(), None, 'Unexpected choice in conformance')
+            # when we have only this feature, we should not have a choice
+            asserts.assert_equal(conformance(AB, [], []), ConformanceDecision.OPTIONAL, 'Unexpected conformance')
+            asserts.assert_equal(conformance(AB, [], []).get_choice(), None, 'Unexpected choice in conformance')
 
             # - multiple in otherwise [AB].a, [CD].b
             xml = ('<otherwiseConform>'
@@ -834,7 +867,24 @@ class TestConformanceSupport(MatterBaseTest):
                    '<feature name="CD" />'
                    '</optionalConform>'
                    '</otherwiseConform>')
-            check_good_choice(xml, f'attr1, [AB].{suffix}, [CD].b')
+            conformance = check_good_choice(xml, f'attr1, [AB].{suffix}, [CD].b')
+            asserts.assert_equal(conformance(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg_not_applicable)
+            # when we have this attribute, we should not have a choice
+            asserts.assert_equal(conformance(0, attr1, []), ConformanceDecision.MANDATORY, 'Unexpected conformance')
+            asserts.assert_equal(conformance(0, attr1, []).get_choice(), None, 'Unexpected choice in conformance')
+            # When it's just AB, we should have a choice
+            check_decision(conformance, AB, [], [])
+            # When we have both the attribute and AB, we should not have a choice
+            asserts.assert_equal(conformance(0, attr1, []), ConformanceDecision.MANDATORY, 'Unexpected conformance')
+            asserts.assert_equal(conformance(0, attr1, []).get_choice(), None, 'Unexpected choice in conformance')
+            # When we have AB and CD, we should be using the AB choice
+            CD = self.feature_names_to_bits['CD']
+            ABCD = AB | CD
+            check_decision(conformance, ABCD, [], [])
+            # When we just have CD, we still have a choice, but the string should be b
+            asserts.assert_equal(conformance(CD, [], []), ConformanceDecision.OPTIONAL, 'Unexpected conformance')
+            asserts.assert_equal(conformance(CD, [], []).get_choice(), Choice('b', False), 'Unexpected choice in conformance')
+
 
             # Ones that should throw exceptions
             def check_bad_choice(xml: str):
