@@ -57,7 +57,7 @@ class BasicConformanceException(ConformanceException):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Choice:
     choice: str
     more: bool
@@ -108,9 +108,6 @@ def is_disallowed(conformance: Callable):
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
     return conformance(0, [], []) == ConformanceDecision.DISALLOWED
 
-
-def evaluate_choice_conformance():
-    pass
 
 @dataclass
 class Conformance(Callable):
