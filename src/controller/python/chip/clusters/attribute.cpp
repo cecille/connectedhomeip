@@ -265,6 +265,9 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
                                                     size_t attributeDataLength);
+PyChipError pychip_WriteClient_TestOnlySendWriteTimedRequestFlagWithNoTimedRequest(void * appContext, DeviceProxy * device,
+                                                                                   chip::python::PyWriteAttributeData * writeAttributesData,
+                                                                                   size_t attributeDataLength);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,

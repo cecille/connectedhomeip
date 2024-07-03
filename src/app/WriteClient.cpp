@@ -201,7 +201,12 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue() || mForceTimedFlag);
+#else
     mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+#endif
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());

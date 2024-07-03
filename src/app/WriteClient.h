@@ -228,6 +228,12 @@ public:
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetForceTimedFlag(bool forceTimedFlag) {
+        mForceTimedFlag = forceTimedFlag;
+    }
+#endif
+
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
@@ -423,6 +429,9 @@ private:
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead = kReservedSizeForIMRevision + kReservedSizeForMoreChunksFlag +
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
     bool mHasDataVersion = false;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    bool mForceTimedFlag = false;
+#endif
 };
 
 } // namespace app

@@ -1215,6 +1215,31 @@ class ChipDeviceControllerBase():
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    async def TestOnlySendWriteTimedRequestFlagWithNoTimedRequest(self, nodeid: int,
+                                                                  attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]):
+        '''
+
+        Please see WriteAttribute for description.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
+
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], 0, 0, v[1].value))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2], 1, v[1].value))
+
+        ClusterAttribute.TestOnlySendWriteTimedRequestFlagWithNoTimedRequest(future, eventLoop, device.deviceProxy, attrs).raise_on_error()
+        return await future
+
     def WriteGroupAttribute(
             self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
         '''
