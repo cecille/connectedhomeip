@@ -306,6 +306,10 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(str(self.xml_device_types[color_temp_device_type].server_clusters[color_control].attribute_overrides[remaining_time]),
                              "M", "Unexpected attribute override for RemainingTime")
 
+    def test_problems(self):
+        for p in self.xml_device_types_problems:
+            print(str(p))
+
     # All these tests are based on the temp sensor device type because it is very simple
     # it requires temperature measurement, identify and the base devices.
     # Right now I'm not testing for binding condition.
