@@ -956,7 +956,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
-    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl] = None, node_id: Optional[int] = None) -> CustomCommissioningParameters:
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
         rnd_discriminator = random.randint(0, 4095)
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,

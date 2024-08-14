@@ -133,7 +133,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
         asserts.assert_true(type_matches(result, Clusters.Attribute.ValueDecodeFailure), "We were expecting a value decode failure")
         asserts.assert_equal(result.Reason.status, Status.UnsupportedAttribute, "Incorrect error returned from reading UniqueID")
 
-        params = await self.openCommissioningWindow(dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid)
+        params = await self.open_commissioning_window(dev_ctrl=self.TH_server_controller, node_id=self.device_for_dut_eco_nodeid)
 
         self.wait_for_user_input(
             prompt_msg=f"Using the DUT vendor's provided interface, commission the device using the following parameters:\n"

@@ -129,7 +129,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         await self.default_controller.CommissionOnNetwork(nodeId=self.icd_nodeid, setupPinCode=passcode, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
         logging.info("Commissioning of ICD to fabric two (DUT)")
-        params = await self.openCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
+        params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.icd_nodeid)
 
         self._ask_for_vendor_commissioniong_ux_operation(params.randomDiscriminator, params.commissioningParameters.setupPinCode,
                                                          params.commissioningParameters.setupManualCode, params.commissioningParameters.setupQRCode)
