@@ -30,10 +30,9 @@ namespace chip {
  * May contain generic fixed keys (e.g. "g/fidx") or formatted fabric-specific
  * keys ("f/%x/..." where %x is the fabric index).
  */
-class StorageKeyName
-{
+class StorageKeyName {
 public:
-    StorageKeyName(const StorageKeyName & other)             = default;
+    StorageKeyName(const StorageKeyName & other) = default;
     StorageKeyName & operator=(const StorageKeyName & other) = default;
 
     ~StorageKeyName() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -88,8 +87,7 @@ private:
  * * Keys that are tied to a specific fabric: "f/%x/...." where the %x gets
  *   replaced by the fabric index.
  */
-class DefaultStorageKeyAllocator
-{
+class DefaultStorageKeyAllocator {
 private:
     DefaultStorageKeyAllocator() = default;
 
@@ -118,7 +116,7 @@ public:
     static StorageKeyName FabricSession(FabricIndex fabric, NodeId nodeId)
     {
         return StorageKeyName::Formatted("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32),
-                                         static_cast<uint32_t>(nodeId));
+            static_cast<uint32_t>(nodeId));
     }
 
     static StorageKeyName SessionResumptionIndex() { return StorageKeyName::FromConst("g/sri"); }
@@ -204,7 +202,7 @@ public:
     static StorageKeyName ThreadNetworkDirectoryDataset(uint64_t extendedPanId)
     {
         return StorageKeyName::Formatted("g/tnd/n/%08" PRIx32 "%08" PRIx32, // some platforms can't format uint64
-                                         static_cast<uint32_t>(extendedPanId >> 32), static_cast<uint32_t>(extendedPanId));
+            static_cast<uint32_t>(extendedPanId >> 32), static_cast<uint32_t>(extendedPanId));
     }
 
     // OTA
@@ -307,10 +305,16 @@ public:
 
     // Stores an intermediate cert payload for a client cert for the given fabric & endpoint
     static StorageKeyName TlsClientCertEntityIntermediateKey(FabricIndex fabric, EndpointId endpoint, uint16_t entity_idx,
-                                                             uint8_t intermediate_idx)
+        uint8_t intermediate_idx)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x/%x", fabric, endpoint, entity_idx, intermediate_idx);
     }
+    // Valve configuration and control
+    static StorageKeyName VCCDefaultOpenDuration(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/vcc/dod/%x", endpoint);
+    }
+    static StorageKeyName VCCDefaultOpenLevel(EndpointId endpoint) { return StorageKeyName::Formatted("g/vcc/dol/%x", endpoint); }
 };
 
 } // namespace chip
