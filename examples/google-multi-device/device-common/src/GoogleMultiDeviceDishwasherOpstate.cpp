@@ -1,13 +1,14 @@
 // Copyright 2024 Google. All rights reserved.
 
 #include "GoogleMultiDeviceDishwasherOpstate.h"
+#include "GoogleMultiDeviceCommon.h"
 
 #include <memory>
 #include <utility>
 
 #include "app-common/zap-generated/cluster-enums.h"
-#include "app/clusters/operational-state-server/operational-state-server.h"
 #include "app/clusters/operational-state-server/operational-state-cluster-objects.h"
+#include "app/clusters/operational-state-server/operational-state-server.h"
 #include <app/data-model/Nullable.h>
 
 #include <lib/core/CHIPError.h>
@@ -21,10 +22,10 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-using chip::app::Clusters::OperationalState::GenericOperationalState;
-using chip::app::Clusters::OperationalState::GenericOperationalError;
-using chip::app::Clusters::OperationalState::OperationalStateEnum;
 using chip::app::Clusters::OperationalState::ErrorStateEnum;
+using chip::app::Clusters::OperationalState::GenericOperationalError;
+using chip::app::Clusters::OperationalState::GenericOperationalState;
+using chip::app::Clusters::OperationalState::OperationalStateEnum;
 
 namespace google {
 namespace matter {
@@ -32,10 +33,7 @@ namespace matter {
 class GoogleDishwasherOperationalStateDelegate : public OperationalState::Delegate
 {
 public:
-    GoogleDishwasherOperationalStateDelegate()
-    {
-        mOperationalStateList = Span<const GenericOperationalState>(kOpStateList);
-    }
+    GoogleDishwasherOperationalStateDelegate() { mOperationalStateList = Span<const GenericOperationalState>(kOpStateList); }
 
     /**
      * Get the countdown time. This attribute is not used in this application.
@@ -101,11 +99,13 @@ public:
         {
             GetInstance()->UpdateCountdownTimeFromDelegate();
             err.Set(to_underlying(ErrorStateEnum::kNoError));
+            GoogleMultiDeviceIntegration::GetInstance().SetDebugLed(true, 2);
         }
         else
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         }
+        // I know this inverts the relationship. We can care about the integrity of our class structure another day.
     }
 
     /**
@@ -125,6 +125,7 @@ public:
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         }
+        GoogleMultiDeviceIntegration::GetInstance().SetDebugLed(false, 2);
     }
 
     /**
@@ -156,6 +157,7 @@ public:
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         }
+        GoogleMultiDeviceIntegration::GetInstance().SetDebugLed(true, 1);
     }
 
     /**
@@ -195,6 +197,7 @@ public:
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         }
+        GoogleMultiDeviceIntegration::GetInstance().SetDebugLed(false, 1);
     }
 
     static void OnOperationalStateTimerTick(System::Layer * systemLayer, void * data)
@@ -235,10 +238,7 @@ public:
     }
 
 protected:
-    OperationalState::Instance * GetClusterInstance()
-    {
-        return GetInstance();
-    }
+    OperationalState::Instance * GetClusterInstance() { return GetInstance(); }
     static constexpr uint32_t kExamplePhaseTime = 30u;
 
     uint32_t mRunningTime = 0;
@@ -254,8 +254,6 @@ protected:
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 };
-
-
 
 #if 0
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
@@ -282,7 +280,6 @@ std::unique_ptr<GoogleFakeDishwasherInterface> MakeGoogleFakeDishwasher(Endpoint
 {
     return std::make_unique<GoogleFakeDishwasherInterface>(endpointId);
 }
-
 
 } // namespace matter
 } // namespace google

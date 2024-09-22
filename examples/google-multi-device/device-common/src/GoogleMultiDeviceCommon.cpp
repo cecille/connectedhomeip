@@ -7,20 +7,20 @@
 
 #include "GoogleMultiDeviceCommon.h"
 
-#include "GoogleMultiDeviceInfoProvider.h"
-#include "GoogleMultiDeviceAttestationProvider.h"
-#include "GenericSwitchStateMachine.h"
 #include "DefaultGenericSwitchStateMachineDriver.h"
+#include "GenericSwitchStateMachine.h"
+#include "GoogleMultiDeviceAttestationProvider.h"
 #include "GoogleMultiDeviceDishwasherOpstate.h"
+#include "GoogleMultiDeviceInfoProvider.h"
 
-#include <app/server/Server.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/server/Server.h>
 #include <include/platform/ConnectivityManager.h>
 #include <include/platform/DeviceInstanceInfoProvider.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
@@ -43,8 +43,8 @@ GoogleMultiDeviceAttestationProvider sAttestationProvider;
 
 class OccupancyDelegate : public OccupancySensing::Instance::Delegate
 {
-  public:
-    //OccupancyDelegate() = delete;
+public:
+    // OccupancyDelegate() = delete;
     OccupancyDelegate(EndpointId endpointId) : mEndpoint(endpointId) {}
 
     // Not copyable.
@@ -102,9 +102,11 @@ class OccupancyDelegate : public OccupancySensing::Instance::Delegate
     bool StartHoldTimer(uint16_t numSeconds, std::function<void()> callback) override
     {
         mHoldTimerCallback = callback;
-        return CHIP_NO_ERROR == chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Timeout(numSeconds * 1000u), &HoldTimerHandler, this);
+        return CHIP_NO_ERROR ==
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Timeout(numSeconds * 1000u), &HoldTimerHandler, this);
     }
-  private:
+
+private:
     static void HoldTimerHandler(System::Layer * layer, void * ctx)
     {
         if (ctx != nullptr)
@@ -149,8 +151,7 @@ void GoogleMultiDeviceIntegration::InitializeProduct()
     {
         mGenericSwitchDriverEp2.SetEndpointId(2);
         BitFlags<Clusters::Switch::Feature> ep2Features;
-        ep2Features
-            .Set(Clusters::Switch::Feature::kActionSwitch)
+        ep2Features.Set(Clusters::Switch::Feature::kActionSwitch)
             .Set(Clusters::Switch::Feature::kMomentarySwitch)
             .Set(Clusters::Switch::Feature::kMomentarySwitchLongPress)
             .Set(Clusters::Switch::Feature::kMomentarySwitchMultiPress);
@@ -166,8 +167,7 @@ void GoogleMultiDeviceIntegration::InitializeProduct()
     {
         mGenericSwitchDriverEp3.SetEndpointId(3);
         BitFlags<Clusters::Switch::Feature> ep3Features;
-        ep3Features
-            .Set(Clusters::Switch::Feature::kMomentarySwitch)
+        ep3Features.Set(Clusters::Switch::Feature::kMomentarySwitch)
             .Set(Clusters::Switch::Feature::kMomentarySwitchLongPress)
             .Set(Clusters::Switch::Feature::kMomentarySwitchRelease)
             .Set(Clusters::Switch::Feature::kMomentarySwitchMultiPress);
@@ -192,18 +192,19 @@ void GoogleMultiDeviceIntegration::InitializeProduct()
         mGenericSwitchStateMachineEp4.SetDriver(&mGenericSwitchDriverEp4);
 
         // Initialize initial state.
-        mGenericSwitchDriverEp4.SetButtonPosition(GetEp4LatchInitialPosition());
+        mLatchPos = GetEp4LatchInitialPosition();
+        mGenericSwitchDriverEp4.SetButtonPosition(mLatchPos);
     }
 
     // EP5: Occupancy sensor setup
     const EndpointId kOccupancyEndpointId = 5;
-    mOccupancyDelegateEp5 = std::make_unique<OccupancyDelegate>(kOccupancyEndpointId);
+    mOccupancyDelegateEp5                 = std::make_unique<OccupancyDelegate>(kOccupancyEndpointId);
     mOccupancyInstanceEp5 = std::make_unique<OccupancySensing::Instance>(mOccupancyDelegateEp5.get(), kOccupancyEndpointId);
     VerifyOrDie(mOccupancyInstanceEp5->Init() == CHIP_NO_ERROR);
 
     // EP6: Dishwasher setup
     const EndpointId kDishwasherEndpointId = 6;
-    mFakeDishwasherEp6 = MakeGoogleFakeDishwasher(kDishwasherEndpointId);
+    mFakeDishwasherEp6                     = MakeGoogleFakeDishwasher(kDishwasherEndpointId);
     mOpStateInstanceEp6 = std::make_unique<OperationalState::Instance>(mFakeDishwasherEp6->GetDelegate(), kDishwasherEndpointId);
 
     mOpStateInstanceEp6->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
@@ -211,45 +212,85 @@ void GoogleMultiDeviceIntegration::InitializeProduct()
 
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
     {
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([](){
-           chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(chip::DeviceLayer::ConnectivityManager::BLEAdvertisingMode::kFastAdvertising);
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
+            chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(
+                chip::DeviceLayer::ConnectivityManager::BLEAdvertisingMode::kFastAdvertising);
         });
     }
 }
 
 void GoogleMultiDeviceIntegration::HandleButtonPress(ButtonId buttonId)
 {
-    uint8_t latchPos = 0;
     bool isLatch = false;
 
     switch (buttonId)
     {
     case ButtonId::kRed:
         // Position 1 on EP2
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             this->mGenericSwitchStateMachineEp2.HandleEvent(GenericSwitchStateMachine::Event::MakeButtonPressEvent(1));
         });
         break;
     case ButtonId::kYellow:
         // Position 1 on EP3
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             this->mGenericSwitchStateMachineEp3.HandleEvent(GenericSwitchStateMachine::Event::MakeButtonPressEvent(1));
         });
         break;
-    case ButtonId::kGreen:
-        // TODO: Handle for opstate
-        break;
+    case ButtonId::kGreen: {
+        if (mLatchPos == 1)
+        {
+            // Controlling start and stop
+            if (mOpStateInstanceEp6->GetCurrentOperationalState() ==
+                to_underlying(OperationalState::OperationalStateEnum::kRunning))
+            {
+                chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+                    mFakeDishwasherEp6->GetDelegate()->HandleStopStateCallback(err);
+                });
+            }
+            else if (mOpStateInstanceEp6->GetCurrentOperationalState() ==
+                     to_underlying(OperationalState::OperationalStateEnum::kStopped))
+            {
+                chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+                    mFakeDishwasherEp6->GetDelegate()->HandleStartStateCallback(err);
+                });
+            }
+        }
+        else if (mLatchPos == 2)
+        {
+            // Controlling pause and resume
+            if (mOpStateInstanceEp6->GetCurrentOperationalState() ==
+                to_underlying(OperationalState::OperationalStateEnum::kRunning))
+            {
+                chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+                    mFakeDishwasherEp6->GetDelegate()->HandlePauseStateCallback(err);
+                });
+            }
+            else if (mOpStateInstanceEp6->GetCurrentOperationalState() ==
+                     to_underlying(OperationalState::OperationalStateEnum::kPaused))
+            {
+                chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+                    mFakeDishwasherEp6->GetDelegate()->HandleResumeStateCallback(err);
+                });
+            }
+        }
+    }
+    break;
     case ButtonId::kLatch1:
-        latchPos = 0;
-        isLatch = true;
+        mLatchPos = 0;
+        isLatch   = true;
         break;
     case ButtonId::kLatch2:
-        latchPos = 1;
-        isLatch = true;
+        mLatchPos = 1;
+        isLatch   = true;
         break;
     case ButtonId::kLatch3:
-        latchPos = 2;
-        isLatch = true;
+        mLatchPos = 2;
+        isLatch   = true;
         break;
     default:
         break;
@@ -258,7 +299,8 @@ void GoogleMultiDeviceIntegration::HandleButtonPress(ButtonId buttonId)
     if (isLatch)
     {
         // Latch positions on EP4
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this, latchPos](){
+        uint8_t latchPos = mLatchPos;
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([this, latchPos]() {
             this->mGenericSwitchStateMachineEp4.HandleEvent(GenericSwitchStateMachine::Event::MakeLatchSwitchChangeEvent(latchPos));
         });
     }
@@ -270,13 +312,13 @@ void GoogleMultiDeviceIntegration::HandleButtonRelease(ButtonId buttonId)
     {
     case ButtonId::kRed:
         // Position 1 on EP2
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             this->mGenericSwitchStateMachineEp2.HandleEvent(GenericSwitchStateMachine::Event::MakeButtonReleaseEvent(1));
         });
         break;
     case ButtonId::kYellow:
         // Position 1 on EP3
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             this->mGenericSwitchStateMachineEp3.HandleEvent(GenericSwitchStateMachine::Event::MakeButtonReleaseEvent(1));
         });
         break;
@@ -292,9 +334,8 @@ void GoogleMultiDeviceIntegration::HandleOccupancyDetected(uint8_t sensorId)
 {
     if (sensorId == 0)
     {
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
-            this->mOccupancyInstanceEp5->SetOccupancyDetectedFromSensor(true);
-        });
+        chip::DeviceLayer::SystemLayer().ScheduleLambda(
+            [this]() { this->mOccupancyInstanceEp5->SetOccupancyDetectedFromSensor(true); });
     }
 }
 
@@ -302,9 +343,8 @@ void GoogleMultiDeviceIntegration::HandleOccupancyUndetected(uint8_t sensorId)
 {
     if (sensorId == 0)
     {
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([this](){
-            this->mOccupancyInstanceEp5->SetOccupancyDetectedFromSensor(false);
-        });
+        chip::DeviceLayer::SystemLayer().ScheduleLambda(
+            [this]() { this->mOccupancyInstanceEp5->SetOccupancyDetectedFromSensor(false); });
     }
 }
 

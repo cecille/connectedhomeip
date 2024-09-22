@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include "GenericSwitchStateMachine.h"
 #include "DefaultGenericSwitchStateMachineDriver.h"
+#include "GenericSwitchStateMachine.h"
 #include "GoogleMultiDeviceDishwasherOpstate.h"
 #include "app/clusters/occupancy-sensor-server/occupancy-sensor-server.h"
 #include "app/clusters/operational-state-server/operational-state-server.h"
@@ -17,11 +17,12 @@ namespace matter {
 
 class GoogleMultiDeviceIntegration
 {
-  public:
-    enum class ButtonId : uint8_t {
-        kRed = 0,
+public:
+    enum class ButtonId : uint8_t
+    {
+        kRed    = 0,
         kYellow = 1,
-        kGreen = 2,
+        kGreen  = 2,
         kLatch1 = 3,
         kLatch2 = 4,
         kLatch3 = 5
@@ -42,7 +43,9 @@ class GoogleMultiDeviceIntegration
     void HandleOccupancyUndetected(uint8_t sensorId);
 
     // IMPLEMENT IN THE ACTUAL PRODUCT MODULE
-    void SetDebugLed(bool enabled);
+    // Yeah, I know the idx thing is gross, it's 8pm the day before SVE.
+    // 0 == red, 1 == green , 2 == yellow
+    void SetDebugLed(bool enabled, int idx = 0);
     void EmitDebugCode(uint8_t code);
     uint8_t GetEp4LatchInitialPosition();
     bool IsAlternativeDiscriminator();
@@ -52,7 +55,8 @@ class GoogleMultiDeviceIntegration
         static GoogleMultiDeviceIntegration instance;
         return instance;
     }
-  private:
+
+private:
     chip::app::DefaultGenericSwitchStateMachineDriver mGenericSwitchDriverEp2;
     chip::app::GenericSwitchStateMachine mGenericSwitchStateMachineEp2;
 
@@ -62,11 +66,13 @@ class GoogleMultiDeviceIntegration
     chip::app::DefaultGenericSwitchStateMachineDriver mGenericSwitchDriverEp4;
     chip::app::GenericSwitchStateMachine mGenericSwitchStateMachineEp4;
 
-    std::unique_ptr<chip::app::Clusters::OccupancySensing::Instance> mOccupancyInstanceEp5 = nullptr;
+    std::unique_ptr<chip::app::Clusters::OccupancySensing::Instance> mOccupancyInstanceEp5           = nullptr;
     std::unique_ptr<chip::app::Clusters::OccupancySensing::Instance::Delegate> mOccupancyDelegateEp5 = nullptr;
 
-    std::unique_ptr<GoogleFakeDishwasherInterface> mFakeDishwasherEp6 = nullptr;
+    std::unique_ptr<GoogleFakeDishwasherInterface> mFakeDishwasherEp6                    = nullptr;
     std::unique_ptr<chip::app::Clusters::OperationalState::Instance> mOpStateInstanceEp6 = nullptr;
+
+    uint8_t mLatchPos = 0;
 };
 
 } // namespace matter

@@ -79,53 +79,52 @@ LEDWidget sLightLED;
 void MultiDeviceDriverEvent(HardwareEvent event)
 {
     AppEvent app_event = {};
-    app_event.Handler = AppTask::MultiDeviceDriverAppEventHandler;
+    app_event.Handler  = AppTask::MultiDeviceDriverAppEventHandler;
 
     bool send_event = true;
     switch (event)
     {
-        case HardwareEvent::kRedButtonPressed:
-            app_event.Type = AppEvent::kEventType_kRedButtonPressed;
-            break;
-        case HardwareEvent::kRedButtonReleased:
-            app_event.Type = AppEvent::kEventType_kRedButtonReleased;
-            break;
-        case HardwareEvent::kYellowButtonPressed:
-            app_event.Type = AppEvent::kEventType_kYellowButtonPressed;
-            break;
-        case HardwareEvent::kYellowButtonReleased:
-            app_event.Type = AppEvent::kEventType_kYellowButtonReleased;
-            break;
-        case HardwareEvent::kGreenButtonPressed:
-            app_event.Type = AppEvent::kEventType_kGreenButtonPressed;
-            break;
-        case HardwareEvent::kGreenButtonReleased:
-            app_event.Type = AppEvent::kEventType_kGreenButtonReleased;
-            break;
+    case HardwareEvent::kRedButtonPressed:
+        app_event.Type = AppEvent::kEventType_kRedButtonPressed;
+        break;
+    case HardwareEvent::kRedButtonReleased:
+        app_event.Type = AppEvent::kEventType_kRedButtonReleased;
+        break;
+    case HardwareEvent::kYellowButtonPressed:
+        app_event.Type = AppEvent::kEventType_kYellowButtonPressed;
+        break;
+    case HardwareEvent::kYellowButtonReleased:
+        app_event.Type = AppEvent::kEventType_kYellowButtonReleased;
+        break;
+    case HardwareEvent::kGreenButtonPressed:
+        app_event.Type = AppEvent::kEventType_kGreenButtonPressed;
+        break;
+    case HardwareEvent::kGreenButtonReleased:
+        app_event.Type = AppEvent::kEventType_kGreenButtonReleased;
+        break;
 
+    case HardwareEvent::kLatchSwitch1Selected:
+        app_event.Type = AppEvent::kEventType_kLatchSwitch1Selected;
+        break;
 
-        case HardwareEvent::kLatchSwitch1Selected:
-            app_event.Type = AppEvent::kEventType_kLatchSwitch1Selected;
-            break;
+    case HardwareEvent::kLatchSwitch2Selected:
+        app_event.Type = AppEvent::kEventType_kLatchSwitch2Selected;
+        break;
 
-        case HardwareEvent::kLatchSwitch2Selected:
-            app_event.Type = AppEvent::kEventType_kLatchSwitch2Selected;
-            break;
+    case HardwareEvent::kLatchSwitch3Selected:
+        app_event.Type = AppEvent::kEventType_kLatchSwitch3Selected;
+        break;
 
-        case HardwareEvent::kLatchSwitch3Selected:
-            app_event.Type = AppEvent::kEventType_kLatchSwitch3Selected;
-            break;
+    case HardwareEvent::kOccupancyDetected:
+        app_event.Type = AppEvent::kEventType_OccupancyDetected;
+        break;
+    case HardwareEvent::kOccupancyUndetected:
+        app_event.Type = AppEvent::kEventType_OccupancyUndetected;
+        break;
 
-        case HardwareEvent::kOccupancyDetected:
-            app_event.Type = AppEvent::kEventType_OccupancyDetected;
-            break;
-        case HardwareEvent::kOccupancyUndetected:
-            app_event.Type = AppEvent::kEventType_OccupancyUndetected;
-            break;
-
-        default:
-            send_event = false;
-            break;
+    default:
+        send_event = false;
+        break;
     }
 
     if (send_event)
@@ -134,7 +133,7 @@ void MultiDeviceDriverEvent(HardwareEvent event)
     }
 }
 
-}
+} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -183,9 +182,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([](){
-        GoogleMultiDeviceIntegration::GetInstance().InitializeProduct();
-    });
+    chip::DeviceLayer::SystemLayer().ScheduleLambda([]() { GoogleMultiDeviceIntegration::GetInstance().InitializeProduct(); });
 
     SILABS_LOG("App Task started");
 
@@ -206,42 +203,42 @@ void AppTask::MultiDeviceDriverAppEventHandler(AppEvent * aEvent)
 
     switch (aEvent->Type)
     {
-        case AppEvent::kEventType_kRedButtonPressed:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kRed);
-            break;
-        case AppEvent::kEventType_kRedButtonReleased:
-            productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kRed);
-            break;
-        case AppEvent::kEventType_kYellowButtonPressed:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kYellow);
-            break;
-        case AppEvent::kEventType_kYellowButtonReleased:
-            productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kYellow);
-            break;
-        case AppEvent::kEventType_kGreenButtonPressed:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kGreen);
-            break;
-        case AppEvent::kEventType_kGreenButtonReleased:
-            productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kGreen);
-            break;
-        case AppEvent::kEventType_kLatchSwitch1Selected:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch1);
-            break;
-        case AppEvent::kEventType_kLatchSwitch2Selected:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch2);
-            break;
-        case AppEvent::kEventType_kLatchSwitch3Selected:
-            productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch3);
-            break;
+    case AppEvent::kEventType_kRedButtonPressed:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kRed);
+        break;
+    case AppEvent::kEventType_kRedButtonReleased:
+        productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kRed);
+        break;
+    case AppEvent::kEventType_kYellowButtonPressed:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kYellow);
+        break;
+    case AppEvent::kEventType_kYellowButtonReleased:
+        productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kYellow);
+        break;
+    case AppEvent::kEventType_kGreenButtonPressed:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kGreen);
+        break;
+    case AppEvent::kEventType_kGreenButtonReleased:
+        productIntegration.HandleButtonRelease(GoogleMultiDeviceIntegration::ButtonId::kGreen);
+        break;
+    case AppEvent::kEventType_kLatchSwitch1Selected:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch1);
+        break;
+    case AppEvent::kEventType_kLatchSwitch2Selected:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch2);
+        break;
+    case AppEvent::kEventType_kLatchSwitch3Selected:
+        productIntegration.HandleButtonPress(GoogleMultiDeviceIntegration::ButtonId::kLatch3);
+        break;
 
-        case AppEvent::kEventType_OccupancyDetected:
-            productIntegration.HandleOccupancyDetected(0);
-            break;
-        case AppEvent::kEventType_OccupancyUndetected:
-            productIntegration.HandleOccupancyUndetected(0);
-            break;
-        default:
-            break;
+    case AppEvent::kEventType_OccupancyDetected:
+        productIntegration.HandleOccupancyDetected(0);
+        break;
+    case AppEvent::kEventType_OccupancyUndetected:
+        productIntegration.HandleOccupancyUndetected(0);
+        break;
+    default:
+        break;
     }
 }
 
@@ -258,10 +255,25 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 }
 
-void ::google::matter::GoogleMultiDeviceIntegration::SetDebugLed(bool enabled)
+void ::google::matter::GoogleMultiDeviceIntegration::SetDebugLed(bool enabled, int idx)
 {
     auto & driver = GmdSilabsDriver::GetInstance();
-    driver.SetLightLedEnabled(GmdSilabsDriver::LedId::kRed, enabled);
+    GmdSilabsDriver::LedId id;
+    switch (idx)
+    {
+    case 0:
+        id = GmdSilabsDriver::LedId::kRed;
+        break;
+    case 1:
+        id = GmdSilabsDriver::LedId::kGreen;
+        break;
+    case 2:
+        id = GmdSilabsDriver::LedId::kYellow;
+        break;
+    default:
+        return;
+    }
+    driver.SetLightLedEnabled(id, enabled);
 }
 
 void ::google::matter::GoogleMultiDeviceIntegration::EmitDebugCode(uint8_t code)
