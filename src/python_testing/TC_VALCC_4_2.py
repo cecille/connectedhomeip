@@ -66,13 +66,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VALCC_4_2(self) -> list[str]:
-        pics = [
-            "VALCC.S",
-        ]
-        return pics
-
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.ValveConfigurationAndControl))
     async def test_TC_VALCC_4_2(self):
 
         endpoint = self.get_endpoint(default=1)
