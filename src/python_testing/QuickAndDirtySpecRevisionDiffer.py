@@ -47,7 +47,7 @@ def str_changes(element, added, removed, change_ids, old, new):
 
 def str_element_changes(element, old, new):
     added, removed, same_ids = get_changes(old, new)
-    change_ids = [id for id in same_ids if old[id] != new[id]]
+    change_ids = [id for id in same_ids if old[id] != new[id] or str(old[id].conformance) != str(new[id].conformance)]
     return str_changes(element, added, removed, change_ids, old, new)
 
 

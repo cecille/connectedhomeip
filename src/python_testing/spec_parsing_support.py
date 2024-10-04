@@ -58,6 +58,9 @@ class XmlFeature:
     name: str
     conformance: Callable[[uint], ConformanceDecision]
 
+    def __str__(self):
+        return f'{self.name}: id: {self.name} conformance: {str(self.conformance)}'
+
 
 @dataclass
 class XmlAttribute:
@@ -85,11 +88,17 @@ class XmlCommand:
     name: str
     conformance: Callable[[uint], ConformanceDecision]
 
+    def __str__(self):
+        return f'{self.name}: id: {self.id} conformance: {str(self.conformance)}'
+
 
 @dataclass
 class XmlEvent:
     name: str
     conformance: Callable[[uint], ConformanceDecision]
+
+    def __str__(self):
+        return f'{self.name}: conformance: {str(self.conformance)}'
 
 
 @dataclass
