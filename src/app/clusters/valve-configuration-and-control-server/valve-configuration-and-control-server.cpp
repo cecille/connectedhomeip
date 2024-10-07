@@ -381,49 +381,42 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
     if (!targetLevel.IsNull() && currentLevel == targetLevel.Value())
     {
         targetLevel = DataModel::NullNullable;
-        TargetLevel::Set(ep, targetLevel);
-        UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
-}
 
-CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
-{
-    VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    DataModel::Nullable<ValveStateEnum> targetState = DataModel::NullNullable;
-    TargetState::Get(ep, targetState);
-    if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue))
+    CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
     {
-        targetState = DataModel::NullNullable;
-        TargetState::Set(ep, targetState);
-    }
-    emitValveStateChangedEvent(ep, currentState);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
-{
-    ReturnErrorOnFailure(emitValveFaultEvent(ep, fault));
-    return CHIP_NO_ERROR;
-}
-
-void UpdateAutoCloseTime(uint64_t time)
-{
-    for (auto & t : gRemainingDuration)
-    {
-        const auto & d = t.remainingDuration;
-        if (!d.IsNull() && d.Value() != 0)
+        VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        DataModel::Nullable<ValveStateEnum> targetState = DataModel::NullNullable;
+        TargetState::Get(ep, targetState);
+        if (currentState == targetState.ValueOr(ValveStateEnum::kUnknownEnumValue))
         {
-            uint64_t closingTime = d.Value() * chip::kMicrosecondsPerSecond + time;
-            if (Status::Success != AutoCloseTime::Set(t.endpoint, closingTime))
+            targetState = DataModel::NullNullable;
+            TargetState::Set(ep, targetState);
+            emitValveStateChangedEvent(ep, currentState);
+            return CHIP_NO_ERROR;
             {
-                ChipLogError(Zcl, "Unable to update AutoCloseTime");
+                ReturnErrorOnFailure(emitValveFaultEvent(ep, fault));
+                return CHIP_NO_ERROR;
             }
-        }
-    }
-}
-} // namespace ValveConfigurationAndControl
-} // namespace Clusters
+
+            void UpdateAutoCloseTime(uint64_t time)
+            {
+                for (auto & t : gRemainingDuration)
+                {
+                    const auto & d = t.remainingDuration;
+                    if (!d.IsNull() && d.Value() != 0)
+                    {
+                        uint64_t closingTime = d.Value() * chip::kMicrosecondsPerSecond + time;
+                        if (Status::Success != AutoCloseTime::Set(t.endpoint, closingTime))
+                        {
+                            ChipLogError(Zcl, "Unable to update AutoCloseTime");
+                        }
+                    }
+                }
+            }
+        } // namespace ValveConfigurationAndControl
+    } // namespace Clusters
 } // namespace app
 } // namespace chip
 
