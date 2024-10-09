@@ -16,6 +16,7 @@
 #
 
 from spec_parsing_support import build_xml_clusters, build_xml_device_types, PrebuiltDataModelDirectory
+from conformance_support import ConformanceDecision
 
 
 def get_changes(old, new):
@@ -110,9 +111,61 @@ def diff_device_types():
             print('\n'.join(changes))
 
 
+def _get_provisional(items):
+    return [e.name for e in items if e.conformance(0, [], []).decision == ConformanceDecision.PROVISIONAL]
+
+
+def get_all_provisional_clusters():
+    clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+
+    provisional_clusters = [c.name for c in clusters.values() if c.is_provisional]
+    print('\n\nProvisional Clusters')
+    print(f'\t{sorted(provisional_clusters)}')
+
+    for c in clusters.values():
+        features = _get_provisional(c.features.values())
+        attributes = _get_provisional(c.attributes.values())
+        accepted_commands = _get_provisional(c.accepted_commands.values())
+        generated_commands = _get_provisional(c.generated_commands.values())
+        events = _get_provisional(c.events.values())
+
+        if not features and not attributes and not accepted_commands and not generated_commands and not events:
+            continue
+
+        print(f'\n{c.name}')
+        if features:
+            print(f'\tProvisional features: {features}')
+        if attributes:
+            print(f'\tProvisional attributes: {attributes}')
+        if accepted_commands:
+            print(f'\tProvisional accepted commands: {accepted_commands}')
+        if generated_commands:
+            print(f'\tProvisional generated commands: {generated_commands}')
+        if events:
+            print(f'\tProvisional events: {events}')
+
+
+def get_all_provisional_device_types():
+    device_types, problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
+
+    for d in device_types.values():
+        server_clusters = _get_provisional(d.server_clusters.values())
+        client_clusters = _get_provisional(d.client_clusters.values())
+        if not server_clusters and not client_clusters:
+            continue
+
+        print(f'\n{d.name}')
+        if server_clusters:
+            print(f'\tProvisional server clusters: {server_clusters}')
+        if client_clusters:
+            print(f'\tProvisional client clusters: {client_clusters}')
+
+
 def main():
-    diff_clusters()
-    diff_device_types()
+    # diff_clusters()
+    # diff_device_types()
+    get_all_provisional_clusters()
+    get_all_provisional_device_types()
 
 
 if __name__ == "__main__":
