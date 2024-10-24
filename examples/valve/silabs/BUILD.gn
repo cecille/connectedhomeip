@@ -136,10 +136,13 @@ silabs_executable("drink-machine") {
 
   sources = [
     "${examples_common_plat_dir}/main.cpp",
+    "include/DrinkMachineCommon.h",
     "include/DrinksMachineDeviceDriver.h",
     "src/AppTask.cpp",
     "src/DrinksMachineDeviceDriver.cpp",
     "src/ZclCallbacks.cpp",
+    "src/dm_dac.cpp",
+    "src/dm_pai.cpp",
   ]
 
   deps = [
