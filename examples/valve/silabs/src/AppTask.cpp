@@ -185,6 +185,7 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
+    google::matter::DrinkMachineMatterProviders::GetInstance().Init();
 
     return err;
 }
@@ -199,7 +200,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
-    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(ButtonEventHandler);
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
