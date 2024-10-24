@@ -33,8 +33,8 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include "DrinksMachineDeviceDriver.h"
 #include "DrinkMachineCommon.h"
+#include "DrinksMachineDeviceDriver.h"
 
 /**********************************************************
  * Defines
