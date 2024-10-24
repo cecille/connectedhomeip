@@ -199,6 +199,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
 
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(ButtonEventHandler);
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -222,4 +223,13 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
+}
+
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
+{
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
+    button_event.Handler            = BaseApplication::ButtonHandler;
+    sAppTask.PostEvent(&button_event);
 }

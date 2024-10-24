@@ -68,6 +68,7 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
 private:
     static AppTask sAppTask;
