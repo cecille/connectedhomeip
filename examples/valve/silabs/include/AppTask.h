@@ -34,6 +34,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include "DrinksMachineDeviceDriver.h"
+#include "DrinkMachineCommon.h"
 
 /**********************************************************
  * Defines
