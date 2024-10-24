@@ -128,7 +128,7 @@ class DrinkMachine:
             return
 
         ingredients = self.recipes[recipe]
-        self._dispense_ingredients(ingredients)
+        await self._dispense_ingredients(ingredients)
 
     async def _dispense_ingredients(self, ingredients: dict[Bottle, Oz]):
         for bottle, amount in ingredients.items():
