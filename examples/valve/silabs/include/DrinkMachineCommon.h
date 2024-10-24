@@ -153,7 +153,7 @@ public:
     CHIP_ERROR GetCertificationDeclaration(chip::MutableByteSpan & out_cd_buffer) override
     {
         // chip-cert gen-cd -C credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K
-        // credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --out cd.bin -f 1 -V 6006 -p B002 -d 000E -c
+        // credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --out cd.bin -f 1 -V 6006 -p B002 -d 0042 -c
         // "ZIG0000000000000000" -l 0 -i 0 -n 0001 -t 0
         const uint8_t kCdContents[] = {
             0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x81, 0xda, 0x30, 0x81, 0xd7,
