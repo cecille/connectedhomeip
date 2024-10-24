@@ -47,7 +47,7 @@ public:
 
     CHIP_ERROR GetProductId(uint16_t & productId) override
     {
-        productId = 0xFFFEu;
+        productId = 0xB002u;
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override
