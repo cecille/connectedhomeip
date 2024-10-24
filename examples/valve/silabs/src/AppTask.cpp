@@ -69,15 +69,17 @@ DeviceAttestationCredentialsProvider * GetExampleDACProvider()
 } // namespace chip
 
 namespace {
-class PrintOnlyDelegate : public NonLevelControlDelegate
+DrinksMachineSilabsDriver driver;
+class GPIODelegate : public NonLevelControlDelegate
 {
 public:
-    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    GPIODelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
     CHIP_ERROR HandleOpenValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
     {
         ChipLogError(NotSpecified, "\n\nVALVE IS OPENING on endpoint %u!!!!!\n\n", mEndpoint);
         state        = ValveStateEnum::kOpen;
         currentState = state;
+        driver.SetPumpEnabled(mEndpoint - 1, true);
         return CHIP_NO_ERROR;
     }
     ValveStateEnum GetCurrentValveState() override { return state; }
@@ -86,6 +88,7 @@ public:
         ChipLogError(NotSpecified, "\n\nVALVE IS CLOSING on endpoint %u!!!!!\n\n", mEndpoint);
         state        = ValveStateEnum::kClosed;
         currentState = state;
+        driver.SetPumpEnabled(mEndpoint - 1, false);
         return CHIP_NO_ERROR;
     }
 
@@ -122,7 +125,7 @@ private:
                                                 .levelStep    = 1 };
     EndpointId mEndpoint;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    GPIODelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };
@@ -225,6 +228,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     SetTagList(/* endpoint= */ 4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
     SetTagList(/* endpoint= */ 5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp5TagList));
     SetTagList(/* endpoint= */ 6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp6TagList));
+    driver.Init();
 
     SILABS_LOG("App Task started");
 
