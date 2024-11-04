@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 104,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -993,6 +995,38 @@
               "reportableChange": 0
             },
             {
+              "name": "ScanMaxTimeSeconds",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "30",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ConnectMaxTimeSeconds",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "15",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "InterfaceEnabled",
               "code": 4,
               "mfgCode": null,
@@ -1057,6 +1091,38 @@
               "reportableChange": 0
             },
             {
+              "name": "SupportedThreadFeatures",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThreadCapabilitiesBitmap",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThreadVersion",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "4",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "FeatureMap",
               "code": 65532,
               "mfgCode": null,
@@ -1066,7 +1132,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1820,14 +1886,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2070,7 +2138,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2387,14 +2455,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2637,7 +2707,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2954,14 +3024,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -3204,7 +3276,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3521,14 +3593,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -3771,7 +3845,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4088,14 +4162,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4338,7 +4414,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4655,14 +4731,16 @@
         "code": 66,
         "profileId": 259,
         "label": "MA-water-valve",
-        "name": "MA-water-valve"
+        "name": "MA-water-valve",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 66,
           "profileId": 259,
           "label": "MA-water-valve",
-          "name": "MA-water-valve"
+          "name": "MA-water-valve",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4905,7 +4983,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
