@@ -23,7 +23,7 @@ import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
 
@@ -64,45 +64,49 @@ class XmlFeature:
     name: str
     conformance: ConformanceCallable
 
+# NOTE: singleton and reportable are omitted here and should probably be removed from the spec
+# NOTE: Source attribution is also omitted because it is still provisional
+
+
+class QualityEnum(StrEnum):
+    kChangesOmitted = "C"
+    kFixed = "F"
+    kDiagnostics = "K"
+    kLargeMessage = "L"
+    kNonVolatile = "N"
+    kQuieterReporting = "Q"
+    kScene = "S"
+    kAtomic = "T"
+    kNullable = "X"
+
 
 @dataclass
-class Qualities:
-    # NOTE: singleton and reportable are omitted here and should probably be removed from the spec
-    source_attribution: bool = False
-    changes_omitted: bool = False
-    fixed: bool = False
-    diagnostics: bool = False
-    large_message: bool = False
-    non_volatile: bool = False
-    quieter_reporting: bool = False
-    scene: bool = False
-    atomic: bool = False
-    nullable: bool = False
+class TagInfo():
+    attrib_name: str
+    attrib_value: str
 
-    def parse
+
+QUALITY_TAGS: dict[QualityEnum, TagInfo] = {
+    QualityEnum.kChangesOmitted: TagInfo("changeOmitted", "true"),
+    QualityEnum.kFixed: TagInfo("persistence", "fixed"),
+    QualityEnum.kDiagnostics: TagInfo("diagnostics", "true"),
+    QualityEnum.kLargeMessage: TagInfo("largeMessage", "true"),
+    QualityEnum.kNonVolatile: TagInfo("persistence", "nonVolatile"),
+    QualityEnum.kQuieterReporting: TagInfo("quieterReporting", "true"),
+    QualityEnum.kScene: TagInfo("scene", "true"),
+    QualityEnum.kAtomic: TagInfo("atomicWrite", "true"),
+    QualityEnum.kNullable: TagInfo("nullable", "true")}
+
+
+class Qualities:
+    def __init__(self, tag: ElementTree.Element):
+        self.qualities: list[QualityEnum] = []
+        for q, info in QUALITY_TAGS.items():
+            if tag.attrib.get(info.attrib_name) == info.attrib_value:
+                self.qualities.append(q)
 
     def __str__(self):
-        msg = ""
-        if self.source_attribution:
-            msg += "A"
-        if self.changes_omitted:
-            msg += "C"
-        if self.fixed:
-            msg += "F"
-        if self.diagnostics:
-            msg += "K"
-        if self.large_message:
-            msg += "L"
-        if self.non_volatile:
-            msg += "N"
-        if self.quieter_reporting:
-            msg += "Q"
-        if self.scene:
-            msg += "S"
-        if self.atomic:
-            msg += "T"
-        if self.nullable:
-            msg += "X"
+        return "".join(self.qualities)
 
 
 @dataclass
