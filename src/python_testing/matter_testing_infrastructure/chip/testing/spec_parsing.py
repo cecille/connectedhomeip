@@ -66,6 +66,46 @@ class XmlFeature:
 
 
 @dataclass
+class Qualities:
+    # NOTE: singleton and reportable are omitted here and should probably be removed from the spec
+    source_attribution: bool = False
+    changes_omitted: bool = False
+    fixed: bool = False
+    diagnostics: bool = False
+    large_message: bool = False
+    non_volatile: bool = False
+    quieter_reporting: bool = False
+    scene: bool = False
+    atomic: bool = False
+    nullable: bool = False
+
+    def parse
+
+    def __str__(self):
+        msg = ""
+        if self.source_attribution:
+            msg += "A"
+        if self.changes_omitted:
+            msg += "C"
+        if self.fixed:
+            msg += "F"
+        if self.diagnostics:
+            msg += "K"
+        if self.large_message:
+            msg += "L"
+        if self.non_volatile:
+            msg += "N"
+        if self.quieter_reporting:
+            msg += "Q"
+        if self.scene:
+            msg += "S"
+        if self.atomic:
+            msg += "T"
+        if self.nullable:
+            msg += "X"
+
+
+@dataclass
 class XmlAttribute:
     name: str
     datatype: str
@@ -73,6 +113,7 @@ class XmlAttribute:
     read_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
     write_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
     write_optional: bool
+    quality: Qualities
 
     def access_string(self):
         read_marker = "R" if self.read_access is not Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue else ""
