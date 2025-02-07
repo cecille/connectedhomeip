@@ -21,7 +21,7 @@ import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, Qualities, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
@@ -498,6 +498,11 @@ class TestSpecParsingSupport(MatterBaseTest):
             "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
         asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                               "Atomic request found in thermostat generated command list for 1.3")
+
+    def test_qualities(self):
+        q = '<quality scene="true">'
+        cluster_xml = ElementTree.fromstring(q)
+        qualities = Qu
 
 
 if __name__ == "__main__":

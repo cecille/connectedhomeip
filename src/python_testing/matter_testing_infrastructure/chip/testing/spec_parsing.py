@@ -99,8 +99,11 @@ QUALITY_TAGS: dict[QualityEnum, TagInfo] = {
 
 
 class Qualities:
-    def __init__(self, tag: ElementTree.Element):
+    def __init__(self):
         self.qualities: list[QualityEnum] = []
+
+    def parse(self, tag: ElementTree.Element):
+        self.qualities = []
         for q, info in QUALITY_TAGS.items():
             if tag.attrib.get(info.attrib_name) == info.attrib_value:
                 self.qualities.append(q)
