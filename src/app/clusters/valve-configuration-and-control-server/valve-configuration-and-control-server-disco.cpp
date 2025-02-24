@@ -41,43 +41,25 @@ using namespace Commands;
 using namespace Protocols::InteractionModel;
 namespace {
 
-CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
+Status TranslateErrorToStatus(CHIP_ERROR err) {
+    if (err == CHIP_NO_ERROR)
+    {
+        return Status::Success;
+    }
+    if (err == CHIP_ERROR_INCORRECT_STATE) {
+        return Status::ConstraintError;
+    }
+    return Status::Failure;
+}
+
+CHIP_ERROR TranslateErrorToIMError(CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
         return err;
     }
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        // what actually gets returned here? This is really an internal error, so failure seems perhaps correct.
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-    // Catch-all error
-    return CHIP_IM_GLOBAL_STATUS(Failure);
+    return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(TranslateErrorToStatus(err));
 }
-
-template <typename T, typename F>
-CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
-{
-    T ret;
-    CHIP_ERROR err = getter(ret);
-    if (err == CHIP_NO_ERROR)
-    {
-        err = aEncoder.Encode(ret);
-    }
-
-    // TODO: Should the logic return these directly? I didn't want to mix the IM layer into there, but this is annoying.
-    return TranslateErrorToIMStatus(err);
-}
-
 } // namespace
 
 CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -85,57 +67,43 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     switch (aPath.mAttributeId)
     {
     case OpenDuration::Id: {
-        typedef OpenDuration::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOpenDuration(ret); });
+        return aEncoder.Encode(mClusterLogic.GetOpenDuration());
     }
     case DefaultOpenDuration::Id: {
-        typedef DefaultOpenDuration::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder,
-                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetDefaultOpenDuration(ret); });
+        return aEncoder.Encode(mClusterLogic.GetDefaultOpenDuration());
     }
     case AutoCloseTime::Id: {
-        typedef AutoCloseTime::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetAutoCloseTime(ret); });
+        return aEncoder.Encode(mClusterLogic.GetAutoCloseTime());
     }
     case RemainingDuration::Id: {
-        typedef RemainingDuration::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetRemainingDuration(ret); });
+        return aEncoder.Encode(mClusterLogic.GetRemainingDuration());
     }
     case CurrentState::Id: {
-        typedef CurrentState::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
+        return aEncoder.Encode(mClusterLogic.GetCurrentState());
     }
     case TargetState::Id: {
-        typedef TargetState::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTargetState(ret); });
+        return aEncoder.Encode(mClusterLogic.GetTargetState());
     }
     case CurrentLevel::Id: {
-        typedef CurrentLevel::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentLevel(ret); });
+        return aEncoder.Encode(mClusterLogic.GetCurrentLevel());
     }
     case TargetLevel::Id: {
-        typedef TargetLevel::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTargetLevel(ret); });
+        return aEncoder.Encode(mClusterLogic.GetTargetLevel());
     }
     case DefaultOpenLevel::Id: {
-        typedef DefaultOpenLevel::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetDefaultOpenLevel(ret); });
+        return aEncoder.Encode(mClusterLogic.GetDefaultOpenLevel());
     }
     case ValveFault::Id: {
-        typedef ValveFault::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetValveFault(ret); });
+        return aEncoder.Encode(mClusterLogic.GetValveFault());
     }
     case LevelStep::Id: {
-        typedef LevelStep::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLevelStep(ret); });
+        return aEncoder.Encode(mClusterLogic.GetLevelStep());
     }
     case FeatureMap::Id: {
-        typedef FeatureMap::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+        return aEncoder.Encode(0);
     }
     case ClusterRevision::Id: {
-        typedef ClusterRevision::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
+        return aEncoder.Encode(mClusterLogic.GetClusterRevision());
     }
     default:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
@@ -149,13 +117,13 @@ CHIP_ERROR Interface::Write(const ConcreteDataAttributePath & aPath, AttributeVa
     case DefaultOpenDuration::Id: {
         DefaultOpenDuration::TypeInfo::Type val;
         ReturnErrorOnFailure(aDecoder.Decode(val));
-        return TranslateErrorToIMStatus(mClusterLogic.SetDefaultOpenDuration(val));
+        return TranslateErrorToIMError(mClusterLogic.SetDefaultOpenDuration(val));
     }
     break;
     case DefaultOpenLevel::Id: {
         DefaultOpenLevel::TypeInfo::Type val;
         ReturnErrorOnFailure(aDecoder.Decode(val));
-        return TranslateErrorToIMStatus(mClusterLogic.SetDefaultOpenLevel(val));
+        return TranslateErrorToIMError(mClusterLogic.SetDefaultOpenLevel(val));
     }
     default:
         return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
@@ -174,32 +142,14 @@ void Interface::InvokeCommand(HandlerContext & handlerContext)
                 // So here, I need to change over. But I can also change the Logic cluster to use Optional
                 CHIP_ERROR err =
                     logic.HandleOpenCommand(commandData.openDuration.std_optional(), commandData.targetLevel.std_optional());
-                Status status = Status::Success;
-                if (err == CHIP_ERROR_INVALID_ARGUMENT)
-                {
-                    status = Status::ConstraintError;
-                }
-                if (err != CHIP_NO_ERROR)
-                {
-                    status = Status::Failure;
-                }
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, TranslateErrorToStatus(err));
             });
         return;
     case Close::Id:
         HandleCommand<Close::DecodableType>(handlerContext,
                                             [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
                                                 CHIP_ERROR err = logic.HandleCloseCommand();
-                                                Status status  = Status::Success;
-                                                if (err == CHIP_ERROR_INVALID_ARGUMENT)
-                                                {
-                                                    status = Status::ConstraintError;
-                                                }
-                                                if (err != CHIP_NO_ERROR)
-                                                {
-                                                    status = Status::Failure;
-                                                }
-                                                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+                                                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, TranslateErrorToStatus(err));
                                             });
         return;
     }

@@ -358,30 +358,6 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestConformanceValid)
     EXPECT_FALSE(conformance.Valid());
 }
 
-// The cluster requires different versions of the delegate depending on the supported feature set.
-// This test ensures the Init function corectly errors if the supplied delegate does not match
-// the given cluster conformance.
-TEST_F(TestValveConfigurationAndControlClusterLogic, TestWrongDelegates)
-{
-    TestDelegateLevel delegateLevel;
-    TestDelegateNoLevel delegateNoLevel;
-    TestPersistentStorageDelegate storageDelegate;
-    EndpointId endpoint = 0;
-    MockedMatterContext context(endpoint, storageDelegate);
-    ClusterLogic logicLevel(delegateLevel, context);
-    ClusterLogic logicNoLevel(delegateNoLevel, context);
-    ClusterConformance conformanceLevel   = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                              .supportsDefaultOpenLevel = true,
-                                              .supportsValveFault       = true,
-                                              .supportsLevelStep        = true };
-    ClusterConformance conformanceNoLevel = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
-    };
-
-    EXPECT_EQ(logicLevel.Init(conformanceNoLevel), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-    EXPECT_EQ(logicNoLevel.Init(conformanceLevel), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-}
-
 //=========================================================================================
 // Tests for getters
 //=========================================================================================
@@ -394,120 +370,20 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesAllFeature
     MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    // Everything on, all should return values
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<EpochUs> valEpochUsNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    Percent valPercent;
-    uint8_t val8;
-    BitMask<ValveFaultBitmap> valBitmap;
-    Attributes::FeatureMap::TypeInfo::Type featureMap;
-    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
-
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetAutoCloseTime(valEpochUsNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEpochUsNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetDefaultOpenLevel(valPercent), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercent, 100);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap.Raw(), 0);
-
-    EXPECT_EQ(logic.GetLevelStep(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, 1);
-
-    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
-    EXPECT_EQ(featureMap, conformance.featureMap);
-
-    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
-}
-
-// This test ensures that attributes that are not supported by the conformance properly return errors
-// and attributes that are supported return values properly.
-TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesNoFeatures)
-{
-    TestDelegateNoLevel delegate;
-    TestPersistentStorageDelegate storageDelegate;
-    MockedMatterContext context(0, storageDelegate);
-    ClusterLogic logic(delegate, context);
-
-    // Everything on, all should return values
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<EpochUs> valEpochUsNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    Percent valPercent;
-    uint8_t val8;
-    BitMask<ValveFaultBitmap> valBitmap;
-    Attributes::FeatureMap::TypeInfo::Type featureMap;
-    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
-
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetAutoCloseTime(valEpochUsNullable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetDefaultOpenLevel(valPercent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
-    EXPECT_EQ(featureMap, conformance.featureMap);
-
-    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetAutoCloseTime(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), 100);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(0));
+    EXPECT_EQ(logic.GetLevelStep(), 1);
+    EXPECT_EQ(logic.GetClusterRevision(), kExpectedClusterRevision);
 }
 
 // This test ensures that all attribute getters return the given starting state values before changes.
@@ -518,18 +394,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
     MockedMatterContext context(0, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    // Everything on, all should return values
-    ClusterConformance conformance     = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                           .supportsDefaultOpenLevel = true,
-                                           .supportsValveFault       = true,
-                                           .supportsLevelStep        = true };
     ClusterInitParameters initialState = {
         .currentState = DataModel::MakeNullable(ValveStateEnum::kTransitioning),
         .currentLevel = DataModel::MakeNullable(static_cast<Percent>(50u)),
         .valveFault   = BitMask<ValveFaultBitmap>(ValveFaultBitmap::kLeaking),
         .levelStep    = 2u,
     };
-    EXPECT_EQ(logic.Init(conformance, initialState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(initialState), CHIP_NO_ERROR);
 
     ClusterState state;
     state.currentState = initialState.currentState;
@@ -537,87 +408,18 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesStartingSt
     state.valveFault   = initialState.valveFault;
     state.levelStep    = initialState.levelStep;
 
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<EpochUs> valEpochUsNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    Percent valPercent;
-    uint8_t val8;
-    BitMask<ValveFaultBitmap> valBitmap;
-    Attributes::FeatureMap::TypeInfo::Type featureMap;
-    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
-
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, state.openDuration);
-
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, state.defaultOpenDuration);
-
-    EXPECT_EQ(logic.GetAutoCloseTime(valEpochUsNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEpochUsNullable, state.autoCloseTime);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, state.remainingDuration.value());
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, state.currentState);
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, state.targetState);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, state.currentLevel);
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, state.targetLevel);
-
-    EXPECT_EQ(logic.GetDefaultOpenLevel(valPercent), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercent, state.defaultOpenLevel);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, state.valveFault);
-
-    EXPECT_EQ(logic.GetLevelStep(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, state.levelStep);
-
-    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_NO_ERROR);
-    EXPECT_EQ(featureMap, conformance.featureMap);
-
-    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
-}
-
-// This test ensures that all attribute getter functions properly error on an uninitialized cluster.
-TEST_F(TestValveConfigurationAndControlClusterLogic, TestGetAttributesUninitialized)
-{
-    TestDelegateLevel delegate;
-    TestPersistentStorageDelegate storageDelegate;
-    MockedMatterContext context(0, storageDelegate);
-    ClusterLogic logic(delegate, context);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<EpochUs> valEpochUsNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    Percent valPercent;
-    uint8_t val8;
-    BitMask<ValveFaultBitmap> valBitmap;
-    Attributes::FeatureMap::TypeInfo::Type featureMap;
-    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
-
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetAutoCloseTime(valEpochUsNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(valPercent), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetLevelStep(val8), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetFeatureMap(featureMap), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(logic.GetClusterRevision(clusterRevision), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(logic.GetOpenDuration(), state.openDuration);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), state.defaultOpenDuration);
+    EXPECT_EQ(logic.GetAutoCloseTime(), state.autoCloseTime);
+    EXPECT_EQ(logic.GetRemainingDuration(), state.remainingDuration.value());
+    EXPECT_EQ(logic.GetCurrentState(), state.currentState);
+    EXPECT_EQ(logic.GetTargetState(), state.targetState);
+    EXPECT_EQ(logic.GetCurrentLevel(), state.currentLevel);
+    EXPECT_EQ(logic.GetTargetLevel(), state.targetLevel);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), state.defaultOpenLevel);
+    EXPECT_EQ(logic.GetValveFault(), state.valveFault);
+    EXPECT_EQ(logic.GetLevelStep(), state.levelStep);
+    EXPECT_EQ(logic.GetClusterRevision(), 1);
 }
 
 //=========================================================================================
@@ -639,28 +441,20 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-
     // Setting this value before initialization should fail
     auto testVal = DataModel::MakeNullable(static_cast<ElapsedS>(5u));
     EXPECT_EQ(logic.SetDefaultOpenDuration(testVal), CHIP_ERROR_INCORRECT_STATE);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), DataModel::NullNullable);
 
     // Lowest possible value
     testVal = DataModel::MakeNullable(static_cast<ElapsedS>(1u));
     EXPECT_EQ(logic.SetDefaultOpenDuration(testVal), CHIP_NO_ERROR);
 
     // Ensure the value is accessible via the API
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), testVal);
 
     // Ensure the value is persisted in the test storage
     StorageKeyName keyName = DefaultStorageKeyAllocator::VCCDefaultOpenDuration(endpoint);
@@ -674,9 +468,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 
     testVal = DataModel::MakeNullable(static_cast<ElapsedS>(12u));
     EXPECT_EQ(logic.SetDefaultOpenDuration(testVal), CHIP_NO_ERROR);
-
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), testVal);
 
     EXPECT_TRUE(storageDelegate.HasKey(keyName.KeyName()));
     EXPECT_EQ(storageDelegate.SyncGetKeyValue(keyName.KeyName(), &persistedValue, size), CHIP_NO_ERROR);
@@ -686,8 +478,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
     EXPECT_EQ(logic.SetDefaultOpenDuration(outOfRangeVal), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Ensure the value wasn't changed
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), testVal);
 
     EXPECT_TRUE(storageDelegate.HasKey(keyName.KeyName()));
     EXPECT_EQ(storageDelegate.SyncGetKeyValue(keyName.KeyName(), &persistedValue, size), CHIP_NO_ERROR);
@@ -695,16 +486,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 
     // Test that firing up a new logic cluster on the same endpoint loads the value from persisted storage
     ClusterLogic logic_same_endpoint = ClusterLogic(delegate, context);
-    EXPECT_EQ(logic_same_endpoint.Init(conformance), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_same_endpoint.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, testVal);
+    EXPECT_EQ(logic_same_endpoint.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic_same_endpoint.GetDefaultOpenDuration(), testVal);
 
     // Test that a new logic cluster on a different endpoint does not load the value
     MockedMatterContext context_ep1       = MockedMatterContext(1, storageDelegate);
     ClusterLogic logic_different_endpoint = ClusterLogic(delegate, context_ep1);
-    EXPECT_EQ(logic_different_endpoint.Init(conformance), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_different_endpoint.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic_different_endpoint.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic_different_endpoint.GetDefaultOpenDuration(), DataModel::NullNullable);
 
     // Test setting back to null, this should clear the persisted value
     testVal = DataModel::NullNullable;
@@ -713,9 +502,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenDuration)
 
     // Check that the value is not loaded when a new logic cluster is created
     ClusterLogic logic_same_endpoint_again = ClusterLogic(delegate, context);
-    EXPECT_EQ(logic_same_endpoint_again.Init(conformance), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_same_endpoint_again.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic_same_endpoint_again.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic_same_endpoint_again.GetDefaultOpenDuration(), DataModel::NullNullable);
 
     // Test that the calling function fails when write fails are on
     storageDelegate.SetRejectWrites(true);
@@ -740,28 +528,19 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    uint8_t val8;
-
     // Setting this value before initialization should fail
     uint8_t testVal = 5u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_ERROR_INCORRECT_STATE);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, 100u);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), 100u);
 
     // Lowest possible value
     testVal = 1u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
 
     // Ensure the value is accessible via the API
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     // Ensure the value is persisted in the test storage
     StorageKeyName keyName = DefaultStorageKeyAllocator::VCCDefaultOpenLevel(endpoint);
@@ -776,8 +555,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     // Highest possible value
     testVal = 100u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     EXPECT_TRUE(storageDelegate.HasKey(keyName.KeyName()));
     EXPECT_EQ(storageDelegate.SyncGetKeyValue(keyName.KeyName(), &persistedValue, size), CHIP_NO_ERROR);
@@ -789,8 +567,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     EXPECT_EQ(logic.SetDefaultOpenLevel(outOfRangeVal), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Ensure the value wasn't changed
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     EXPECT_TRUE(storageDelegate.HasKey(keyName.KeyName()));
     EXPECT_EQ(storageDelegate.SyncGetKeyValue(keyName.KeyName(), &persistedValue, size), CHIP_NO_ERROR);
@@ -801,31 +578,20 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevel)
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
     // Test that firing up a new logic cluster on the same endpoint loads the value from persisted storage
     ClusterLogic logic_same_endpoint = ClusterLogic(delegate, context);
-    EXPECT_EQ(logic_same_endpoint.Init(conformance), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_same_endpoint.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic_same_endpoint.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic_same_endpoint.GetDefaultOpenLevel(), testVal);
 
     // Test that a new logic cluster on a different endpoint does not load the value
     MockedMatterContext context_ep1       = MockedMatterContext(1, storageDelegate);
     ClusterLogic logic_different_endpoint = ClusterLogic(delegate, context_ep1);
-    EXPECT_EQ(logic_different_endpoint.Init(conformance), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_different_endpoint.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, 100u);
+    EXPECT_EQ(logic_different_endpoint.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(logic_different_endpoint.GetDefaultOpenLevel(), 100u);
 
     // Test that the calling function fails when write fails are on
     storageDelegate.SetRejectWrites(true);
     testVal = 15u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     storageDelegate.SetRejectWrites(false);
-
-    // Test that we get an error if this attribute is not supported
-    ClusterLogic logic_no_level             = ClusterLogic(delegate, context);
-    ClusterConformance conformance_no_level = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                                .supportsDefaultOpenLevel = false,
-                                                .supportsValveFault       = true,
-                                                .supportsLevelStep        = true };
-    EXPECT_EQ(logic_no_level.Init(conformance_no_level), CHIP_NO_ERROR);
-    EXPECT_EQ(logic_no_level.SetDefaultOpenLevel(testVal), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
 // This test ensures that the SetDefaultOpenLevel function correctly assesses the set value with respect to the LevelStep.
@@ -837,38 +603,28 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestSetDefaultOpenLevelWith
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    uint8_t val8;
     uint8_t testVal;
-
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
     ClusterInitParameters state;
     state.levelStep = 45;
-    EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(state), CHIP_NO_ERROR);
 
     // Default is 100
     // 45, 90 and 100 should work, others should fail.
     testVal = 45u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     testVal = 90u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     testVal = 100u;
     EXPECT_EQ(logic.SetDefaultOpenLevel(testVal), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 
     // Test a value that's not in the level step and ensure the value is not changed.
     EXPECT_EQ(logic.SetDefaultOpenLevel(33u), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(logic.GetDefaultOpenLevel(val8), CHIP_NO_ERROR);
-    EXPECT_EQ(val8, testVal);
+    EXPECT_EQ(logic.GetDefaultOpenLevel(), testVal);
 }
 
 //=========================================================================================
@@ -888,44 +644,31 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenDuration)
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(DataModel::NullNullable), std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetDefaultOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetDefaultOpenDuration(), DataModel::NullNullable);
 
     // Fall back to default
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
 
     DataModel::Nullable<ElapsedS> defaultOpenDuration;
     defaultOpenDuration.SetNonNull(12u);
     EXPECT_EQ(logic.SetDefaultOpenDuration(defaultOpenDuration), CHIP_NO_ERROR);
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, defaultOpenDuration);
+    EXPECT_EQ(logic.GetOpenDuration(), defaultOpenDuration);
 
     // Set from command parameters
     DataModel::Nullable<ElapsedS> openDuration;
     openDuration.SetNull();
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
 
-    openDuration.SetNonNull(12u);
+    openDuration.SetNonNull(13u);
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable.ValueOr(0), 12u);
+    EXPECT_EQ(logic.GetOpenDuration(), openDuration);
 }
 
 // This test ensures that the Open command correctly errors when the TargetLevel field is
@@ -938,15 +681,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelFe
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 
-    // Should get an error when this is called with target level set since the feature is unsupported.
+    // Should get an error when this is called with target level set since the delegate doesn't handle level.
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(50u)), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
@@ -961,16 +701,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNo
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = false,
-                                       .supportsValveFault       = false,
-                                       .supportsLevelStep        = false };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.lastRequestedLevel, 100u);
 }
 
-// This test ensures that the Open command correclty calls back to the DefaultOpenLevel when the target level
+// This test ensures that the Open command correctly calls back to the DefaultOpenLevel when the target level
 // is omitted and the DefaultOpenLevel is supported.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNotSuppliedDefaultSupported)
 {
@@ -980,11 +716,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelNo
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = false,
-                                       .supportsLevelStep        = false };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.lastRequestedLevel, 100u);
 
@@ -1002,13 +734,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelSu
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = false,
-                                       .supportsLevelStep        = true };
     ClusterInitParameters state;
     state.levelStep = 33;
-    EXPECT_EQ(logic.Init(conformance, state), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(state), CHIP_NO_ERROR);
 
     // 33, 66, 99 and 100 should all work, nothing else should
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(33u)), CHIP_NO_ERROR);
@@ -1034,7 +762,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenTargetLevelSu
 // Tests for Open Command handlers - current and target values
 //=========================================================================================
 
-// This test ensures the target and current values are set correcly when the delegate is
+// This test ensures the target and current values are set correctly when the delegate is
 // able to open the value immediately. Cluster supports LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelSupported)
 {
@@ -1048,45 +776,31 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = false;
     delegate.simulateAsync       = false;
 
-    DataModel::Nullable<uint8_t> level;
-    DataModel::Nullable<ValveStateEnum> state;
     uint8_t targetLevel;
 
     targetLevel = 100u;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel);
-    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level, DataModel::NullNullable);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
 
     targetLevel = 50u;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel);
-    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level, DataModel::NullNullable);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
 
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
 }
 
-// This test ensures the target and current values are set correcly when the delegate is
+// This test ensures the target and current values are set correctly when the delegate is
 // able to open the value immediately. Cluster does not support LVL feature
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLevelNotSupported)
 {
@@ -1096,20 +810,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenImmediateLeve
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = false;
     delegate.simulateAsync       = false;
 
-    DataModel::Nullable<ValveStateEnum> state;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
 
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
@@ -1124,40 +832,26 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelSup
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = false;
     delegate.simulateAsync       = true;
 
-    DataModel::Nullable<uint8_t> level;
-    DataModel::Nullable<ValveStateEnum> state;
     uint8_t targetLevel;
 
     targetLevel = 100u;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel / 2);
-    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(0), targetLevel / 2);
+    EXPECT_EQ(logic.GetTargetLevel().ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetCurrentState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
+    EXPECT_EQ(logic.GetTargetState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
 
     targetLevel = 50u;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::make_optional(targetLevel)), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel / 2);
-    EXPECT_EQ(logic.GetTargetLevel(level), CHIP_NO_ERROR);
-    EXPECT_EQ(level.ValueOr(0), targetLevel);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(0), targetLevel / 2);
+    EXPECT_EQ(logic.GetTargetLevel().ValueOr(0), targetLevel);
+    EXPECT_EQ(logic.GetCurrentState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
+    EXPECT_EQ(logic.GetTargetState().ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
 
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
 }
@@ -1172,24 +866,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenAsyncLevelNot
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap               = 0,
-        .supportsDefaultOpenLevel = false,
-        .supportsValveFault       = false,
-        .supportsLevelStep        = false,
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = false;
     delegate.simulateAsync       = true;
 
-    DataModel::Nullable<ValveStateEnum> state;
-
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetCurrentState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kTransitioning);
-    EXPECT_EQ(logic.GetTargetState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(state.ValueOr(ValveStateEnum::kUnknownEnumValue), ValveStateEnum::kOpen);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
 
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
 }
@@ -1207,20 +891,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    BitMask<ValveFaultBitmap> valveFault;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateValveFaultNoFailure = true;
     delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
-    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
-    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+    EXPECT_EQ(logic.GetValveFault(), delegate.simulatedFailureBitMask);
 }
 
 // Test ensures valve faults are handled correctly when the valve can still be opened. LVL feature not supported.
@@ -1232,22 +909,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap               = 0,
-        .supportsDefaultOpenLevel = false,
-        .supportsValveFault       = true,
-        .supportsLevelStep        = false,
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    BitMask<ValveFaultBitmap> valveFault;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateValveFaultNoFailure = true;
     delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_NO_ERROR);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
-    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
-    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+    EXPECT_EQ(logic.GetValveFault(), delegate.simulatedFailureBitMask);
 }
 
 // Test ensures valve faults are handled correctly when the valve cannot be opened. LVL feature supported.
@@ -1259,19 +927,12 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    BitMask<ValveFaultBitmap> valveFault;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
-    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
-    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+    EXPECT_EQ(logic.GetValveFault(), delegate.simulatedFailureBitMask);
 }
 
 // Test ensures valve faults are handled correctly when the valve cannot be opened. LVL feature not supported.
@@ -1283,25 +944,15 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap               = 0,
-        .supportsDefaultOpenLevel = false,
-        .supportsValveFault       = true,
-        .supportsLevelStep        = false,
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    BitMask<ValveFaultBitmap> valveFault;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 1);
-    EXPECT_EQ(logic.GetValveFault(valveFault), CHIP_NO_ERROR);
-    EXPECT_EQ(valveFault, delegate.simulatedFailureBitMask);
+    EXPECT_EQ(logic.GetValveFault(), delegate.simulatedFailureBitMask);
 }
 
-// Test ensures returned valve faults do not cause cluster problems if returned from the delegate when the valve feature is not
-// supported.
+// Test ensures returned valve faults do not cause cluster problems if returned from the delegate.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorLevelFaultNotSupported)
 {
     TestDelegateLevel delegate;
@@ -1310,11 +961,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap               = to_underlying(Feature::kLevel),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = false,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
@@ -1326,8 +973,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     EXPECT_EQ(delegate.numHandleOpenValveCalls, 2);
 }
 
-// Test ensures returned valve faults do not cause cluster problems if returned from the delegate when the valve feature is not
-// supported.
+// Test ensures returned valve faults do not cause cluster problems if returned from the delegate.
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturnedErrorNoLevelFaultNotSupported)
 {
     TestDelegateNoLevel delegate;
@@ -1336,13 +982,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestHandleOpenFaultReturned
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap               = 0,
-        .supportsDefaultOpenLevel = false,
-        .supportsValveFault       = false,
-        .supportsLevelStep        = false,
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateOpenFailure = true;
     EXPECT_EQ(logic.HandleOpenCommand(std::nullopt, std::nullopt), CHIP_ERROR_INTERNAL);
@@ -1372,22 +1012,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     // When null, RemainingDuration should also be null. No updates are expected.
     context.ClearDirtyList();
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(DataModel::NullNullable), std::nullopt), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
 
     // We should see the CurrentLevel and CurrentState marked as dirty because they are changed.
     // TargetState and TargetLevel should ALSO be marked as dirty because the target state should transition through
@@ -1412,10 +1043,8 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     Percent requestedLevel = 50u;
     // Test also that we get an attribute update
     EXPECT_EQ(logic.HandleOpenCommand(std::make_optional(openDuration), std::make_optional(requestedLevel)), CHIP_NO_ERROR);
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value());
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable.ValueOr(0), requestedLevel);
+    EXPECT_EQ(logic.GetOpenDuration().ValueOr(0), openDuration.Value());
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(0), requestedLevel);
     // We should see the following attributes marked as dirty since they are different at the end
     // of the command: currentLevel, remainingDuration, openDuration
     // The TargetLevel and TargetState should be NULL at the end of the open call, but will still be
@@ -1434,7 +1063,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     // No new reports should be happening in this time.
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
     // Even if we read the remaining duration to force an update, we shouldn't expect an attribute change report
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
+    logic.GetRemainingDuration();
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
 
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
@@ -1447,8 +1076,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     context.ClearDirtyList();
     gSystemLayerAndClock.AdvanceMonotonic(500_ms64);
     EXPECT_TRUE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value() - 1);
+    EXPECT_EQ(logic.GetRemainingDuration().ValueOr(0), openDuration.Value() - 1);
 
     // Nothing else should have changed
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::CurrentLevel::Id));
@@ -1461,8 +1089,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
     // The new duration should be reflected (rounded to nearest s)
     context.ClearDirtyList();
     gSystemLayerAndClock.AdvanceMonotonic(700_ms64);
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable.ValueOr(0), openDuration.Value() - 2);
+    EXPECT_EQ(logic.GetRemainingDuration().ValueOr(0), openDuration.Value() - 2);
     EXPECT_FALSE(HasAttributeChanges(context.GetDirtyList(), Attributes::RemainingDuration::Id));
 
     // At 2s, we should get an attribute change report even if we don't read.
@@ -1492,8 +1119,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdates)
 
     context.ClearDirtyList();
     // Ensure we don't get a further report generated by reading
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
 
     // Test increasing the open duration on a non-second order to see that we get an attribute change callback for the change
     // up.
@@ -1553,11 +1179,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestAttributeUpdatesNonExac
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1594,16 +1216,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1616,26 +1229,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
     // No valve faults, level should say 0, state should say closed, targets should be null
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::Nullable<Percent>(0));
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel(), DataModel::Nullable<Percent>(0));
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(0));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevel)
@@ -1645,15 +1245,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     EndpointId endpoint = 0;
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
-
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1666,20 +1258,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
     // No valve faults, level should say 0, state should say closed, targets should be null
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(0));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelAsync)
@@ -1690,18 +1273,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateAsync = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1713,27 +1287,14 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
 
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
-    // No valve faults, level should say 0, state should say closed, targets should be null
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_NE(valPercentNullable, DataModel::Nullable<Percent>(0));
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+    // This is async, so level will say 10 (per test delegate), targets will say 0, closed
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetCurrentLevel().ValueOr(100), 10);
+    EXPECT_EQ(logic.GetTargetLevel().ValueOr(100), 0);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(0));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelAsync)
@@ -1744,16 +1305,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateAsync = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1766,20 +1320,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
 
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(0));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(0));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelOkFaultReturned)
@@ -1790,19 +1335,10 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
     delegate.simulateValveFaultNoFailure = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1815,26 +1351,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
 
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::Nullable<Percent>(0));
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel(), DataModel::Nullable<Percent>(0));
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelOkFaultReturned)
@@ -1845,17 +1368,10 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulatedFailureBitMask     = BitMask<ValveFaultBitmap>(to_underlying(ValveFaultBitmap::kLeaking));
     delegate.simulateValveFaultNoFailure = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1868,20 +1384,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
 
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationLevelFailure)
@@ -1892,18 +1399,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateCloseFailure = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    DataModel::Nullable<Percent> valPercentNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1916,26 +1414,13 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
 
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetLevel(valPercentNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valPercentNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetTargetLevel(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
 }
 
 TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurationNoLevelFailure)
@@ -1946,16 +1431,9 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateCloseFailure = true;
-
-    DataModel::Nullable<ElapsedS> valElapsedSNullable;
-    DataModel::Nullable<ValveStateEnum> valEnumNullable;
-    BitMask<ValveFaultBitmap> valBitmap;
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -1968,20 +1446,11 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCalledAtOpenDurati
     gSystemLayerAndClock.AdvanceMonotonic(2000_ms64);
     EXPECT_EQ(delegate.numHandleCloseValveCalls, 1);
 
-    EXPECT_EQ(logic.GetOpenDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetRemainingDuration(valElapsedSNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valElapsedSNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetCurrentState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetTargetState(valEnumNullable), CHIP_NO_ERROR);
-    EXPECT_EQ(valEnumNullable, DataModel::NullNullable);
-
-    EXPECT_EQ(logic.GetValveFault(valBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(valBitmap, BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
+    EXPECT_EQ(logic.GetOpenDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetRemainingDuration(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetCurrentState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetTargetState(), DataModel::NullNullable);
+    EXPECT_EQ(logic.GetValveFault(), BitMask<ValveFaultBitmap>(delegate.simulatedFailureBitMask));
 }
 
 //=========================================================================================
@@ -1997,11 +1466,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandOpenValveDu
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2028,10 +1493,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandOpenValveDu
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2059,11 +1521,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandOpenValveNo
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2083,10 +1541,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandOpenValveNo
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2107,11 +1562,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandClosedLevel
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2128,10 +1579,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandClosedNoLev
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     gSystemLayerAndClock.SetMonotonic(0_ms64);
     gSystemLayerAndClock.Clear();
@@ -2161,11 +1609,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandReturnsErro
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = { .featureMap = to_underlying(Feature::kLevel) | to_underlying(Feature::kTimeSync),
-                                       .supportsDefaultOpenLevel = true,
-                                       .supportsValveFault       = true,
-                                       .supportsLevelStep        = true };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateCloseFailure = true;
 
@@ -2187,10 +1631,7 @@ TEST_F(TestValveConfigurationAndControlClusterLogic, TestCloseCommandReturnsErro
     MockedMatterContext context(endpoint, storageDelegate);
     ClusterLogic logic(delegate, context);
 
-    ClusterConformance conformance = {
-        .featureMap = 0, .supportsDefaultOpenLevel = false, .supportsValveFault = true, .supportsLevelStep = false
-    };
-    EXPECT_EQ(logic.Init(conformance), CHIP_NO_ERROR);
+    EXPECT_EQ(logic.Init(), CHIP_NO_ERROR);
 
     delegate.simulateCloseFailure = true;
 

@@ -144,7 +144,7 @@ public:
         };
     }
 
-    Nullable<T> value() const { return mValue; }
+    const Nullable<T> & value() const { return mValue; }
     QuieterReportingPolicyFlags & policy() { return mPolicyFlags; }
     const QuieterReportingPolicyFlags & policy() const { return mPolicyFlags; }
 

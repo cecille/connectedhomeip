@@ -26,6 +26,7 @@
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
@@ -35,23 +36,20 @@ namespace ValveConfigurationAndControl {
 
 struct ClusterConformance
 {
-    inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
+    constexpr inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
     uint32_t featureMap;
     bool supportsDefaultOpenLevel;
     bool supportsValveFault;
     bool supportsLevelStep;
-    bool Valid() const
+    constexpr bool Valid() const
     {
         bool supportsLvl = HasFeature(Feature::kLevel);
         if (supportsDefaultOpenLevel & !supportsLvl)
         {
-            ChipLogError(Zcl,
-                         "Invalid Valve configuration and control conformance - DefaultOpenLevel is not supported without LVL");
             return false;
         }
         if (supportsLevelStep & !supportsLvl)
         {
-            ChipLogError(Zcl, "Invalid Valve configuration and control conformance - LevelStep is not supported without LVL");
             return false;
         }
         return true;
@@ -81,7 +79,8 @@ struct ClusterState
 };
 
 // Attribute sets are forced to go through this class so the attributes can be marked dirty appropriately.
-// This cluster handles storage and marking dirty. The cluster logic should handle constraint and conformance checking.
+// This cluster handles storage and marking dirty. The cluster logic should handle constraint checking.
+// Conformance checking should be handled in the server layer.
 class ClusterStateAttributes
 {
 public:
@@ -116,40 +115,32 @@ public:
     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
     // the ClusterLogic class.
     ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
-        mClusterDriver(clusterDriver), mState(ClusterStateAttributes(matterContext))
+        mClusterDriver(clusterDriver), mAttributes(ClusterStateAttributes(matterContext))
     {
         // TODO: remove these once the fields are used properly
         (void) mClusterDriver;
     }
 
-    // Validates the conformance and performs initialization.
     // Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
-    // Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
-    CHIP_ERROR Init(const ClusterConformance & conformance, const ClusterInitParameters & initialState = ClusterInitParameters());
-    // CHIP_ERROR HandleOpen();
-    // CHIP_ERROR HandleClose();
+    CHIP_ERROR Init(const ClusterInitParameters & initialState = ClusterInitParameters());
 
-    // All Get functions:
-    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
-    // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
-    CHIP_ERROR GetOpenDuration(DataModel::Nullable<ElapsedS> & openDuration);
-    CHIP_ERROR GetDefaultOpenDuration(DataModel::Nullable<ElapsedS> & defaultOpenDuration);
-    CHIP_ERROR GetAutoCloseTime(DataModel::Nullable<EpochUs> & autoCloseTime);
-    CHIP_ERROR GetRemainingDuration(DataModel::Nullable<ElapsedS> & remainingDuration);
-    CHIP_ERROR GetCurrentState(DataModel::Nullable<ValveStateEnum> & currentState);
-    CHIP_ERROR GetTargetState(DataModel::Nullable<ValveStateEnum> & targetState);
-    CHIP_ERROR GetCurrentLevel(DataModel::Nullable<Percent> & currentLevel);
-    CHIP_ERROR GetTargetLevel(DataModel::Nullable<Percent> & targetLevel);
-    CHIP_ERROR GetDefaultOpenLevel(Percent & defaultOpenLevel);
-    CHIP_ERROR GetValveFault(BitMask<ValveFaultBitmap> & valveFault);
-    CHIP_ERROR GetLevelStep(uint8_t & levelStep);
-    CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
-    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+    // TODO: Open question - is it better to get the types from the codegen? Attributes::<whatever>>::TypeInfo::
+    const DataModel::Nullable<ElapsedS> & GetOpenDuration() { return mAttributes.GetState().openDuration; }
+    const DataModel::Nullable<ElapsedS> & GetDefaultOpenDuration() { return mAttributes.GetState().defaultOpenDuration; }
+    const DataModel::Nullable<EpochUs> & GetAutoCloseTime() { return mAttributes.GetState().autoCloseTime; }
+    // This has an internal handler for the Q quality.
+    const DataModel::Nullable<ElapsedS> & GetRemainingDuration();
+    const DataModel::Nullable<ValveStateEnum> & GetCurrentState() { return mAttributes.GetState().currentState; };
+    const DataModel::Nullable<ValveStateEnum> & GetTargetState() { return mAttributes.GetState().targetState; }
+    const DataModel::Nullable<Percent> & GetCurrentLevel() { return mAttributes.GetState().currentLevel; }
+    const DataModel::Nullable<Percent> & GetTargetLevel() { return mAttributes.GetState().targetLevel; }
+    const Percent & GetDefaultOpenLevel() { return mAttributes.GetState().defaultOpenLevel; }
+    const BitMask<ValveFaultBitmap> & GetValveFault() { return mAttributes.GetState().valveFault; }
+    const uint8_t & GetLevelStep() { return mAttributes.GetState().levelStep; }
+    const uint16_t & GetClusterRevision() { return kClusterRevision; }
 
     // All Set functions
     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
     // Return CHIP_ERROR_INVALID_ARGUMENT if the input value is out of range.
     // Returns CHIP_ERROR_PERSISTED_STORAGE_FAILED if the value could not not be stored in persistent storage.
     // Otherwise return CHIP_NO_ERROR and set the parameter value in the cluster state
@@ -190,7 +181,7 @@ private:
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
     // Determines if the level value is allowed per the level step.
     bool ValueCompliesWithLevelStep(const uint8_t value);
-    // Returns the target level to send to the delegate based on the targetLevel command field, the device conformance and the
+    // Returns the target level to send to the delegate based on the targetLevel command field and the
     // defaults. Returns error if the supplied target level is invalid.
     CHIP_ERROR GetRealTargetLevel(const std::optional<Percent> & targetLevel, Percent & realTargetLevel);
     // Internal function call to handle open commands for devices that support the LVL feature.
@@ -211,8 +202,7 @@ private:
 
     DelegateBase & mClusterDriver;
 
-    ClusterConformance mConformance;
-    ClusterStateAttributes mState;
+    ClusterStateAttributes mAttributes;
 };
 
 } // namespace ValveConfigurationAndControl

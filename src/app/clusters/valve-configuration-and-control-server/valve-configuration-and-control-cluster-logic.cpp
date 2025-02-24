@@ -174,118 +174,12 @@ System::Clock::Milliseconds64 ClusterStateAttributes::GetNextReportTimeForRemain
         kRemainingDurationReportRate;
 }
 
-CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const ClusterInitParameters & initialState)
+CHIP_ERROR ClusterLogic::Init(const ClusterInitParameters & initialState)
 {
-    if (!conformance.Valid())
-    {
-        return CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
-    }
-    if (conformance.HasFeature(Feature::kLevel) && mClusterDriver.GetDelegateType() != kLevel)
-    {
-        return CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
-    }
-    if (!conformance.HasFeature(Feature::kLevel) && mClusterDriver.GetDelegateType() != kNonLevel)
-    {
-        return CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
-    }
-    mConformance = conformance;
-
-    mState.Init(initialState);
+    mAttributes.Init(initialState);
     mDurationStarted = System::SystemClock().GetMonotonicMilliseconds64();
 
     mInitialized = true;
-    return CHIP_NO_ERROR;
-}
-
-// All Get functions:
-// Return CHIP_ERROR_INVALID_STATE if the class has not been initialized.
-// Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
-// Return CHIP_NO_ERROR and set the parameter value otherwise
-CHIP_ERROR ClusterLogic::GetOpenDuration(DataModel::Nullable<uint32_t> & openDuration)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    openDuration = mState.GetState().openDuration;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetDefaultOpenDuration(DataModel::Nullable<uint32_t> & defaultOpenDuration)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    defaultOpenDuration = mState.GetState().defaultOpenDuration;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetAutoCloseTime(DataModel::Nullable<uint64_t> & autoCloseTime)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kTimeSync), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    autoCloseTime = mState.GetState().autoCloseTime;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetRemainingDuration(DataModel::Nullable<uint32_t> & remainingDuration)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    HandleUpdateRemainingDurationInternal();
-    remainingDuration = mState.GetState().remainingDuration.value();
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetCurrentState(DataModel::Nullable<ValveStateEnum> & currentState)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    currentState = mState.GetState().currentState;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetTargetState(DataModel::Nullable<ValveStateEnum> & targetState)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    targetState = mState.GetState().targetState;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetCurrentLevel(DataModel::Nullable<uint8_t> & currentLevel)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    currentLevel = mState.GetState().currentLevel;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetTargetLevel(DataModel::Nullable<uint8_t> & targetLevel)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    targetLevel = mState.GetState().targetLevel;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetDefaultOpenLevel(uint8_t & defaultOpenLevel)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(mConformance.supportsDefaultOpenLevel, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    defaultOpenLevel = mState.GetState().defaultOpenLevel;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetValveFault(BitMask<ValveFaultBitmap> & valveFault)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.supportsValveFault, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    valveFault = mState.GetState().valveFault;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetLevelStep(uint8_t & levelStep)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(mConformance.supportsLevelStep, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    levelStep = mState.GetState().levelStep;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    featureMap = mConformance.featureMap;
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    clusterRevision = kClusterRevision;
     return CHIP_NO_ERROR;
 }
 
@@ -296,17 +190,14 @@ CHIP_ERROR ClusterLogic::SetDefaultOpenDuration(const DataModel::Nullable<Elapse
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return mState.SetDefaultOpenDuration(defaultOpenDuration);
+    return mAttributes.SetDefaultOpenDuration(defaultOpenDuration);
 }
 
 bool ClusterLogic::ValueCompliesWithLevelStep(const uint8_t value)
 {
-    if (mConformance.supportsLevelStep)
+    if ((value != 100u) && ((value % mAttributes.GetState().levelStep) != 0))
     {
-        if ((value != 100u) && ((value % mState.GetState().levelStep) != 0))
-        {
-            return false;
-        }
+        return false;
     }
     return true;
 }
@@ -314,13 +205,12 @@ bool ClusterLogic::ValueCompliesWithLevelStep(const uint8_t value)
 CHIP_ERROR ClusterLogic::SetDefaultOpenLevel(const uint8_t defaultOpenLevel)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.supportsDefaultOpenLevel, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     if (defaultOpenLevel < 1 || defaultOpenLevel > 100)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_ERROR_INVALID_ARGUMENT);
-    return mState.SetDefaultOpenLevel(defaultOpenLevel);
+    return mAttributes.SetDefaultOpenLevel(defaultOpenLevel);
 }
 
 CHIP_ERROR ClusterLogic::SetValveFault(const ValveFaultBitmap valveFault)
@@ -336,12 +226,7 @@ CHIP_ERROR ClusterLogic::GetRealTargetLevel(const std::optional<Percent> & targe
 {
     if (!targetLevel.has_value())
     {
-        if (mConformance.supportsDefaultOpenLevel)
-        {
-            realTargetLevel = mState.GetState().defaultOpenLevel;
-            return CHIP_NO_ERROR;
-        }
-        realTargetLevel = 100u;
+        realTargetLevel = mAttributes.GetState().defaultOpenLevel;
         return CHIP_NO_ERROR;
     }
     // targetLevel has a value
@@ -352,9 +237,6 @@ CHIP_ERROR ClusterLogic::GetRealTargetLevel(const std::optional<Percent> & targe
 
 CHIP_ERROR ClusterLogic::HandleOpenLevel(const std::optional<Percent> & targetLevel)
 {
-    // This function should only be called for devices that support the level feature.
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_INTERNAL);
-
     Percent realTargetLevel;
     Percent returnedCurrentLevel                 = 0;
     BitMask<ValveFaultBitmap> returnedValveFault = 0;
@@ -362,26 +244,23 @@ CHIP_ERROR ClusterLogic::HandleOpenLevel(const std::optional<Percent> & targetLe
 
     CHIP_ERROR err = mClusterDriver.HandleOpenValve(realTargetLevel, returnedCurrentLevel, returnedValveFault);
 
-    if (mConformance.supportsValveFault)
-    {
-        mState.SetValveFault(returnedValveFault);
-    }
+    mAttributes.SetValveFault(returnedValveFault);
     if (err != CHIP_NO_ERROR)
     {
         return err;
     }
 
-    mState.SetTargetLevel(realTargetLevel);
-    mState.SetCurrentLevel(returnedCurrentLevel);
-    mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
-    mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    mAttributes.SetTargetLevel(realTargetLevel);
+    mAttributes.SetCurrentLevel(returnedCurrentLevel);
+    mAttributes.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
+    mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
 
     if (returnedCurrentLevel == realTargetLevel)
     {
-        mState.SetTargetLevel(DataModel::NullNullable);
-        mState.SetCurrentLevel(realTargetLevel);
-        mState.SetTargetState(DataModel::NullNullable);
-        mState.SetCurrentState(ValveStateEnum::kOpen);
+        mAttributes.SetTargetLevel(DataModel::NullNullable);
+        mAttributes.SetCurrentLevel(realTargetLevel);
+        mAttributes.SetTargetState(DataModel::NullNullable);
+        mAttributes.SetCurrentState(ValveStateEnum::kOpen);
     }
     else
     {
@@ -392,21 +271,15 @@ CHIP_ERROR ClusterLogic::HandleOpenLevel(const std::optional<Percent> & targetLe
 
 CHIP_ERROR ClusterLogic::HandleOpenNoLevel()
 {
-    // This function should only be called for devices that do not support the level feature.
-    VerifyOrReturnError(!mConformance.HasFeature(Feature::kLevel), CHIP_ERROR_INTERNAL);
-
     ValveStateEnum returnedState                 = ValveStateEnum::kUnknownEnumValue;
     BitMask<ValveFaultBitmap> returnedValveFault = 0;
 
     // Per the spec, set these to transitioning regardless
-    mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
-    mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+    mAttributes.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
+    mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
 
     CHIP_ERROR err = mClusterDriver.HandleOpenValve(returnedState, returnedValveFault);
-    if (mConformance.supportsValveFault)
-    {
-        mState.SetValveFault(returnedValveFault);
-    }
+    mAttributes.SetValveFault(returnedValveFault);
     if (err != CHIP_NO_ERROR)
     {
         // TODO: How should the target and current be set in this case?
@@ -415,8 +288,8 @@ CHIP_ERROR ClusterLogic::HandleOpenNoLevel()
 
     if (returnedState == ValveStateEnum::kOpen)
     {
-        mState.SetTargetState(DataModel::NullNullable);
-        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
+        mAttributes.SetTargetState(DataModel::NullNullable);
+        mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kOpen));
     }
     else
     {
@@ -449,15 +322,16 @@ CHIP_ERROR ClusterLogic::HandleOpenCommand(std::optional<DataModel::Nullable<Ela
     }
     else
     {
-        realOpenDuration = mState.GetState().defaultOpenDuration;
+        realOpenDuration = mAttributes.GetState().defaultOpenDuration;
     }
 
-    if (!mConformance.HasFeature(Feature::kLevel) && targetLevel.has_value())
+    if (mClusterDriver.GetDelegateType() != DelegateType::kLevel && targetLevel.has_value())
     {
+        ChipLogError(Zcl, "Received request to open by level, but the valve does not support level")
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (mConformance.HasFeature(Feature::kLevel))
+    if (mClusterDriver.GetDelegateType() == DelegateType::kLevel)
     {
         ReturnErrorOnFailure(HandleOpenLevel(targetLevel));
     }
@@ -466,7 +340,7 @@ CHIP_ERROR ClusterLogic::HandleOpenCommand(std::optional<DataModel::Nullable<Ela
         ReturnErrorOnFailure(HandleOpenNoLevel());
     }
 
-    mState.SetOpenDuration(realOpenDuration);
+    mAttributes.SetOpenDuration(realOpenDuration);
     mDurationStarted = System::SystemClock().GetMonotonicMilliseconds64();
     HandleUpdateRemainingDurationInternal();
     return CHIP_NO_ERROR;
@@ -483,21 +357,21 @@ CHIP_ERROR ClusterLogic::HandleCloseInternal()
 {
     CHIP_ERROR err;
     BitMask<ValveFaultBitmap> faults;
-    if (mConformance.HasFeature(Feature::kLevel))
+    if (mClusterDriver.GetDelegateType() == DelegateType::kLevel)
     {
         Percent currentLevel;
-        mState.SetTargetLevel(0);
-        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+        mAttributes.SetTargetLevel(0);
+        mAttributes.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+        mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         err = mClusterDriver.HandleCloseValve(currentLevel, faults);
         if (err == CHIP_NO_ERROR)
         {
-            mState.SetCurrentLevel(DataModel::Nullable<Percent>(currentLevel));
+            mAttributes.SetCurrentLevel(DataModel::Nullable<Percent>(currentLevel));
             if (currentLevel == 0)
             {
-                mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-                mState.SetTargetState(DataModel::NullNullable);
-                mState.SetTargetLevel(DataModel::NullNullable);
+                mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+                mAttributes.SetTargetState(DataModel::NullNullable);
+                mAttributes.SetTargetLevel(DataModel::NullNullable);
             }
             else
             {
@@ -508,26 +382,28 @@ CHIP_ERROR ClusterLogic::HandleCloseInternal()
     else
     {
         ValveStateEnum state;
-        mState.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
-        mState.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
+        mAttributes.SetTargetState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kClosed));
+        mAttributes.SetCurrentState(DataModel::Nullable<ValveStateEnum>(ValveStateEnum::kTransitioning));
         err = mClusterDriver.HandleCloseValve(state, faults);
-        if (err == CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR && state == ValveStateEnum::kClosed)
         {
-            mState.SetCurrentState(state);
+            mAttributes.SetCurrentState(state);
+            mAttributes.SetTargetState(DataModel::NullNullable);
         }
     }
     // If there was an error, we know nothing about the current state
     if (err != CHIP_NO_ERROR)
     {
-        mState.SetCurrentLevel(DataModel::NullNullable);
-        mState.SetCurrentState(DataModel::NullNullable);
+        mAttributes.SetCurrentLevel(DataModel::NullNullable);
+        mAttributes.SetCurrentState(DataModel::NullNullable);
+        mAttributes.SetValveFault(faults);
+        mAttributes.SetTargetLevel(DataModel::NullNullable);
+        mAttributes.SetTargetState(DataModel::NullNullable);
     }
-    mState.SetValveFault(faults);
-    mState.SetOpenDuration(DataModel::NullNullable);
-    mState.SetRemainingDuration(DataModel::NullNullable);
-    mState.SetTargetLevel(DataModel::NullNullable);
-    mState.SetTargetState(DataModel::NullNullable);
-    mState.SetAutoCloseTime(DataModel::NullNullable);
+
+    mAttributes.SetOpenDuration(DataModel::NullNullable);
+    mAttributes.SetRemainingDuration(DataModel::NullNullable);
+    mAttributes.SetAutoCloseTime(DataModel::NullNullable);
     return err;
 }
 
@@ -543,16 +419,16 @@ void ClusterLogic::HandleUpdateRemainingDurationInternal()
     // We will start a new timer if required.
     DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
 
-    if (mState.GetState().openDuration.IsNull())
+    if (mAttributes.GetState().openDuration.IsNull())
     {
         // I think this might be an error state - if openDuration is NULL, this timer shouldn't be on.
-        mState.SetRemainingDuration(DataModel::NullNullable);
+        mAttributes.SetRemainingDuration(DataModel::NullNullable);
         return;
     }
 
     // Setup a new timer to either send the next report or handle the close operation
     System::Clock::Milliseconds64 now      = System::SystemClock().GetMonotonicMilliseconds64();
-    System::Clock::Seconds64 openDurationS = System::Clock::Seconds64(mState.GetState().openDuration.ValueOr(0));
+    System::Clock::Seconds64 openDurationS = System::Clock::Seconds64(mAttributes.GetState().openDuration.ValueOr(0));
     System::Clock::Milliseconds64 closeTimeMs =
         mDurationStarted + std::chrono::duration_cast<System::Clock::Milliseconds64>(openDurationS);
     if (now >= closeTimeMs)
@@ -562,14 +438,20 @@ void ClusterLogic::HandleUpdateRemainingDurationInternal()
         return;
     }
     System::Clock::Milliseconds64 remainingMs     = closeTimeMs - now;
-    System::Clock::Milliseconds64 nextReportTimer = mState.GetNextReportTimeForRemainingDuration() - now;
+    System::Clock::Milliseconds64 nextReportTimer = mAttributes.GetNextReportTimeForRemainingDuration() - now;
 
     System::Clock::Milliseconds64 nextTimerTime = std::min(nextReportTimer, remainingMs);
     DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(nextTimerTime),
                                           HandleUpdateRemainingDuration, this);
 
     auto remainingS = std::chrono::round<System::Clock::Seconds32>(remainingMs);
-    mState.SetRemainingDuration(DataModel::Nullable<ElapsedS>(remainingS.count()));
+    mAttributes.SetRemainingDuration(DataModel::Nullable<ElapsedS>(remainingS.count()));
+}
+
+const DataModel::Nullable<ElapsedS> & ClusterLogic::GetRemainingDuration()
+{
+    HandleUpdateRemainingDurationInternal();
+    return mAttributes.GetState().remainingDuration.value();
 }
 
 } // namespace ValveConfigurationAndControl
