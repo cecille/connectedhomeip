@@ -144,7 +144,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Identify::Attributes::IdentifyTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -1573,7 +1573,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OnOff::Attributes::OnTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -1637,7 +1637,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OnOff::Attributes::OffWaitTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -1705,7 +1705,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                  nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -2855,7 +2855,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = LevelControl::Attributes::Options::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -2919,7 +2919,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -2987,7 +2987,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -3056,7 +3056,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -3125,7 +3125,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -3194,7 +3194,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -3263,7 +3263,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -5180,23 +5180,23 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRBindingClusterTargetStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       if (element_0.node != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].node.Emplace();
-                 definedValue_2 = element_0.node.unsignedLongLongValue;
+                     if (element_0.node != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].node.Emplace();
+         definedValue_2 = element_0.node.unsignedLongLongValue;
   }
-       if (element_0.group != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].group.Emplace();
-                 definedValue_2 = element_0.group.unsignedShortValue;
+     if (element_0.group != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].group.Emplace();
+         definedValue_2 = element_0.group.unsignedShortValue;
   }
-       if (element_0.endpoint != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].endpoint.Emplace();
-                 definedValue_2 = element_0.endpoint.unsignedShortValue;
+     if (element_0.endpoint != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].endpoint.Emplace();
+         definedValue_2 = element_0.endpoint.unsignedShortValue;
   }
-       if (element_0.cluster != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].cluster.Emplace();
-                 definedValue_2 = element_0.cluster.unsignedIntValue;
+     if (element_0.cluster != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].cluster.Emplace();
+         definedValue_2 = element_0.cluster.unsignedIntValue;
   }
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -5720,82 +5720,82 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRAccessControlClusterAccessControlEntryStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                           listHolder_0->mList[i_0].privilege = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].privilege)>>(element_0.privilege.unsignedCharValue);
-           listHolder_0->mList[i_0].authMode = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].authMode)>>(element_0.authMode.unsignedCharValue);
-       if (element_0.subjects == nil) {
-         listHolder_0->mList[i_0].subjects.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].subjects.SetNonNull();
-           {
-             using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
-             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-             if (element_0.subjects.count != 0) {
-               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.subjects.count);
-               if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                     listHolder_0->mList[i_0].privilege = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].privilege)>>(element_0.privilege.unsignedCharValue);
+     listHolder_0->mList[i_0].authMode = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].authMode)>>(element_0.authMode.unsignedCharValue);
+     if (element_0.subjects == nil) {
+       listHolder_0->mList[i_0].subjects.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].subjects.SetNonNull();
+         {
+           using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
+           using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+           if (element_0.subjects.count != 0) {
+             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.subjects.count);
+             if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+               return CHIP_ERROR_INVALID_ARGUMENT;
+             }
+             listFreer.add(listHolder_3);
+             for (size_t i_3 = 0; i_3 < element_0.subjects.count; ++i_3) {
+               auto element_3 = MTR_SAFE_CAST(element_0.subjects[i_3], NSNumber);
+               if (!element_3) {
+                 // Wrong kind of value.
+                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.subjects[i_3], NSStringFromClass(NSNumber.class));
                  return CHIP_ERROR_INVALID_ARGUMENT;
                }
-               listFreer.add(listHolder_3);
-               for (size_t i_3 = 0; i_3 < element_0.subjects.count; ++i_3) {
-                 auto element_3 = MTR_SAFE_CAST(element_0.subjects[i_3], NSNumber);
-                 if (!element_3) {
-                   // Wrong kind of value.
-                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.subjects[i_3], NSStringFromClass(NSNumber.class));
-                   return CHIP_ERROR_INVALID_ARGUMENT;
-                 }
-                         listHolder_3->mList[i_3] = element_3.unsignedLongLongValue;
+                 listHolder_3->mList[i_3] = element_3.unsignedLongLongValue;
       }
-               nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.subjects.count);
-             } else {
-               nonNullValue_2 = ListType_3();
-             }
+             nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.subjects.count);
+           } else {
+             nonNullValue_2 = ListType_3();
            }
-       }
-       if (element_0.targets == nil) {
-         listHolder_0->mList[i_0].targets.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].targets.SetNonNull();
-           {
-             using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
-             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-             if (element_0.targets.count != 0) {
-               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.targets.count);
-               if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+         }
+     }
+     if (element_0.targets == nil) {
+       listHolder_0->mList[i_0].targets.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].targets.SetNonNull();
+         {
+           using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
+           using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+           if (element_0.targets.count != 0) {
+             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.targets.count);
+             if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+               return CHIP_ERROR_INVALID_ARGUMENT;
+             }
+             listFreer.add(listHolder_3);
+             for (size_t i_3 = 0; i_3 < element_0.targets.count; ++i_3) {
+               auto element_3 = MTR_SAFE_CAST(element_0.targets[i_3], MTRAccessControlClusterAccessControlTargetStruct);
+               if (!element_3) {
+                 // Wrong kind of value.
+                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.targets[i_3], NSStringFromClass(MTRAccessControlClusterAccessControlTargetStruct.class));
                  return CHIP_ERROR_INVALID_ARGUMENT;
                }
-               listFreer.add(listHolder_3);
-               for (size_t i_3 = 0; i_3 < element_0.targets.count; ++i_3) {
-                 auto element_3 = MTR_SAFE_CAST(element_0.targets[i_3], MTRAccessControlClusterAccessControlTargetStruct);
-                 if (!element_3) {
-                   // Wrong kind of value.
-                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.targets[i_3], NSStringFromClass(MTRAccessControlClusterAccessControlTargetStruct.class));
-                   return CHIP_ERROR_INVALID_ARGUMENT;
-                 }
-                        if (element_3.cluster == nil) {
-         listHolder_3->mList[i_3].cluster.SetNull();
-       } else {
-         auto & nonNullValue_5 = listHolder_3->mList[i_3].cluster.SetNonNull();
-                 nonNullValue_5 = element_3.cluster.unsignedIntValue;
+                    if (element_3.cluster == nil) {
+       listHolder_3->mList[i_3].cluster.SetNull();
+     } else {
+       auto & nonNullValue_5 = listHolder_3->mList[i_3].cluster.SetNonNull();
+         nonNullValue_5 = element_3.cluster.unsignedIntValue;
   }
-       if (element_3.endpoint == nil) {
-         listHolder_3->mList[i_3].endpoint.SetNull();
-       } else {
-         auto & nonNullValue_5 = listHolder_3->mList[i_3].endpoint.SetNonNull();
-                 nonNullValue_5 = element_3.endpoint.unsignedShortValue;
+     if (element_3.endpoint == nil) {
+       listHolder_3->mList[i_3].endpoint.SetNull();
+     } else {
+       auto & nonNullValue_5 = listHolder_3->mList[i_3].endpoint.SetNonNull();
+         nonNullValue_5 = element_3.endpoint.unsignedShortValue;
   }
-       if (element_3.deviceType == nil) {
-         listHolder_3->mList[i_3].deviceType.SetNull();
-       } else {
-         auto & nonNullValue_5 = listHolder_3->mList[i_3].deviceType.SetNonNull();
-                 nonNullValue_5 = element_3.deviceType.unsignedIntValue;
+     if (element_3.deviceType == nil) {
+       listHolder_3->mList[i_3].deviceType.SetNull();
+     } else {
+       auto & nonNullValue_5 = listHolder_3->mList[i_3].deviceType.SetNonNull();
+         nonNullValue_5 = element_3.deviceType.unsignedIntValue;
   }
       }
-               nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.targets.count);
-             } else {
-               nonNullValue_2 = ListType_3();
-             }
+             nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.targets.count);
+           } else {
+             nonNullValue_2 = ListType_3();
            }
-       }
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+         }
+     }
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -5881,8 +5881,8 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRAccessControlClusterAccessControlExtensionStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       listHolder_0->mList[i_0].data = AsByteSpan(element_0.data);
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                     listHolder_0->mList[i_0].data = AsByteSpan(element_0.data);
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -8287,7 +8287,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = BasicInformation::Attributes::LocalConfigDisabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -10183,9 +10183,9 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTROTASoftwareUpdateRequestorClusterProviderLocation.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                             listHolder_0->mList[i_0].providerNodeID = element_0.providerNodeID.unsignedLongLongValue;
-             listHolder_0->mList[i_0].endpoint = element_0.endpoint.unsignedShortValue;
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                     listHolder_0->mList[i_0].providerNodeID = element_0.providerNodeID.unsignedLongLongValue;
+     listHolder_0->mList[i_0].endpoint = element_0.endpoint.unsignedShortValue;
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -11438,7 +11438,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = TimeFormatLocalization::Attributes::HourFormat::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -11502,7 +11502,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = TimeFormatLocalization::Attributes::ActiveCalendarType::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -12093,7 +12093,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitLocalization::Attributes::TemperatureUnit::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -15719,7 +15719,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -17006,7 +17006,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -31220,6 +31220,58 @@ public:
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
+- (void)setVidVerificationStatementWithCompletion:(MTRStatusCompletion)completion
+{
+    [self setVidVerificationStatementWithParams:nil completion:completion];
+}
+- (void)setVidVerificationStatementWithParams:(MTROperationalCredentialsClusterSetVidVerificationStatementParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterSetVidVerificationStatementParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::SetVidVerificationStatement::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)signVidVerificationRequestWithParams:(MTROperationalCredentialsClusterSignVidVerificationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterSignVidVerificationResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterSignVidVerificationRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::SignVidVerificationRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterSignVidVerificationResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
 
 - (void)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
@@ -32228,9 +32280,9 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRGroupKeyManagementClusterGroupKeyMapStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                             listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
-             listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                     listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
+     listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -33410,8 +33462,8 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRUserLabelClusterLabelStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       listHolder_0->mList[i_0].label = AsCharSpan(element_0.label);
-       listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+                     listHolder_0->mList[i_0].label = AsCharSpan(element_0.label);
+     listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -36123,7 +36175,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                  nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -36545,7 +36597,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -36614,7 +36666,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -37883,7 +37935,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -37948,7 +38000,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = LaundryWasherControls::Attributes::NumberOfRinses::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -40441,7 +40493,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = SmokeCoAlarm::Attributes::SmokeSensitivityLevel::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -43579,7 +43631,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -44041,7 +44093,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -44375,7 +44427,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -44972,7 +45024,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -45253,7 +45305,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ValveConfigurationAndControl::Attributes::DefaultOpenLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -47635,7 +47687,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DemandResponseLoadControl::Attributes::DefaultRandomStart::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -47699,7 +47751,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DemandResponseLoadControl::Attributes::DefaultRandomDuration::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -49459,7 +49511,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = EnergyEvse::Attributes::UserMaximumChargeCurrent::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.longLongValue;
+          cppValue = value.longLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -49523,7 +49575,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = EnergyEvse::Attributes::RandomizationDelayWindow::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -49735,7 +49787,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -50272,7 +50324,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = EnergyPreference::Attributes::CurrentEnergyBalance::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -50408,7 +50460,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -52450,7 +52502,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::DoorOpenEvents::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -52514,7 +52566,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::DoorClosedEvents::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -52578,7 +52630,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::OpenPeriod::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53138,7 +53190,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::LEDSettings::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53202,7 +53254,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::AutoRelockTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53266,7 +53318,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::SoundVolume::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53330,7 +53382,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::OperatingMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53466,7 +53518,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::EnableLocalProgramming::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53530,7 +53582,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53594,7 +53646,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::EnableInsideStatusLED::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53658,7 +53710,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53722,7 +53774,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::LocalProgrammingFeatures::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53786,7 +53838,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53850,7 +53902,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::UserCodeTemporaryDisableTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53914,7 +53966,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::SendPINOverTheAir::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -53978,7 +54030,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::RequirePINforRemoteOperation::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -54042,7 +54094,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = DoorLock::Attributes::ExpiringUserTimeout::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -57214,7 +57266,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = WindowCovering::Attributes::Mode::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -58476,6 +58528,691 @@ public:
 
 @end
 
+@implementation MTRBaseClusterClosureControl
+
+- (void)stopWithCompletion:(MTRStatusCompletion)completion
+{
+    [self stopWithParams:nil completion:completion];
+}
+- (void)stopWithParams:(MTRClosureControlClusterStopParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRClosureControlClusterStopParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ClosureControl::Commands::Stop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)moveToWithCompletion:(MTRStatusCompletion)completion
+{
+    [self moveToWithParams:nil completion:completion];
+}
+- (void)moveToWithParams:(MTRClosureControlClusterMoveToParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRClosureControlClusterMoveToParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ClosureControl::Commands::MoveTo::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)calibrateWithCompletion:(MTRStatusCompletion)completion
+{
+    [self calibrateWithParams:nil completion:completion];
+}
+- (void)calibrateWithParams:(MTRClosureControlClusterCalibrateParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRClosureControlClusterCalibrateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ClosureControl::Commands::Calibrate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)configureFallbackWithCompletion:(MTRStatusCompletion)completion
+{
+    [self configureFallbackWithParams:nil completion:completion];
+}
+- (void)configureFallbackWithParams:(MTRClosureControlClusterConfigureFallbackParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRClosureControlClusterConfigureFallbackParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ClosureControl::Commands::ConfigureFallback::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)cancelFallbackWithCompletion:(MTRStatusCompletion)completion
+{
+    [self cancelFallbackWithParams:nil completion:completion];
+}
+- (void)cancelFallbackWithParams:(MTRClosureControlClusterCancelFallbackParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRClosureControlClusterCancelFallbackParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ClosureControl::Commands::CancelFallback::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeCountdownTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::CountdownTime::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeCountdownTimeWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::CountdownTime::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeCountdownTimeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::CountdownTime::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeMainStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::MainState::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMainStateWithParams:(MTRSubscribeParams * _Nonnull)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::MainState::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMainStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::MainState::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeCurrentErrorListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::CurrentErrorList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeCurrentErrorListWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::CurrentErrorList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeCurrentErrorListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::CurrentErrorList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeOverallStateWithCompletion:(void (^)(MTRClosureControlClusterOverallStateStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::OverallState::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeOverallStateWithParams:(MTRSubscribeParams * _Nonnull)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(MTRClosureControlClusterOverallStateStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::OverallState::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeOverallStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRClosureControlClusterOverallStateStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::OverallState::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeOverallTargetWithCompletion:(void (^)(MTRClosureControlClusterOverallTargetStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::OverallTarget::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeOverallTargetWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(MTRClosureControlClusterOverallTargetStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::OverallTarget::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeOverallTargetWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRClosureControlClusterOverallTargetStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::OverallTarget::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeRestingProcedureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::RestingProcedure::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeRestingProcedureWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::RestingProcedure::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeRestingProcedureWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::RestingProcedure::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeTriggerConditionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerCondition::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeTriggerConditionWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerCondition::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeTriggerConditionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerCondition::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeTriggerPositionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerPosition::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeTriggerPositionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerPosition::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeTriggerPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::TriggerPosition::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeWaitingDelayWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::WaitingDelay::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeWaitingDelayWithParams:(MTRSubscribeParams * _Nonnull)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::WaitingDelay::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeWaitingDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::WaitingDelay::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeKickoffTimerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::KickoffTimer::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeKickoffTimerWithParams:(MTRSubscribeParams * _Nonnull)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::KickoffTimer::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeKickoffTimerWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::KickoffTimer::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::GeneratedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::AcceptedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::AttributeList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::AttributeList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::AttributeList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::FeatureMap::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::FeatureMap::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::FeatureMap::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::ClusterRevision::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ClosureControl::Attributes::ClusterRevision::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ClosureControl::Attributes::ClusterRevision::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+@end
+
 @implementation MTRBaseClusterServiceArea
 
 - (void)selectAreasWithParams:(MTRServiceAreaClusterSelectAreasParams *)params completion:(void (^)(MTRServiceAreaClusterSelectAreasResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -59611,7 +60348,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -59716,7 +60453,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -59781,7 +60518,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -59845,7 +60582,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61613,7 +62350,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::HVACSystemTypeConfiguration::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61677,7 +62414,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::LocalTemperatureCalibration::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.charValue;
+          cppValue = value.charValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61741,7 +62478,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61805,7 +62542,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61869,7 +62606,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::UnoccupiedCoolingSetpoint::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61933,7 +62670,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::UnoccupiedHeatingSetpoint::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -61997,7 +62734,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62061,7 +62798,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62125,7 +62862,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62189,7 +62926,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62253,7 +62990,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.charValue;
+          cppValue = value.charValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62317,7 +63054,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::RemoteSensing::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62381,7 +63118,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62445,7 +63182,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::SystemMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62653,7 +63390,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::TemperatureSetpointHold::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62721,7 +63458,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -62786,7 +63523,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ThermostatProgrammingOperationMode::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -62998,7 +63735,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -63139,7 +63876,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -63276,7 +64013,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::EmergencyHeatDelta::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63340,7 +64077,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACType::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63404,7 +64141,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACCapacity::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63468,7 +64205,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACRefrigerantType::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63532,7 +64269,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACCompressorType::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63596,7 +64333,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACErrorCode::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63660,7 +64397,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACLouverPosition::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -63760,7 +64497,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Thermostat::Attributes::ACCapacityformat::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -64128,35 +64865,35 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRThermostatClusterPresetStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       if (element_0.presetHandle == nil) {
-         listHolder_0->mList[i_0].presetHandle.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].presetHandle.SetNonNull();
-           nonNullValue_2 = AsByteSpan(element_0.presetHandle);
-       }
-           listHolder_0->mList[i_0].presetScenario = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].presetScenario)>>(element_0.presetScenario.unsignedCharValue);
-       if (element_0.name != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
-           if (element_0.name == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-               nonNullValue_3 = AsCharSpan(element_0.name);
-           }
-       }
-       if (element_0.coolingSetpoint != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].coolingSetpoint.Emplace();
-                 definedValue_2 = element_0.coolingSetpoint.shortValue;
+                     if (element_0.presetHandle == nil) {
+       listHolder_0->mList[i_0].presetHandle.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].presetHandle.SetNonNull();
+         nonNullValue_2 = AsByteSpan(element_0.presetHandle);
+     }
+     listHolder_0->mList[i_0].presetScenario = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].presetScenario)>>(element_0.presetScenario.unsignedCharValue);
+     if (element_0.name != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+         if (element_0.name == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             nonNullValue_3 = AsCharSpan(element_0.name);
+         }
+     }
+     if (element_0.coolingSetpoint != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].coolingSetpoint.Emplace();
+         definedValue_2 = element_0.coolingSetpoint.shortValue;
   }
-       if (element_0.heatingSetpoint != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].heatingSetpoint.Emplace();
-                 definedValue_2 = element_0.heatingSetpoint.shortValue;
+     if (element_0.heatingSetpoint != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].heatingSetpoint.Emplace();
+         definedValue_2 = element_0.heatingSetpoint.shortValue;
   }
-       if (element_0.builtIn == nil) {
-         listHolder_0->mList[i_0].builtIn.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].builtIn.SetNonNull();
-                 nonNullValue_2 = element_0.builtIn.boolValue;
+     if (element_0.builtIn == nil) {
+       listHolder_0->mList[i_0].builtIn.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].builtIn.SetNonNull();
+         nonNullValue_2 = element_0.builtIn.boolValue;
   }
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -64243,66 +64980,66 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRThermostatClusterScheduleStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       if (element_0.scheduleHandle == nil) {
-         listHolder_0->mList[i_0].scheduleHandle.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].scheduleHandle.SetNonNull();
-           nonNullValue_2 = AsByteSpan(element_0.scheduleHandle);
-       }
-           listHolder_0->mList[i_0].systemMode = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].systemMode)>>(element_0.systemMode.unsignedCharValue);
-       if (element_0.name != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
-           definedValue_2 = AsCharSpan(element_0.name);
-       }
-       if (element_0.presetHandle != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].presetHandle.Emplace();
-           definedValue_2 = AsByteSpan(element_0.presetHandle);
-       }
-       {
-         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].transitions)>;
-         using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-         if (element_0.transitions.count != 0) {
-           auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.transitions.count);
-           if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                     if (element_0.scheduleHandle == nil) {
+       listHolder_0->mList[i_0].scheduleHandle.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].scheduleHandle.SetNonNull();
+         nonNullValue_2 = AsByteSpan(element_0.scheduleHandle);
+     }
+     listHolder_0->mList[i_0].systemMode = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].systemMode)>>(element_0.systemMode.unsignedCharValue);
+     if (element_0.name != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+         definedValue_2 = AsCharSpan(element_0.name);
+     }
+     if (element_0.presetHandle != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].presetHandle.Emplace();
+         definedValue_2 = AsByteSpan(element_0.presetHandle);
+     }
+     {
+       using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].transitions)>;
+       using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+       if (element_0.transitions.count != 0) {
+         auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.transitions.count);
+         if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+           return CHIP_ERROR_INVALID_ARGUMENT;
+         }
+         listFreer.add(listHolder_2);
+         for (size_t i_2 = 0; i_2 < element_0.transitions.count; ++i_2) {
+           auto element_2 = MTR_SAFE_CAST(element_0.transitions[i_2], MTRThermostatClusterScheduleTransitionStruct);
+           if (!element_2) {
+             // Wrong kind of value.
+             MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.transitions[i_2], NSStringFromClass(MTRThermostatClusterScheduleTransitionStruct.class));
              return CHIP_ERROR_INVALID_ARGUMENT;
            }
-           listFreer.add(listHolder_2);
-           for (size_t i_2 = 0; i_2 < element_0.transitions.count; ++i_2) {
-             auto element_2 = MTR_SAFE_CAST(element_0.transitions[i_2], MTRThermostatClusterScheduleTransitionStruct);
-             if (!element_2) {
-               // Wrong kind of value.
-               MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.transitions[i_2], NSStringFromClass(MTRThermostatClusterScheduleTransitionStruct.class));
-               return CHIP_ERROR_INVALID_ARGUMENT;
-             }
-                          listHolder_2->mList[i_2].dayOfWeek = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].dayOfWeek)>>(element_2.dayOfWeek.unsignedCharValue);
-             listHolder_2->mList[i_2].transitionTime = element_2.transitionTime.unsignedShortValue;
-       if (element_2.presetHandle != nil) {
-         auto & definedValue_4 = listHolder_2->mList[i_2].presetHandle.Emplace();
-           definedValue_4 = AsByteSpan(element_2.presetHandle);
-       }
-       if (element_2.systemMode != nil) {
-         auto & definedValue_4 = listHolder_2->mList[i_2].systemMode.Emplace();
-               definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_2.systemMode.unsignedCharValue);
+                listHolder_2->mList[i_2].dayOfWeek = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].dayOfWeek)>>(element_2.dayOfWeek.unsignedCharValue);
+     listHolder_2->mList[i_2].transitionTime = element_2.transitionTime.unsignedShortValue;
+     if (element_2.presetHandle != nil) {
+       auto & definedValue_4 = listHolder_2->mList[i_2].presetHandle.Emplace();
+         definedValue_4 = AsByteSpan(element_2.presetHandle);
+     }
+     if (element_2.systemMode != nil) {
+       auto & definedValue_4 = listHolder_2->mList[i_2].systemMode.Emplace();
+         definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_2.systemMode.unsignedCharValue);
   }
-       if (element_2.coolingSetpoint != nil) {
-         auto & definedValue_4 = listHolder_2->mList[i_2].coolingSetpoint.Emplace();
-                 definedValue_4 = element_2.coolingSetpoint.shortValue;
+     if (element_2.coolingSetpoint != nil) {
+       auto & definedValue_4 = listHolder_2->mList[i_2].coolingSetpoint.Emplace();
+         definedValue_4 = element_2.coolingSetpoint.shortValue;
   }
-       if (element_2.heatingSetpoint != nil) {
-         auto & definedValue_4 = listHolder_2->mList[i_2].heatingSetpoint.Emplace();
-                 definedValue_4 = element_2.heatingSetpoint.shortValue;
+     if (element_2.heatingSetpoint != nil) {
+       auto & definedValue_4 = listHolder_2->mList[i_2].heatingSetpoint.Emplace();
+         definedValue_4 = element_2.heatingSetpoint.shortValue;
   }
       }
-           listHolder_0->mList[i_0].transitions = ListType_2(listHolder_2->mList, element_0.transitions.count);
-         } else {
-           listHolder_0->mList[i_0].transitions = ListType_2();
-         }
-       }
-       if (element_0.builtIn == nil) {
-         listHolder_0->mList[i_0].builtIn.SetNull();
+         listHolder_0->mList[i_0].transitions = ListType_2(listHolder_2->mList, element_0.transitions.count);
        } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].builtIn.SetNonNull();
-                 nonNullValue_2 = element_0.builtIn.boolValue;
+         listHolder_0->mList[i_0].transitions = ListType_2();
+       }
+     }
+     if (element_0.builtIn == nil) {
+       listHolder_0->mList[i_0].builtIn.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].builtIn.SetNonNull();
+         nonNullValue_2 = element_0.builtIn.boolValue;
   }
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -66763,7 +67500,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = FanControl::Attributes::FanMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -66827,7 +67564,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = FanControl::Attributes::FanModeSequence::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -66895,7 +67632,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -67036,7 +67773,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -67173,7 +67910,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = FanControl::Attributes::RockSetting::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -67273,7 +68010,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = FanControl::Attributes::WindSetting::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -67337,7 +68074,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = FanControl::Attributes::AirflowDirection::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -68204,7 +68941,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -68268,7 +69005,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -68332,7 +69069,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -69676,7 +70413,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::Options::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70424,7 +71161,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::WhitePointX::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70488,7 +71225,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::WhitePointY::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70552,7 +71289,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointRX::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70616,7 +71353,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointRY::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70684,7 +71421,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -70749,7 +71486,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointGX::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70813,7 +71550,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointGY::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -70881,7 +71618,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -70946,7 +71683,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointBX::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -71010,7 +71747,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ColorControl::Attributes::ColorPointBY::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -71078,7 +71815,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -71543,7 +72280,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -74106,7 +74843,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = BallastConfiguration::Attributes::MinLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -74170,7 +74907,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = BallastConfiguration::Attributes::MaxLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -74238,7 +74975,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -74307,7 +75044,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -74540,7 +75277,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -74609,7 +75346,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -74674,7 +75411,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = BallastConfiguration::Attributes::LampAlarmMode::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -74742,7 +75479,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -79551,7 +80288,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::HoldTime::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79651,7 +80388,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79715,7 +80452,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79779,7 +80516,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79843,7 +80580,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79907,7 +80644,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -79971,7 +80708,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -80035,7 +80772,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -80099,7 +80836,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -80163,7 +80900,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -92909,7 +93646,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -94135,11 +94872,11 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                              nonNullValue_0.application.catalogVendorID = value.application.catalogVendorID.unsignedShortValue;
-       nonNullValue_0.application.applicationID = AsCharSpan(value.application.applicationID);
-       if (value.endpoint != nil) {
-         auto & definedValue_2 = nonNullValue_0.endpoint.Emplace();
-                 definedValue_2 = value.endpoint.unsignedShortValue;
+                    nonNullValue_0.application.catalogVendorID = value.application.catalogVendorID.unsignedShortValue;
+     nonNullValue_0.application.applicationID = AsCharSpan(value.application.applicationID);
+     if (value.endpoint != nil) {
+       auto & definedValue_2 = nonNullValue_0.endpoint.Emplace();
+         definedValue_2 = value.endpoint.unsignedShortValue;
   }
   }
 
@@ -97230,13 +97967,13 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRZoneManagementClusterZoneTriggerControlStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                             listHolder_0->mList[i_0].initialDuration = element_0.initialDuration.unsignedShortValue;
-             listHolder_0->mList[i_0].augmentationDuration = element_0.augmentationDuration.unsignedShortValue;
-             listHolder_0->mList[i_0].maxDuration = element_0.maxDuration.unsignedIntValue;
-             listHolder_0->mList[i_0].blindDuration = element_0.blindDuration.unsignedShortValue;
-       if (element_0.sensitivity != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].sensitivity.Emplace();
-                 definedValue_2 = element_0.sensitivity.unsignedCharValue;
+                     listHolder_0->mList[i_0].initialDuration = element_0.initialDuration.unsignedShortValue;
+     listHolder_0->mList[i_0].augmentationDuration = element_0.augmentationDuration.unsignedShortValue;
+     listHolder_0->mList[i_0].maxDuration = element_0.maxDuration.unsignedIntValue;
+     listHolder_0->mList[i_0].blindDuration = element_0.blindDuration.unsignedShortValue;
+     if (element_0.sensitivity != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].sensitivity.Emplace();
+         definedValue_2 = element_0.sensitivity.unsignedCharValue;
   }
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -97307,7 +98044,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = ZoneManagement::Attributes::Sensitivity::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98240,7 +98977,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::HDRModeEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98484,7 +99221,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98548,7 +99285,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98648,7 +99385,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::NightVision::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98712,7 +99449,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::NightVisionIllum::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98776,10 +99513,10 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::Viewport::TypeInfo;
         TypeInfo::Type cppValue;
-                     cppValue.x1 = value.x1.unsignedShortValue;
-             cppValue.y1 = value.y1.unsignedShortValue;
-             cppValue.x2 = value.x2.unsignedShortValue;
-             cppValue.y2 = value.y2.unsignedShortValue;
+             cppValue.x1 = value.x1.unsignedShortValue;
+     cppValue.y1 = value.y1.unsignedShortValue;
+     cppValue.x2 = value.x2.unsignedShortValue;
+     cppValue.y2 = value.y2.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98843,7 +99580,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::SpeakerMuted::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -98907,7 +99644,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::SpeakerVolumeLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99043,7 +99780,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::MicrophoneMuted::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99107,7 +99844,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::MicrophoneVolumeLevel::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99243,7 +99980,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::MicrophoneAGCEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99307,7 +100044,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::ImageRotation::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99371,7 +100108,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::ImageFlipHorizontal::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99435,7 +100172,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::ImageFlipVertical::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99499,7 +100236,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::LocalVideoRecordingEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99563,7 +100300,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::LocalSnapshotRecordingEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99627,7 +100364,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::StatusLightEnabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99691,7 +100428,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = CameraAvStreamManagement::Attributes::StatusLightBrightness::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -99905,6 +100642,691 @@ public:
 
 @end
 
+@implementation MTRBaseClusterCameraAVSettingsUserLevelManagement
+
+- (void)MPTZSetPositionWithCompletion:(MTRStatusCompletion)completion
+{
+    [self MPTZSetPositionWithParams:nil completion:completion];
+}
+- (void)MPTZSetPositionWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSetPositionParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)MPTZRelativeMoveWithCompletion:(MTRStatusCompletion)completion
+{
+    [self MPTZRelativeMoveWithParams:nil completion:completion];
+}
+- (void)MPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRelativeMoveParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)MPTZMoveToPresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZMoveToPresetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)MPTZSavePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZSavePresetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)MPTZRemovePresetWithParams:(MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterMPTZRemovePresetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)DPTZSetViewportWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZSetViewportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)DPTZRelativeMoveWithParams:(MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVSettingsUserLevelManagementClusterDPTZRelativeMoveParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeMPTZPositionWithCompletion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMPTZPositionWithParams:(MTRSubscribeParams * _Nonnull)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMPTZPositionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeMaxPresetsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMaxPresetsWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMaxPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeMPTZPresetsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMPTZPresetsWithParams:(MTRSubscribeParams * _Nonnull)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMPTZPresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeDPTZRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeDPTZRelativeMoveWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeDPTZRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeZoomMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeZoomMaxWithParams:(MTRSubscribeParams * _Nonnull)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeZoomMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeTiltMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMin::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeTiltMinWithParams:(MTRSubscribeParams * _Nonnull)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMin::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeTiltMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMin::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeTiltMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMax::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeTiltMaxWithParams:(MTRSubscribeParams * _Nonnull)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMax::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeTiltMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::TiltMax::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributePanMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMin::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributePanMinWithParams:(MTRSubscribeParams * _Nonnull)params
+                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMin::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributePanMinWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMin::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributePanMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMax::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributePanMaxWithParams:(MTRSubscribeParams * _Nonnull)params
+                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMax::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributePanMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::PanMax::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AttributeList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AttributeList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::AttributeList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::FeatureMap::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::FeatureMap::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::FeatureMap::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ClusterRevision::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ClusterRevision::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::ClusterRevision::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+@end
+
 @implementation MTRBaseClusterWebRTCTransportProvider
 
 - (void)solicitOfferWithParams:(MTRWebRTCTransportProviderClusterSolicitOfferParams *)params completion:(void (^)(MTRWebRTCTransportProviderClusterSolicitOfferResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -99979,10 +101401,10 @@ public:
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
-- (void)provideICECandidateWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidateParams *)params completion:(MTRStatusCompletion)completion
+- (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRWebRTCTransportProviderClusterProvideICECandidateParams
+        params = [[MTRWebRTCTransportProviderClusterProvideICECandidatesParams
             alloc] init];
     }
 
@@ -99992,7 +101414,7 @@ public:
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = WebRTCTransportProvider::Commands::ProvideICECandidate::Type;
+    using RequestType = WebRTCTransportProvider::Commands::ProvideICECandidates::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -100296,10 +101718,10 @@ public:
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
-- (void)ICECandidateWithParams:(MTRWebRTCTransportRequestorClusterICECandidateParams *)params completion:(MTRStatusCompletion)completion
+- (void)ICECandidatesWithParams:(MTRWebRTCTransportRequestorClusterICECandidatesParams *)params completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRWebRTCTransportRequestorClusterICECandidateParams
+        params = [[MTRWebRTCTransportRequestorClusterICECandidatesParams
             alloc] init];
     }
 
@@ -100309,7 +101731,7 @@ public:
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = WebRTCTransportRequestor::Commands::ICECandidate::Type;
+    using RequestType = WebRTCTransportRequestor::Commands::ICECandidates::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -100563,6 +101985,447 @@ public:
 
 @end
 
+@implementation MTRBaseClusterPushAVStreamTransport
+
+- (void)allocatePushTransportWithParams:(MTRPushAVStreamTransportClusterAllocatePushTransportParams *)params completion:(void (^)(MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterAllocatePushTransportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::AllocatePushTransport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRPushAVStreamTransportClusterAllocatePushTransportResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)deallocatePushTransportWithParams:(MTRPushAVStreamTransportClusterDeallocatePushTransportParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterDeallocatePushTransportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::DeallocatePushTransport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)modifyPushTransportWithParams:(MTRPushAVStreamTransportClusterModifyPushTransportParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterModifyPushTransportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::ModifyPushTransport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)setTransportStatusWithParams:(MTRPushAVStreamTransportClusterSetTransportStatusParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterSetTransportStatusParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::SetTransportStatus::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)manuallyTriggerTransportWithParams:(MTRPushAVStreamTransportClusterManuallyTriggerTransportParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterManuallyTriggerTransportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)findTransportWithCompletion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self findTransportWithParams:nil completion:completion];
+}
+- (void)findTransportWithParams:(MTRPushAVStreamTransportClusterFindTransportParams * _Nullable)params completion:(void (^)(MTRPushAVStreamTransportClusterFindTransportResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRPushAVStreamTransportClusterFindTransportParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = PushAvStreamTransport::Commands::FindTransport::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRPushAVStreamTransportClusterFindTransportResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeSupportedContainerFormatsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedContainerFormats::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeSupportedContainerFormatsWithParams:(MTRSubscribeParams * _Nonnull)params
+                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedContainerFormats::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeSupportedContainerFormatsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedContainerFormats::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeSupportedIngestMethodsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedIngestMethods::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeSupportedIngestMethodsWithParams:(MTRSubscribeParams * _Nonnull)params
+                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedIngestMethods::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeSupportedIngestMethodsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::SupportedIngestMethods::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeCurrentConnectionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::CurrentConnections::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeCurrentConnectionsWithParams:(MTRSubscribeParams * _Nonnull)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::CurrentConnections::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeCurrentConnectionsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::CurrentConnections::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::GeneratedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AcceptedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AttributeList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AttributeList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::AttributeList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::FeatureMap::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::FeatureMap::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::FeatureMap::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::ClusterRevision::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::ClusterRevision::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = PushAvStreamTransport::Attributes::ClusterRevision::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+@end
+
 @implementation MTRBaseClusterChime
 
 - (void)playChimeSoundWithCompletion:(MTRStatusCompletion)completion
@@ -100662,7 +102525,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Chime::Attributes::ActiveChimeID::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -100726,7 +102589,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Chime::Attributes::Enabled::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -101465,6 +103328,551 @@ public:
 
 @end
 
+@implementation MTRBaseClusterTLSCertificateManagement
+
+- (void)provisionRootCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterProvisionRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterProvisionRootCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::ProvisionRootCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterProvisionRootCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)findRootCertificateWithParams:(MTRTLSCertificateManagementClusterFindRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterFindRootCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::FindRootCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterFindRootCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)lookupRootCertificateWithParams:(MTRTLSCertificateManagementClusterLookupRootCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterLookupRootCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterLookupRootCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::LookupRootCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterLookupRootCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)removeRootCertificateWithParams:(MTRTLSCertificateManagementClusterRemoveRootCertificateParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterRemoveRootCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::RemoveRootCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)TLSClientCSRWithParams:(MTRTLSCertificateManagementClusterTLSClientCSRParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterTLSClientCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterTLSClientCSRParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::TLSClientCSR::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterTLSClientCSRResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)provisionClientCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterProvisionClientCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::ProvisionClientCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)findClientCertificateWithParams:(MTRTLSCertificateManagementClusterFindClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterFindClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterFindClientCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::FindClientCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterFindClientCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)lookupClientCertificateWithParams:(MTRTLSCertificateManagementClusterLookupClientCertificateParams *)params completion:(void (^)(MTRTLSCertificateManagementClusterLookupClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterLookupClientCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::LookupClientCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSCertificateManagementClusterLookupClientCertificateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)removeClientCertificateWithParams:(MTRTLSCertificateManagementClusterRemoveClientCertificateParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRTLSCertificateManagementClusterRemoveClientCertificateParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsCertificateManagement::Commands::RemoveClientCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeMaxRootCertificatesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxRootCertificates::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMaxRootCertificatesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxRootCertificates::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMaxRootCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxRootCertificates::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeCurrentRootCertificatesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentRootCertificates::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeCurrentRootCertificatesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentRootCertificates::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeCurrentRootCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentRootCertificates::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeMaxClientCertificatesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxClientCertificates::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMaxClientCertificatesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxClientCertificates::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMaxClientCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::MaxClientCertificates::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeCurrentClientCertificatesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentClientCertificates::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeCurrentClientCertificatesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentClientCertificates::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeCurrentClientCertificatesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::CurrentClientCertificates::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::GeneratedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AcceptedCommandList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AttributeList::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AttributeList::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::AttributeList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::FeatureMap::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams * _Nonnull)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::FeatureMap::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::FeatureMap::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::ClusterRevision::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams * _Nonnull)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::ClusterRevision::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = TlsCertificateManagement::Attributes::ClusterRevision::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+@end
+
 @implementation MTRBaseClusterUnitTesting
 
 - (void)testWithCompletion:(MTRStatusCompletion)completion
@@ -102179,7 +104587,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Boolean::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102243,7 +104651,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Bitmap8::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102307,7 +104715,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Bitmap16::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102371,7 +104779,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Bitmap32::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102435,7 +104843,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Bitmap64::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedLongLongValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedLongLongValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102499,7 +104907,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int8u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102563,7 +104971,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int16u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102627,7 +105035,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int24u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102691,7 +105099,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int32u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102755,7 +105163,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int40u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102819,7 +105227,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int48u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102883,7 +105291,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int56u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -102947,7 +105355,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int64u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103011,7 +105419,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int8s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.charValue;
+          cppValue = value.charValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103075,7 +105483,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int16s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103139,7 +105547,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int24s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.intValue;
+          cppValue = value.intValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103203,7 +105611,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int32s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.intValue;
+          cppValue = value.intValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103267,7 +105675,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int40s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.longLongValue;
+          cppValue = value.longLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103331,7 +105739,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int48s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.longLongValue;
+          cppValue = value.longLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103395,7 +105803,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int56s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.longLongValue;
+          cppValue = value.longLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103459,7 +105867,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Int64s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.longLongValue;
+          cppValue = value.longLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103523,7 +105931,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Enum8::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103587,7 +105995,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Enum16::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103651,7 +106059,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::FloatSingle::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.floatValue;
+          cppValue = value.floatValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103715,7 +106123,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::FloatDouble::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.doubleValue;
+          cppValue = value.doubleValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -103859,7 +106267,7 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(NSNumber.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                        listHolder_0->mList[i_0] = element_0.unsignedCharValue;
+                  listHolder_0->mList[i_0] = element_0.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -104031,8 +106439,8 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRUnitTestingClusterTestListStructOctet.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                             listHolder_0->mList[i_0].member1 = element_0.member1.unsignedLongLongValue;
-       listHolder_0->mList[i_0].member2 = AsByteSpan(element_0.member2);
+                     listHolder_0->mList[i_0].member1 = element_0.member1.unsignedLongLongValue;
+     listHolder_0->mList[i_0].member2 = AsByteSpan(element_0.member2);
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -104294,7 +106702,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::EpochUs::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedLongLongValue;
+          cppValue = value.unsignedLongLongValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -104358,7 +106766,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::EpochS::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -104422,7 +106830,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::VendorId::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -104502,181 +106910,181 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRUnitTestingClusterNullablesAndOptionalsStruct.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                       if (element_0.nullableInt == nil) {
-         listHolder_0->mList[i_0].nullableInt.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableInt.SetNonNull();
-                 nonNullValue_2 = element_0.nullableInt.unsignedShortValue;
+                     if (element_0.nullableInt == nil) {
+       listHolder_0->mList[i_0].nullableInt.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableInt.SetNonNull();
+         nonNullValue_2 = element_0.nullableInt.unsignedShortValue;
   }
-       if (element_0.optionalInt != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].optionalInt.Emplace();
-                 definedValue_2 = element_0.optionalInt.unsignedShortValue;
+     if (element_0.optionalInt != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].optionalInt.Emplace();
+         definedValue_2 = element_0.optionalInt.unsignedShortValue;
   }
-       if (element_0.nullableOptionalInt != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalInt.Emplace();
-           if (element_0.nullableOptionalInt == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                     nonNullValue_3 = element_0.nullableOptionalInt.unsignedShortValue;
+     if (element_0.nullableOptionalInt != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalInt.Emplace();
+         if (element_0.nullableOptionalInt == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             nonNullValue_3 = element_0.nullableOptionalInt.unsignedShortValue;
   }
-       }
-       if (element_0.nullableString == nil) {
-         listHolder_0->mList[i_0].nullableString.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableString.SetNonNull();
-           nonNullValue_2 = AsCharSpan(element_0.nullableString);
-       }
-       if (element_0.optionalString != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].optionalString.Emplace();
-           definedValue_2 = AsCharSpan(element_0.optionalString);
-       }
-       if (element_0.nullableOptionalString != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalString.Emplace();
-           if (element_0.nullableOptionalString == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-               nonNullValue_3 = AsCharSpan(element_0.nullableOptionalString);
-           }
-       }
-       if (element_0.nullableStruct == nil) {
-         listHolder_0->mList[i_0].nullableStruct.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableStruct.SetNonNull();
-                      nonNullValue_2.a = element_0.nullableStruct.a.unsignedCharValue;
-             nonNullValue_2.b = element_0.nullableStruct.b.boolValue;
-           nonNullValue_2.c = static_cast<std::remove_reference_t<decltype(nonNullValue_2.c)>>(element_0.nullableStruct.c.unsignedCharValue);
-       nonNullValue_2.d = AsByteSpan(element_0.nullableStruct.d);
-       nonNullValue_2.e = AsCharSpan(element_0.nullableStruct.e);
-             nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(element_0.nullableStruct.f.unsignedCharValue);
-             nonNullValue_2.g = element_0.nullableStruct.g.floatValue;
-             nonNullValue_2.h = element_0.nullableStruct.h.doubleValue;
-       if (element_0.nullableStruct.i != nil) {
-         auto & definedValue_4 = nonNullValue_2.i.Emplace();
-               definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.nullableStruct.i.unsignedCharValue);
-  }
-  }
-       if (element_0.optionalStruct != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].optionalStruct.Emplace();
-                      definedValue_2.a = element_0.optionalStruct.a.unsignedCharValue;
-             definedValue_2.b = element_0.optionalStruct.b.boolValue;
-           definedValue_2.c = static_cast<std::remove_reference_t<decltype(definedValue_2.c)>>(element_0.optionalStruct.c.unsignedCharValue);
-       definedValue_2.d = AsByteSpan(element_0.optionalStruct.d);
-       definedValue_2.e = AsCharSpan(element_0.optionalStruct.e);
-             definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(element_0.optionalStruct.f.unsignedCharValue);
-             definedValue_2.g = element_0.optionalStruct.g.floatValue;
-             definedValue_2.h = element_0.optionalStruct.h.doubleValue;
-       if (element_0.optionalStruct.i != nil) {
-         auto & definedValue_4 = definedValue_2.i.Emplace();
-               definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.optionalStruct.i.unsignedCharValue);
+     }
+     if (element_0.nullableString == nil) {
+       listHolder_0->mList[i_0].nullableString.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableString.SetNonNull();
+         nonNullValue_2 = AsCharSpan(element_0.nullableString);
+     }
+     if (element_0.optionalString != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].optionalString.Emplace();
+         definedValue_2 = AsCharSpan(element_0.optionalString);
+     }
+     if (element_0.nullableOptionalString != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalString.Emplace();
+         if (element_0.nullableOptionalString == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             nonNullValue_3 = AsCharSpan(element_0.nullableOptionalString);
+         }
+     }
+     if (element_0.nullableStruct == nil) {
+       listHolder_0->mList[i_0].nullableStruct.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableStruct.SetNonNull();
+            nonNullValue_2.a = element_0.nullableStruct.a.unsignedCharValue;
+     nonNullValue_2.b = element_0.nullableStruct.b.boolValue;
+     nonNullValue_2.c = static_cast<std::remove_reference_t<decltype(nonNullValue_2.c)>>(element_0.nullableStruct.c.unsignedCharValue);
+     nonNullValue_2.d = AsByteSpan(element_0.nullableStruct.d);
+     nonNullValue_2.e = AsCharSpan(element_0.nullableStruct.e);
+     nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(element_0.nullableStruct.f.unsignedCharValue);
+     nonNullValue_2.g = element_0.nullableStruct.g.floatValue;
+     nonNullValue_2.h = element_0.nullableStruct.h.doubleValue;
+     if (element_0.nullableStruct.i != nil) {
+       auto & definedValue_4 = nonNullValue_2.i.Emplace();
+         definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.nullableStruct.i.unsignedCharValue);
   }
   }
-       if (element_0.nullableOptionalStruct != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalStruct.Emplace();
-           if (element_0.nullableOptionalStruct == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                          nonNullValue_3.a = element_0.nullableOptionalStruct.a.unsignedCharValue;
-             nonNullValue_3.b = element_0.nullableOptionalStruct.b.boolValue;
-           nonNullValue_3.c = static_cast<std::remove_reference_t<decltype(nonNullValue_3.c)>>(element_0.nullableOptionalStruct.c.unsignedCharValue);
-       nonNullValue_3.d = AsByteSpan(element_0.nullableOptionalStruct.d);
-       nonNullValue_3.e = AsCharSpan(element_0.nullableOptionalStruct.e);
-             nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(element_0.nullableOptionalStruct.f.unsignedCharValue);
-             nonNullValue_3.g = element_0.nullableOptionalStruct.g.floatValue;
-             nonNullValue_3.h = element_0.nullableOptionalStruct.h.doubleValue;
-       if (element_0.nullableOptionalStruct.i != nil) {
-         auto & definedValue_5 = nonNullValue_3.i.Emplace();
-               definedValue_5 = static_cast<std::remove_reference_t<decltype(definedValue_5)>>(element_0.nullableOptionalStruct.i.unsignedCharValue);
+     if (element_0.optionalStruct != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].optionalStruct.Emplace();
+            definedValue_2.a = element_0.optionalStruct.a.unsignedCharValue;
+     definedValue_2.b = element_0.optionalStruct.b.boolValue;
+     definedValue_2.c = static_cast<std::remove_reference_t<decltype(definedValue_2.c)>>(element_0.optionalStruct.c.unsignedCharValue);
+     definedValue_2.d = AsByteSpan(element_0.optionalStruct.d);
+     definedValue_2.e = AsCharSpan(element_0.optionalStruct.e);
+     definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(element_0.optionalStruct.f.unsignedCharValue);
+     definedValue_2.g = element_0.optionalStruct.g.floatValue;
+     definedValue_2.h = element_0.optionalStruct.h.doubleValue;
+     if (element_0.optionalStruct.i != nil) {
+       auto & definedValue_4 = definedValue_2.i.Emplace();
+         definedValue_4 = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(element_0.optionalStruct.i.unsignedCharValue);
   }
   }
-       }
-       if (element_0.nullableList == nil) {
-         listHolder_0->mList[i_0].nullableList.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableList.SetNonNull();
-           {
-             using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
-             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-             if (element_0.nullableList.count != 0) {
-               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.nullableList.count);
-               if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+     if (element_0.nullableOptionalStruct != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalStruct.Emplace();
+         if (element_0.nullableOptionalStruct == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                nonNullValue_3.a = element_0.nullableOptionalStruct.a.unsignedCharValue;
+     nonNullValue_3.b = element_0.nullableOptionalStruct.b.boolValue;
+     nonNullValue_3.c = static_cast<std::remove_reference_t<decltype(nonNullValue_3.c)>>(element_0.nullableOptionalStruct.c.unsignedCharValue);
+     nonNullValue_3.d = AsByteSpan(element_0.nullableOptionalStruct.d);
+     nonNullValue_3.e = AsCharSpan(element_0.nullableOptionalStruct.e);
+     nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(element_0.nullableOptionalStruct.f.unsignedCharValue);
+     nonNullValue_3.g = element_0.nullableOptionalStruct.g.floatValue;
+     nonNullValue_3.h = element_0.nullableOptionalStruct.h.doubleValue;
+     if (element_0.nullableOptionalStruct.i != nil) {
+       auto & definedValue_5 = nonNullValue_3.i.Emplace();
+         definedValue_5 = static_cast<std::remove_reference_t<decltype(definedValue_5)>>(element_0.nullableOptionalStruct.i.unsignedCharValue);
+  }
+  }
+     }
+     if (element_0.nullableList == nil) {
+       listHolder_0->mList[i_0].nullableList.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableList.SetNonNull();
+         {
+           using ListType_3 = std::remove_reference_t<decltype(nonNullValue_2)>;
+           using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+           if (element_0.nullableList.count != 0) {
+             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.nullableList.count);
+             if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+               return CHIP_ERROR_INVALID_ARGUMENT;
+             }
+             listFreer.add(listHolder_3);
+             for (size_t i_3 = 0; i_3 < element_0.nullableList.count; ++i_3) {
+               auto element_3 = MTR_SAFE_CAST(element_0.nullableList[i_3], NSNumber);
+               if (!element_3) {
+                 // Wrong kind of value.
+                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.nullableList[i_3], NSStringFromClass(NSNumber.class));
                  return CHIP_ERROR_INVALID_ARGUMENT;
                }
-               listFreer.add(listHolder_3);
-               for (size_t i_3 = 0; i_3 < element_0.nullableList.count; ++i_3) {
-                 auto element_3 = MTR_SAFE_CAST(element_0.nullableList[i_3], NSNumber);
-                 if (!element_3) {
-                   // Wrong kind of value.
-                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.nullableList[i_3], NSStringFromClass(NSNumber.class));
-                   return CHIP_ERROR_INVALID_ARGUMENT;
-                 }
-                       listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(element_3.unsignedCharValue);
+                 listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(element_3.unsignedCharValue);
       }
-               nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.nullableList.count);
-             } else {
-               nonNullValue_2 = ListType_3();
-             }
+             nonNullValue_2 = ListType_3(listHolder_3->mList, element_0.nullableList.count);
+           } else {
+             nonNullValue_2 = ListType_3();
            }
-       }
-       if (element_0.optionalList != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].optionalList.Emplace();
-           {
-             using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
-             using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-             if (element_0.optionalList.count != 0) {
-               auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.optionalList.count);
-               if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+         }
+     }
+     if (element_0.optionalList != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].optionalList.Emplace();
+         {
+           using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+           using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+           if (element_0.optionalList.count != 0) {
+             auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.optionalList.count);
+             if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+               return CHIP_ERROR_INVALID_ARGUMENT;
+             }
+             listFreer.add(listHolder_3);
+             for (size_t i_3 = 0; i_3 < element_0.optionalList.count; ++i_3) {
+               auto element_3 = MTR_SAFE_CAST(element_0.optionalList[i_3], NSNumber);
+               if (!element_3) {
+                 // Wrong kind of value.
+                 MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.optionalList[i_3], NSStringFromClass(NSNumber.class));
                  return CHIP_ERROR_INVALID_ARGUMENT;
                }
-               listFreer.add(listHolder_3);
-               for (size_t i_3 = 0; i_3 < element_0.optionalList.count; ++i_3) {
-                 auto element_3 = MTR_SAFE_CAST(element_0.optionalList[i_3], NSNumber);
-                 if (!element_3) {
-                   // Wrong kind of value.
-                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.optionalList[i_3], NSStringFromClass(NSNumber.class));
+                 listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(element_3.unsignedCharValue);
+      }
+             definedValue_2 = ListType_3(listHolder_3->mList, element_0.optionalList.count);
+           } else {
+             definedValue_2 = ListType_3();
+           }
+         }
+     }
+     if (element_0.nullableOptionalList != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalList.Emplace();
+         if (element_0.nullableOptionalList == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             {
+               using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
+               using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+               if (element_0.nullableOptionalList.count != 0) {
+                 auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_0.nullableOptionalList.count);
+                 if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                    return CHIP_ERROR_INVALID_ARGUMENT;
                  }
-                       listHolder_3->mList[i_3] = static_cast<std::remove_reference_t<decltype(listHolder_3->mList[i_3])>>(element_3.unsignedCharValue);
-      }
-               definedValue_2 = ListType_3(listHolder_3->mList, element_0.optionalList.count);
-             } else {
-               definedValue_2 = ListType_3();
-             }
-           }
-       }
-       if (element_0.nullableOptionalList != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalList.Emplace();
-           if (element_0.nullableOptionalList == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-               {
-                 using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
-                 using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                 if (element_0.nullableOptionalList.count != 0) {
-                   auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_0.nullableOptionalList.count);
-                   if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                 listFreer.add(listHolder_4);
+                 for (size_t i_4 = 0; i_4 < element_0.nullableOptionalList.count; ++i_4) {
+                   auto element_4 = MTR_SAFE_CAST(element_0.nullableOptionalList[i_4], NSNumber);
+                   if (!element_4) {
+                     // Wrong kind of value.
+                     MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.nullableOptionalList[i_4], NSStringFromClass(NSNumber.class));
                      return CHIP_ERROR_INVALID_ARGUMENT;
                    }
-                   listFreer.add(listHolder_4);
-                   for (size_t i_4 = 0; i_4 < element_0.nullableOptionalList.count; ++i_4) {
-                     auto element_4 = MTR_SAFE_CAST(element_0.nullableOptionalList[i_4], NSNumber);
-                     if (!element_4) {
-                       // Wrong kind of value.
-                       MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.nullableOptionalList[i_4], NSStringFromClass(NSNumber.class));
-                       return CHIP_ERROR_INVALID_ARGUMENT;
-                     }
-                           listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
+                     listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
       }
-                   nonNullValue_3 = ListType_4(listHolder_4->mList, element_0.nullableOptionalList.count);
-                 } else {
-                   nonNullValue_3 = ListType_4();
-                 }
+                 nonNullValue_3 = ListType_4(listHolder_4->mList, element_0.nullableOptionalList.count);
+               } else {
+                 nonNullValue_3 = ListType_4();
                }
-           }
-       }
+             }
+         }
+     }
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -104746,7 +107154,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::EnumAttr::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -104810,17 +107218,17 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::StructAttr::TypeInfo;
         TypeInfo::Type cppValue;
-                     cppValue.a = value.a.unsignedCharValue;
-             cppValue.b = value.b.boolValue;
-           cppValue.c = static_cast<std::remove_reference_t<decltype(cppValue.c)>>(value.c.unsignedCharValue);
-       cppValue.d = AsByteSpan(value.d);
-       cppValue.e = AsCharSpan(value.e);
-             cppValue.f = static_cast<std::remove_reference_t<decltype(cppValue.f)>>(value.f.unsignedCharValue);
-             cppValue.g = value.g.floatValue;
-             cppValue.h = value.h.doubleValue;
-       if (value.i != nil) {
-         auto & definedValue_1 = cppValue.i.Emplace();
-               definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(value.i.unsignedCharValue);
+             cppValue.a = value.a.unsignedCharValue;
+     cppValue.b = value.b.boolValue;
+     cppValue.c = static_cast<std::remove_reference_t<decltype(cppValue.c)>>(value.c.unsignedCharValue);
+     cppValue.d = AsByteSpan(value.d);
+     cppValue.e = AsCharSpan(value.e);
+     cppValue.f = static_cast<std::remove_reference_t<decltype(cppValue.f)>>(value.f.unsignedCharValue);
+     cppValue.g = value.g.floatValue;
+     cppValue.h = value.h.doubleValue;
+     if (value.i != nil) {
+       auto & definedValue_1 = cppValue.i.Emplace();
+         definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(value.i.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -104885,7 +107293,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::RangeRestrictedInt8u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -104949,7 +107357,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::RangeRestrictedInt8s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.charValue;
+          cppValue = value.charValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105013,7 +107421,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::RangeRestrictedInt16u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedShortValue;
+          cppValue = value.unsignedShortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105077,7 +107485,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::RangeRestrictedInt16s::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.shortValue;
+          cppValue = value.shortValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105243,63 +107651,63 @@ public:
                   MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRUnitTestingClusterTestFabricScoped.class));
                   return CHIP_ERROR_INVALID_ARGUMENT;
                 }
-                             listHolder_0->mList[i_0].fabricSensitiveInt8u = element_0.fabricSensitiveInt8u.unsignedCharValue;
-       if (element_0.optionalFabricSensitiveInt8u != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
-                 definedValue_2 = element_0.optionalFabricSensitiveInt8u.unsignedCharValue;
+                     listHolder_0->mList[i_0].fabricSensitiveInt8u = element_0.fabricSensitiveInt8u.unsignedCharValue;
+     if (element_0.optionalFabricSensitiveInt8u != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].optionalFabricSensitiveInt8u.Emplace();
+         definedValue_2 = element_0.optionalFabricSensitiveInt8u.unsignedCharValue;
   }
-       if (element_0.nullableFabricSensitiveInt8u == nil) {
-         listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNull();
-       } else {
-         auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNonNull();
-                 nonNullValue_2 = element_0.nullableFabricSensitiveInt8u.unsignedCharValue;
+     if (element_0.nullableFabricSensitiveInt8u == nil) {
+       listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNull();
+     } else {
+       auto & nonNullValue_2 = listHolder_0->mList[i_0].nullableFabricSensitiveInt8u.SetNonNull();
+         nonNullValue_2 = element_0.nullableFabricSensitiveInt8u.unsignedCharValue;
   }
-       if (element_0.nullableOptionalFabricSensitiveInt8u != nil) {
-         auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalFabricSensitiveInt8u.Emplace();
-           if (element_0.nullableOptionalFabricSensitiveInt8u == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                     nonNullValue_3 = element_0.nullableOptionalFabricSensitiveInt8u.unsignedCharValue;
+     if (element_0.nullableOptionalFabricSensitiveInt8u != nil) {
+       auto & definedValue_2 = listHolder_0->mList[i_0].nullableOptionalFabricSensitiveInt8u.Emplace();
+         if (element_0.nullableOptionalFabricSensitiveInt8u == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             nonNullValue_3 = element_0.nullableOptionalFabricSensitiveInt8u.unsignedCharValue;
   }
-       }
-       listHolder_0->mList[i_0].fabricSensitiveCharString = AsCharSpan(element_0.fabricSensitiveCharString);
-                  listHolder_0->mList[i_0].fabricSensitiveStruct.a = element_0.fabricSensitiveStruct.a.unsignedCharValue;
-             listHolder_0->mList[i_0].fabricSensitiveStruct.b = element_0.fabricSensitiveStruct.b.boolValue;
-           listHolder_0->mList[i_0].fabricSensitiveStruct.c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.c)>>(element_0.fabricSensitiveStruct.c.unsignedCharValue);
-       listHolder_0->mList[i_0].fabricSensitiveStruct.d = AsByteSpan(element_0.fabricSensitiveStruct.d);
-       listHolder_0->mList[i_0].fabricSensitiveStruct.e = AsCharSpan(element_0.fabricSensitiveStruct.e);
-             listHolder_0->mList[i_0].fabricSensitiveStruct.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>>(element_0.fabricSensitiveStruct.f.unsignedCharValue);
-             listHolder_0->mList[i_0].fabricSensitiveStruct.g = element_0.fabricSensitiveStruct.g.floatValue;
-             listHolder_0->mList[i_0].fabricSensitiveStruct.h = element_0.fabricSensitiveStruct.h.doubleValue;
-       if (element_0.fabricSensitiveStruct.i != nil) {
-         auto & definedValue_3 = listHolder_0->mList[i_0].fabricSensitiveStruct.i.Emplace();
-               definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_0.fabricSensitiveStruct.i.unsignedCharValue);
+     }
+     listHolder_0->mList[i_0].fabricSensitiveCharString = AsCharSpan(element_0.fabricSensitiveCharString);
+        listHolder_0->mList[i_0].fabricSensitiveStruct.a = element_0.fabricSensitiveStruct.a.unsignedCharValue;
+     listHolder_0->mList[i_0].fabricSensitiveStruct.b = element_0.fabricSensitiveStruct.b.boolValue;
+     listHolder_0->mList[i_0].fabricSensitiveStruct.c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.c)>>(element_0.fabricSensitiveStruct.c.unsignedCharValue);
+     listHolder_0->mList[i_0].fabricSensitiveStruct.d = AsByteSpan(element_0.fabricSensitiveStruct.d);
+     listHolder_0->mList[i_0].fabricSensitiveStruct.e = AsCharSpan(element_0.fabricSensitiveStruct.e);
+     listHolder_0->mList[i_0].fabricSensitiveStruct.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>>(element_0.fabricSensitiveStruct.f.unsignedCharValue);
+     listHolder_0->mList[i_0].fabricSensitiveStruct.g = element_0.fabricSensitiveStruct.g.floatValue;
+     listHolder_0->mList[i_0].fabricSensitiveStruct.h = element_0.fabricSensitiveStruct.h.doubleValue;
+     if (element_0.fabricSensitiveStruct.i != nil) {
+       auto & definedValue_3 = listHolder_0->mList[i_0].fabricSensitiveStruct.i.Emplace();
+         definedValue_3 = static_cast<std::remove_reference_t<decltype(definedValue_3)>>(element_0.fabricSensitiveStruct.i.unsignedCharValue);
   }
-       {
-         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveInt8uList)>;
-         using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-         if (element_0.fabricSensitiveInt8uList.count != 0) {
-           auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.fabricSensitiveInt8uList.count);
-           if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+     {
+       using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveInt8uList)>;
+       using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+       if (element_0.fabricSensitiveInt8uList.count != 0) {
+         auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.fabricSensitiveInt8uList.count);
+         if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+           return CHIP_ERROR_INVALID_ARGUMENT;
+         }
+         listFreer.add(listHolder_2);
+         for (size_t i_2 = 0; i_2 < element_0.fabricSensitiveInt8uList.count; ++i_2) {
+           auto element_2 = MTR_SAFE_CAST(element_0.fabricSensitiveInt8uList[i_2], NSNumber);
+           if (!element_2) {
+             // Wrong kind of value.
+             MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.fabricSensitiveInt8uList[i_2], NSStringFromClass(NSNumber.class));
              return CHIP_ERROR_INVALID_ARGUMENT;
            }
-           listFreer.add(listHolder_2);
-           for (size_t i_2 = 0; i_2 < element_0.fabricSensitiveInt8uList.count; ++i_2) {
-             auto element_2 = MTR_SAFE_CAST(element_0.fabricSensitiveInt8uList[i_2], NSNumber);
-             if (!element_2) {
-               // Wrong kind of value.
-               MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.fabricSensitiveInt8uList[i_2], NSStringFromClass(NSNumber.class));
-               return CHIP_ERROR_INVALID_ARGUMENT;
-             }
-                     listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+             listHolder_2->mList[i_2] = element_2.unsignedCharValue;
       }
-           listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2(listHolder_2->mList, element_0.fabricSensitiveInt8uList.count);
-         } else {
-           listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2();
-         }
+         listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2(listHolder_2->mList, element_0.fabricSensitiveInt8uList.count);
+       } else {
+         listHolder_0->mList[i_0].fabricSensitiveInt8uList = ListType_2();
        }
-             listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+     }
+     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
       }
               cppValue = ListType_0(listHolder_0->mList, value.count);
             } else {
@@ -105372,7 +107780,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::TimedWriteBoolean::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105436,7 +107844,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::GeneralErrorBoolean::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105500,7 +107908,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::ClusterErrorBoolean::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105564,7 +107972,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::GlobalEnum::TypeInfo;
         TypeInfo::Type cppValue;
-              cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105628,22 +108036,22 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::GlobalStruct::TypeInfo;
         TypeInfo::Type cppValue;
-               cppValue.name = AsCharSpan(value.name);
-       if (value.myBitmap == nil) {
-         cppValue.myBitmap.SetNull();
-       } else {
-         auto & nonNullValue_1 = cppValue.myBitmap.SetNonNull();
-                 nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(value.myBitmap.unsignedIntValue);
+             cppValue.name = AsCharSpan(value.name);
+     if (value.myBitmap == nil) {
+       cppValue.myBitmap.SetNull();
+     } else {
+       auto & nonNullValue_1 = cppValue.myBitmap.SetNonNull();
+         nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(value.myBitmap.unsignedIntValue);
   }
-       if (value.myEnum != nil) {
-         auto & definedValue_1 = cppValue.myEnum.Emplace();
-           if (value.myEnum == nil) {
-             definedValue_1.SetNull();
-           } else {
-             auto & nonNullValue_2 = definedValue_1.SetNonNull();
-                   nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myEnum.unsignedCharValue);
+     if (value.myEnum != nil) {
+       auto & definedValue_1 = cppValue.myEnum.Emplace();
+         if (value.myEnum == nil) {
+           definedValue_1.SetNull();
+         } else {
+           auto & nonNullValue_2 = definedValue_1.SetNonNull();
+             nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myEnum.unsignedCharValue);
   }
-       }
+     }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105707,7 +108115,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::Unsupported::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105771,7 +108179,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::ReadFailureCode::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105835,7 +108243,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::FailureInt32U::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedIntValue;
+          cppValue = value.unsignedIntValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -105903,7 +108311,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.boolValue;
+              nonNullValue_0 = value.boolValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -105972,7 +108380,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106041,7 +108449,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedShortValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedShortValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106110,7 +108518,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedIntValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedIntValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106179,7 +108587,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedLongLongValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedLongLongValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106248,7 +108656,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106317,7 +108725,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106386,7 +108794,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106455,7 +108863,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedIntValue;
+              nonNullValue_0 = value.unsignedIntValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106524,7 +108932,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedLongLongValue;
+              nonNullValue_0 = value.unsignedLongLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106593,7 +109001,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedLongLongValue;
+              nonNullValue_0 = value.unsignedLongLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106662,7 +109070,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedLongLongValue;
+              nonNullValue_0 = value.unsignedLongLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106731,7 +109139,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedLongLongValue;
+              nonNullValue_0 = value.unsignedLongLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106800,7 +109208,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.charValue;
+              nonNullValue_0 = value.charValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106869,7 +109277,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.shortValue;
+              nonNullValue_0 = value.shortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -106938,7 +109346,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.intValue;
+              nonNullValue_0 = value.intValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107007,7 +109415,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.intValue;
+              nonNullValue_0 = value.intValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107076,7 +109484,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.longLongValue;
+              nonNullValue_0 = value.longLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107145,7 +109553,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.longLongValue;
+              nonNullValue_0 = value.longLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107214,7 +109622,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.longLongValue;
+              nonNullValue_0 = value.longLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107283,7 +109691,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.longLongValue;
+              nonNullValue_0 = value.longLongValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107352,7 +109760,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107421,7 +109829,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107490,7 +109898,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.floatValue;
+              nonNullValue_0 = value.floatValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107559,7 +109967,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.doubleValue;
+              nonNullValue_0 = value.doubleValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107766,7 +110174,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                  nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107835,17 +110243,17 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                         nonNullValue_0.a = value.a.unsignedCharValue;
-             nonNullValue_0.b = value.b.boolValue;
-           nonNullValue_0.c = static_cast<std::remove_reference_t<decltype(nonNullValue_0.c)>>(value.c.unsignedCharValue);
-       nonNullValue_0.d = AsByteSpan(value.d);
-       nonNullValue_0.e = AsCharSpan(value.e);
-             nonNullValue_0.f = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(value.f.unsignedCharValue);
-             nonNullValue_0.g = value.g.floatValue;
-             nonNullValue_0.h = value.h.doubleValue;
-       if (value.i != nil) {
-         auto & definedValue_2 = nonNullValue_0.i.Emplace();
-               definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(value.i.unsignedCharValue);
+                 nonNullValue_0.a = value.a.unsignedCharValue;
+     nonNullValue_0.b = value.b.boolValue;
+     nonNullValue_0.c = static_cast<std::remove_reference_t<decltype(nonNullValue_0.c)>>(value.c.unsignedCharValue);
+     nonNullValue_0.d = AsByteSpan(value.d);
+     nonNullValue_0.e = AsCharSpan(value.e);
+     nonNullValue_0.f = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(value.f.unsignedCharValue);
+     nonNullValue_0.g = value.g.floatValue;
+     nonNullValue_0.h = value.h.doubleValue;
+     if (value.i != nil) {
+       auto & definedValue_2 = nonNullValue_0.i.Emplace();
+         definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(value.i.unsignedCharValue);
   }
   }
 
@@ -107915,7 +110323,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedCharValue;
+              nonNullValue_0 = value.unsignedCharValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -107984,7 +110392,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.charValue;
+              nonNullValue_0 = value.charValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -108053,7 +110461,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.unsignedShortValue;
+              nonNullValue_0 = value.unsignedShortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -108122,7 +110530,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                    nonNullValue_0 = value.shortValue;
+              nonNullValue_0 = value.shortValue;
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -108187,7 +110595,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::WriteOnlyInt8u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -108255,7 +110663,7 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                  nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -108324,22 +110732,22 @@ public:
             cppValue.SetNull();
           } else {
             auto & nonNullValue_0 = cppValue.SetNonNull();
-                   nonNullValue_0.name = AsCharSpan(value.name);
-       if (value.myBitmap == nil) {
-         nonNullValue_0.myBitmap.SetNull();
-       } else {
-         auto & nonNullValue_2 = nonNullValue_0.myBitmap.SetNonNull();
-                 nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myBitmap.unsignedIntValue);
+                 nonNullValue_0.name = AsCharSpan(value.name);
+     if (value.myBitmap == nil) {
+       nonNullValue_0.myBitmap.SetNull();
+     } else {
+       auto & nonNullValue_2 = nonNullValue_0.myBitmap.SetNonNull();
+         nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(value.myBitmap.unsignedIntValue);
   }
-       if (value.myEnum != nil) {
-         auto & definedValue_2 = nonNullValue_0.myEnum.Emplace();
-           if (value.myEnum == nil) {
-             definedValue_2.SetNull();
-           } else {
-             auto & nonNullValue_3 = definedValue_2.SetNonNull();
-                   nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(value.myEnum.unsignedCharValue);
+     if (value.myEnum != nil) {
+       auto & definedValue_2 = nonNullValue_0.myEnum.Emplace();
+         if (value.myEnum == nil) {
+           definedValue_2.SetNull();
+         } else {
+           auto & nonNullValue_3 = definedValue_2.SetNonNull();
+             nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(value.myEnum.unsignedCharValue);
   }
-       }
+     }
   }
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
@@ -108584,7 +110992,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = UnitTesting::Attributes::MeiInt8u::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.unsignedCharValue;
+          cppValue = value.unsignedCharValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -112610,7 +115018,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = SampleMei::Attributes::FlipFlop::TypeInfo;
         TypeInfo::Type cppValue;
-                cppValue = value.boolValue;
+          cppValue = value.boolValue;
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });

@@ -37,8 +37,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
-                                         utc_time_in_matter_epoch)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
 
 
