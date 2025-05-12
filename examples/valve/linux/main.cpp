@@ -29,10 +29,10 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 namespace {
-class PrintOnlyDelegate : public NonLevelControlDelegate
+class NonLevelPrintOnlyDelegate : public NonLevelControlDelegate
 {
 public:
-    PrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    NonLevelPrintOnlyDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
     CHIP_ERROR HandleOpenValve(ValveStateEnum & currentState, BitMask<ValveFaultBitmap> & valveFault) override
     {
         ChipLogError(NotSpecified, "\n\nVALVE IS OPENING on endpoint %u!!!!!\n\n", mEndpoint);
@@ -51,6 +51,33 @@ public:
 
 private:
     ValveStateEnum state = ValveStateEnum::kClosed;
+    EndpointId mEndpoint;
+};
+
+class LevelPrintOnlyDelegate : public LevelControlDelegate
+{
+public:
+    LevelPrintOnlyDelegate(EndpointId endpoint) : mLevel(0), mEndpoint(endpoint){}
+
+    Percent GetCurrentValveLevel() { return mLevel; }
+    CHIP_ERROR HandleOpenValve(const Percent targetLevel, Percent & currentLevel,
+                                       BitMask<ValveFaultBitmap> & valveFault)
+    {
+        ChipLogError(NotSpecified, "\n\nVALVE IS OPENING on endpoint %u!!!!!\n\n", mEndpoint);
+        mLevel = targetLevel;
+        currentLevel = targetLevel;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR HandleCloseValve(Percent & currentLevel, BitMask<ValveFaultBitmap> & valveFault)
+    {
+        ChipLogError(NotSpecified, "\n\nVALVE IS CLOSING on endpoint %u!!!!!\n\n", mEndpoint);
+        mLevel = 0;
+        currentLevel = 0;
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    Percent mLevel;
     EndpointId mEndpoint;
 };
 
@@ -82,17 +109,42 @@ private:
                                                 .levelStep    = 1 };
     EndpointId mEndpoint;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    NonLevelPrintOnlyDelegate mDelegate;
+    ClusterLogic mLogic;
+    Interface mInterface;
+};
+
+class LevelValveEndpoint
+{
+    public:
+    LevelValveEndpoint(EndpointId endpoint) :
+        mEndpoint(endpoint), mContext(mEndpoint, sStorage), mDelegate(mEndpoint), mLogic(mDelegate, mContext),
+        mInterface(mEndpoint, mLogic)
+    {}
+    CHIP_ERROR Init()
+    {
+        ReturnErrorOnFailure(mLogic.Init(kConformance, kInitParams));
+        ReturnErrorOnFailure(mInterface.Init());
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    const ClusterConformance kConformance = {
+        .featureMap = 2, .supportsDefaultOpenLevel = false, .supportsValveFault = false, .supportsLevelStep = false
+    };
+    const ClusterInitParameters kInitParams = { .currentState = DataModel::MakeNullable(ValveStateEnum::kClosed),
+                                                .currentLevel = DataModel::MakeNullable(Percent(0)),
+                                                .valveFault   = 0,
+                                                .levelStep    = 1 };
+    EndpointId mEndpoint;
+    MatterContext mContext;
+    LevelPrintOnlyDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };
 
 NonLevelValveEndpoint ep1(1);
-NonLevelValveEndpoint ep2(2);
-NonLevelValveEndpoint ep3(3);
-NonLevelValveEndpoint ep4(4);
-NonLevelValveEndpoint ep5(5);
-NonLevelValveEndpoint ep6(6);
+LevelValveEndpoint ep2(2);
 
 // from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Common-Position.adoc
 constexpr const uint8_t kNamespaceCommonPosition    = 0x8;
@@ -108,26 +160,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
       .tag         = kNamespaceCommonPositionRow,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("2"_span)) },
 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
-    { .namespaceID = kNamespaceCommonPosition,
-      .tag         = kNamespaceCommonPositionRow,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("3"_span)) },
-};
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = {
-    { .namespaceID = kNamespaceCommonPosition,
-      .tag         = kNamespaceCommonPositionRow,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("4"_span)) },
-};
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp5TagList[] = {
-    { .namespaceID = kNamespaceCommonPosition,
-      .tag         = kNamespaceCommonPositionRow,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("5"_span)) },
-};
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp6TagList[] = {
-    { .namespaceID = kNamespaceCommonPosition,
-      .tag         = kNamespaceCommonPositionRow,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("6"_span)) },
-};
 } // namespace
 
 void ApplicationInit()
@@ -138,17 +170,9 @@ void ApplicationInit()
 
     ep1.Init();
     ep2.Init();
-    ep3.Init();
-    ep4.Init();
-    ep5.Init();
-    ep6.Init();
     // TODO: Can we pull these from the command line or something so these can be swapped on the fly?
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
-    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
-    SetTagList(/* endpoint= */ 4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
-    SetTagList(/* endpoint= */ 5, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp5TagList));
-    SetTagList(/* endpoint= */ 6, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp6TagList));
 }
 
 void ApplicationShutdown()
