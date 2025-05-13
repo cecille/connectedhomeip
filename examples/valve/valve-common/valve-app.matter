@@ -1889,7 +1889,7 @@ endpoint 3 {
     ram      attribute fanModeSequence default = 2;
     ram      attribute percentSetting default = 0;
     ram      attribute percentCurrent default = 0;
-    ram      attribute speedMax;
+    ram      attribute speedMax default = 10;
     ram      attribute speedSetting default = 0;
     ram      attribute speedCurrent;
     ram      attribute rockSupport default = 0x07;

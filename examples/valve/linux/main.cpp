@@ -29,6 +29,17 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
+
+// The MatterPostAttributeChangeCallback is offloaded to the main Air Purifier Manager class.
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    if (AirPurifierManager::GetInstance() != nullptr)
+    {
+        AirPurifierManager::GetInstance()->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                                       attributePath.mAttributeId, type, size, value);
+    }
+}
 namespace {
 class NonLevelPrintOnlyDelegate : public NonLevelControlDelegate
 {
