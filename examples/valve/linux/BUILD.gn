@@ -30,6 +30,9 @@ config("includes") {
 
 executable("valve-app") {
   sources = [
+    "../valve-common/DeviceManager.h",
+    "../valve-common/air-purifier-manager.cpp",
+    "../valve-common/air-purifier-manager.h",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -42,7 +45,10 @@ executable("valve-app") {
 
   cflags = [ "-Wconversion" ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/valve/valve-common",
+  ]
   output_dir = root_out_dir
 }
 

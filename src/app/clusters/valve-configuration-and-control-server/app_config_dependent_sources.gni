@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "valve-configuration-and-control-cluster-logic.cpp",
+  "valve-configuration-and-control-cluster-logic.h",
   "valve-configuration-and-control-delegate.h",
-  "valve-configuration-and-control-server.cpp",
-  "valve-configuration-and-control-server.h",
+  "valve-configuration-and-control-matter-context.cpp",
+  "valve-configuration-and-control-matter-context.h",
+  "valve-configuration-and-control-server-disco.cpp",
+  "valve-configuration-and-control-server-disco.h",
 ]

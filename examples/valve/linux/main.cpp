@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <air-purifier-manager.h>
 #include <AppMain.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h>
@@ -173,6 +174,8 @@ void ApplicationInit()
     // TODO: Can we pull these from the command line or something so these can be swapped on the fly?
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+
+    AirPurifierManager::InitInstance(EndpointId(3));
 }
 
 void ApplicationShutdown()

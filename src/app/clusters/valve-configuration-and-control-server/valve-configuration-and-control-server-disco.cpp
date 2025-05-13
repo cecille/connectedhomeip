@@ -216,3 +216,8 @@ CHIP_ERROR Interface::Init()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+void MatterValveConfigurationAndControlPluginServerInitCallback()
+{
+    // AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}

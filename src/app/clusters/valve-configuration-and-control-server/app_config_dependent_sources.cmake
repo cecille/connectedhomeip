@@ -16,7 +16,11 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster-logic.cpp"
+    "${CLUSTER_DIR}/valve-configuration-and-control-cluster-logic.h"
     "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.cpp"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.h"
+    "${CLUSTER_DIR}/valve-configuration-and-control-matter-context.cpp"
+    "${CLUSTER_DIR}/valve-configuration-and-control-matter-context.h"
+    "${CLUSTER_DIR}/valve-configuration-and-control-server-disco.cpp"
+    "${CLUSTER_DIR}/valve-configuration-and-control-server-disco.h"
 )
