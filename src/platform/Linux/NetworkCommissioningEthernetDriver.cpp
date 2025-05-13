@@ -19,6 +19,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
+#include <inet/InetInterface.h>
 
 #include <limits>
 #include <string>
@@ -36,6 +37,18 @@ NetworkIterator * LinuxEthernetDriver::GetNetworks()
     ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
     ret->interfaceNameLen = static_cast<uint8_t>(strnlen(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName)));
     return ret;
+}
+
+CHIP_ERROR LinuxEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
+{
+    ChipLogError(NotSpecified, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    // This is on the stack, but that's OK because this gets copied out in the callback
+    char name[Inet::InterfaceId::kMaxIfNameLength] = {0};
+    ConnectivityUtils::GetEthInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
+    ByteSpan span(reinterpret_cast<unsigned char*>(name), strnlen(name, Inet::InterfaceId::kMaxIfNameLength));
+    networkStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(span), NullOptional);
+    return CHIP_NO_ERROR;
+
 }
 
 } // namespace NetworkCommissioning

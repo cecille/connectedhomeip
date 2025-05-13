@@ -234,6 +234,7 @@ public:
 
     uint8_t GetMaxNetworks() override { return 1; };
     NetworkIterator * GetNetworks() override;
+    virtual CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
 };
 
 } // namespace NetworkCommissioning

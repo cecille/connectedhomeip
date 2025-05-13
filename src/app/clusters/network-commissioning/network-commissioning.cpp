@@ -362,13 +362,14 @@ Instance::Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) :
 
 CHIP_ERROR Instance::Init()
 {
+    mLastNetworkingStatusValue.SetNull();
+    mLastConnectErrorValue.SetNull();
+    mLastNetworkIDLen = 0;
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
-    mLastNetworkingStatusValue.SetNull();
-    mLastConnectErrorValue.SetNull();
-    mLastNetworkIDLen = 0;
+
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (!sInstances.Contains(this))
     {
