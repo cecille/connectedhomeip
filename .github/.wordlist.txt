@@ -270,6 +270,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
 Commandline
 CommandHandlerInterface
@@ -318,6 +319,7 @@ CPROTO
 cpuapp
 cpython
 CQM
+CRL
 crypto
 cryptographic
 CSA
@@ -368,6 +370,7 @@ decrypt
 decrypted
 DEDEDEDE
 deepnote
+deepwiki
 DefaultOTAProviders
 DefaultOTARequestor
 DefaultOTARequestorDriver
@@ -754,10 +757,12 @@ itsfoss
 IW
 JDK
 jinja
+JCM
 JLink
 JLinkExe
 JLinkRTTClient
 JN
+jf
 jni
 jpg
 jre
@@ -1171,6 +1176,7 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
 PYTHONPATH
@@ -1201,6 +1207,7 @@ READMEs
 readonly
 readthedocs
 Reag
+Realtek
 rebase
 recommand
 recommanded
@@ -1292,6 +1299,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno

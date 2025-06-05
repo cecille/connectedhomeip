@@ -29,6 +29,10 @@
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
+#if !(SL_MATTER_GN_BUILD || defined(SL_PROVISION_GENERATOR))
+#include <sl_matter_provision_config.h>
+#endif
+
 using namespace chip::Credentials;
 
 #if SLI_SI91X_MCU_INTERFACE
@@ -660,7 +664,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 #endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE)
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
     uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
     MutableByteSpan private_key(key_buffer);
     AttestationKey::Unwrap(temp, size, private_key);
@@ -669,7 +673,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     AttestationKey key;
     ReturnErrorOnFailure(key.Import(temp, size));
     return key.SignMessage(message, signature);
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 //

@@ -17,19 +17,21 @@ RUN set -x \
     && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
-# Setup Zephyr
-ARG ZEPHYR_REVISION=ce4027fc0768b8509758af2e43f74e3fd2c7d58d
+# Setup Zephyr version: 3.7.0; branch: develop
+ARG ZEPHYR_REVISION=9a6804cde48f744fa33ce782d2f50453abc9a767
+ARG N22_BIN_REVISION=05f9bcecde9df997a7d735ea119bb9a8212b8a8f
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
-    && git clone https://github.com/telink-semi/zephyr \
+    && git init zephyr \
     && cd zephyr \
+    && git remote add origin https://github.com/telink-semi/zephyr \
+    && git fetch --depth=1 origin ${ZEPHYR_REVISION} \
     && git reset ${ZEPHYR_REVISION} --hard \
     && west init -l \
-    && cd .. \
     && west update -o=--depth=1 -n -f smart \
     && west blobs fetch hal_telink \
-    && west zephyr-export \
+    && scripts/utils/telink_w91_post_build $PWD ${N22_BIN_REVISION} 1 \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

@@ -126,6 +126,17 @@ void ReliableMessageMgr::NotifyMessageSendAnalytics(const RetransTableEntry & en
                                                                   ReliableMessageAnalyticsDelegate::SessionType::kEstablishedCase,
                                                               .eventType      = eventType,
                                                               .messageCounter = messageCounter };
+
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kRetransmission)
+    {
+        event.retransmissionCount = entry.sendCount;
+    }
+    if (eventType == ReliableMessageAnalyticsDelegate::EventType::kAcknowledged)
+    {
+        auto now           = System::SystemClock().GetMonotonicTimestamp();
+        event.ackLatencyMs = now - entry.initialSentTime;
+    }
+
     mAnalyticsDelegate->OnTransmitEvent(event);
 }
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
@@ -215,7 +226,6 @@ void ReliableMessageMgr::ExecuteActions()
                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
-        CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -320,6 +330,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     CalculateNextRetransTime(*entry);
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+    entry->initialSentTime = System::SystemClock().GetMonotonicTimestamp();
     NotifyMessageSendAnalytics(*entry, entry->ec->GetSessionHandle(), ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
     StartTimer();
@@ -372,6 +383,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+        CalculateNextRetransTime(*entry);
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER

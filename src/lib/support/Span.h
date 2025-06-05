@@ -203,10 +203,12 @@ private:
     pointer mDataBuf;
     size_t mDataLen;
 };
+template <class T>
+Span(T * data, size_t size) -> Span<T>;
 
 inline namespace literals {
 
-inline constexpr Span<const char> operator"" _span(const char * literal, size_t size)
+inline constexpr Span<const char> operator""_span(const char * literal, size_t size)
 {
     return Span<const char>(Unchecked, literal, size);
 }
