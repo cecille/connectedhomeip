@@ -16,6 +16,7 @@
 #
 import glob
 import json
+import math
 import os
 import typing
 import xml.etree.ElementTree as ET
@@ -35,6 +36,14 @@ def generated_cmd_pics_str(pics_base: str, id: int) -> str:
 
 def feature_pics_str(pics_base: str, bit: int) -> str:
     return f'{pics_base}.S.F{bit:02x}'
+
+
+def feature_pics_str_from_mask(pics_base: str, mask: int) -> str:
+    return feature_pics_str(pics_base, int(math.log(mask, 2)))
+
+
+def event_pics_str(pics_base: str, id: int) -> str:
+    return f'{pics_base}.S.E{id:02x}'
 
 
 def server_pics_str(pics_base: str) -> str:

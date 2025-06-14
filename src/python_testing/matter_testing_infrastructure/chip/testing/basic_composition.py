@@ -237,6 +237,7 @@ class BasicCompositionTests:
         try:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
+            return PrebuiltDataModelDirectory.k1_3
             asserts.fail(
                 "Specification Version not found on device - ensure device bas a basic information cluster on EP0 supporting Specification Version")
         try:
