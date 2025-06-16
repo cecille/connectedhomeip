@@ -16183,6 +16183,78 @@ public:
                                      completion:completion];
 }
 
+- (void)readAttributeRecoveryIdentifierWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = GeneralCommissioning::Attributes::RecoveryIdentifier::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeRecoveryIdentifierWithParams:(MTRSubscribeParams * _Nonnull)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = GeneralCommissioning::Attributes::RecoveryIdentifier::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeRecoveryIdentifierWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = GeneralCommissioning::Attributes::RecoveryIdentifier::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeNetworkRecoveryReasonWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeNetworkRecoveryReasonWithParams:(MTRSubscribeParams * _Nonnull)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeNetworkRecoveryReasonWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = GeneralCommissioning::Attributes::GeneratedCommandList::TypeInfo;
@@ -98728,10 +98800,58 @@ public:
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
-
-- (void)readAttributeSupportedZoneSourcesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)createOrUpdateTriggerWithParams:(MTRZoneManagementClusterCreateOrUpdateTriggerParams *)params completion:(MTRStatusCompletion)completion
 {
-    using TypeInfo = ZoneManagement::Attributes::SupportedZoneSources::TypeInfo;
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterCreateOrUpdateTriggerParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::CreateOrUpdateTrigger::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)removeTriggerWithParams:(MTRZoneManagementClusterRemoveTriggerParams *)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterRemoveTriggerParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::RemoveTrigger::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeMaxUserDefinedZonesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::MaxUserDefinedZones::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -98740,11 +98860,11 @@ public:
                                         completion:completion];
 }
 
-- (void)subscribeAttributeSupportedZoneSourcesWithParams:(MTRSubscribeParams * _Nonnull)params
-                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeMaxUserDefinedZonesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = ZoneManagement::Attributes::SupportedZoneSources::TypeInfo;
+    using TypeInfo = ZoneManagement::Attributes::MaxUserDefinedZones::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -98754,9 +98874,45 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeSupportedZoneSourcesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeMaxUserDefinedZonesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = ZoneManagement::Attributes::SupportedZoneSources::TypeInfo;
+    using TypeInfo = ZoneManagement::Attributes::MaxUserDefinedZones::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeMaxZonesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::MaxZones::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeMaxZonesWithParams:(MTRSubscribeParams * _Nonnull)params
+                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ZoneManagement::Attributes::MaxZones::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeMaxZonesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::MaxZones::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -98812,63 +98968,6 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeTriggersWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
-{
-    [self writeAttributeTriggersWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
-}
-- (void)writeAttributeTriggersWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
-{
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = ZoneManagement::Attributes::Triggers::TypeInfo;
-        TypeInfo::Type cppValue;
-          {
-            using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (value.count != 0) {
-              auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-              if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-              }
-              listFreer.add(listHolder_0);
-              for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                auto element_0 = MTR_SAFE_CAST(value[i_0], MTRZoneManagementClusterZoneTriggerControlStruct);
-                if (!element_0) {
-                  // Wrong kind of value.
-                  MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRZoneManagementClusterZoneTriggerControlStruct.class));
-                  return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                     listHolder_0->mList[i_0].initialDuration = element_0.initialDuration.unsignedShortValue;
-     listHolder_0->mList[i_0].augmentationDuration = element_0.augmentationDuration.unsignedShortValue;
-     listHolder_0->mList[i_0].maxDuration = element_0.maxDuration.unsignedIntValue;
-     listHolder_0->mList[i_0].blindDuration = element_0.blindDuration.unsignedShortValue;
-     if (element_0.sensitivity != nil) {
-       auto & definedValue_2 = listHolder_0->mList[i_0].sensitivity.Emplace();
-         definedValue_2 = element_0.sensitivity.unsignedCharValue;
-  }
-      }
-              cppValue = ListType_0(listHolder_0->mList, value.count);
-            } else {
-              cppValue = ListType_0();
-            }
-          }
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
-}
-
 - (void)subscribeAttributeTriggersWithParams:(MTRSubscribeParams * _Nonnull)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -98886,6 +98985,42 @@ public:
 + (void)readAttributeTriggersWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = ZoneManagement::Attributes::Triggers::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeSensitivityMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::SensitivityMax::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeSensitivityMaxWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ZoneManagement::Attributes::SensitivityMax::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeSensitivityMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::SensitivityMax::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -98950,6 +99085,42 @@ public:
 + (void)readAttributeSensitivityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = ZoneManagement::Attributes::Sensitivity::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeTwoDCartesianMaxWithCompletion:(void (^)(MTRZoneManagementClusterTwoDCartesianVertexStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::TwoDCartesianMax::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeTwoDCartesianMaxWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(MTRZoneManagementClusterTwoDCartesianVertexStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ZoneManagement::Attributes::TwoDCartesianMax::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeTwoDCartesianMaxWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRZoneManagementClusterTwoDCartesianVertexStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ZoneManagement::Attributes::TwoDCartesianMax::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -100059,9 +100230,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeRankedVideoStreamPrioritiesListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeStreamUsagePrioritiesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+    using TypeInfo = CameraAvStreamManagement::Attributes::StreamUsagePriorities::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -100070,11 +100241,11 @@ public:
                                         completion:completion];
 }
 
-- (void)subscribeAttributeRankedVideoStreamPrioritiesListWithParams:(MTRSubscribeParams * _Nonnull)params
-                                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeStreamUsagePrioritiesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+    using TypeInfo = CameraAvStreamManagement::Attributes::StreamUsagePriorities::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -100084,9 +100255,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeRankedVideoStreamPrioritiesListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeStreamUsagePrioritiesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+    using TypeInfo = CameraAvStreamManagement::Attributes::StreamUsagePriorities::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -100387,7 +100558,7 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeViewportWithCompletion:(void (^)(MTRCameraAVStreamManagementClusterViewportStruct * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeViewportWithCompletion:(void (^)(MTRDataTypeViewportStruct * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = CameraAvStreamManagement::Attributes::Viewport::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
@@ -100398,11 +100569,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeViewportWithValue:(MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeViewportWithValue:(MTRDataTypeViewportStruct * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeViewportWithValue:(MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull) value params:nil completion:completion];
+    [self writeAttributeViewportWithValue:(MTRDataTypeViewportStruct * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeViewportWithValue:(MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeViewportWithValue:(MTRDataTypeViewportStruct * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -100431,7 +100602,7 @@ public:
 
 - (void)subscribeAttributeViewportWithParams:(MTRSubscribeParams * _Nonnull)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                               reportHandler:(void (^)(MTRCameraAVStreamManagementClusterViewportStruct * _Nullable value, NSError * _Nullable error))reportHandler
+                               reportHandler:(void (^)(MTRDataTypeViewportStruct * _Nullable value, NSError * _Nullable error))reportHandler
 {
     using TypeInfo = CameraAvStreamManagement::Attributes::Viewport::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
@@ -100443,7 +100614,7 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeViewportWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRCameraAVStreamManagementClusterViewportStruct * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeViewportWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeViewportStruct * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = CameraAvStreamManagement::Attributes::Viewport::TypeInfo;
     [clusterStateCacheContainer
@@ -101835,9 +102006,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeDPTZRelativeMoveWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeDPTZStreamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -101846,11 +102017,11 @@ public:
                                         completion:completion];
 }
 
-- (void)subscribeAttributeDPTZRelativeMoveWithParams:(MTRSubscribeParams * _Nonnull)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeDPTZStreamsWithParams:(MTRSubscribeParams * _Nonnull)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -101860,9 +102031,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeDPTZRelativeMoveWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeDPTZStreamsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::TypeInfo;
+    using TypeInfo = CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -103078,13 +103249,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeCurrentConnectionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeCurrentConnectionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = PushAvStreamTransport::Attributes::CurrentConnections::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
+                                            params:params
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105778,13 +105949,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeGroupListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeGroupListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::GroupList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105814,13 +105985,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeNodeListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeNodeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::NodeList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105850,13 +106021,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeAdminListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeAdminListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::AdminList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105886,20 +106057,20 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeStatusWithCompletion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::Status::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
 
 - (void)subscribeAttributeStatusWithParams:(MTRSubscribeParams * _Nonnull)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))reportHandler
+                             reportHandler:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))reportHandler
 {
     using TypeInfo = JointFabricDatastore::Attributes::Status::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
@@ -105911,7 +106082,7 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeStatusWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusStruct * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeStatusWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRJointFabricDatastoreClusterDatastoreStatusEntryStruct * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::Status::TypeInfo;
     [clusterStateCacheContainer
@@ -105922,13 +106093,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeEndpointGroupIDListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeEndpointGroupIDListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::EndpointGroupIDList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105958,13 +106129,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeEndpointBindingListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeEndpointBindingListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::EndpointBindingList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -105994,13 +106165,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeNodeKeySetListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeNodeKeySetListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::NodeKeySetList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -106030,13 +106201,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeNodeACLListWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeNodeACLListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = JointFabricDatastore::Attributes::NodeACLList::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
+                                            params:nil
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -106916,13 +107087,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeProvisionedRootCertificatesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeProvisionedRootCertificatesWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = TlsCertificateManagement::Attributes::ProvisionedRootCertificates::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
+                                            params:params
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -106988,13 +107159,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeProvisionedClientCertificatesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeProvisionedClientCertificatesWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = TlsCertificateManagement::Attributes::ProvisionedClientCertificates::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
+                                            params:params
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -107317,13 +107488,13 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeProvisionedEndpointsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeProvisionedEndpointsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = TlsClientManagement::Attributes::ProvisionedEndpoints::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
+                                            params:params
                                              queue:self.callbackQueue
                                         completion:completion];
 }
@@ -108845,6 +109016,37 @@ public:
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
                                      responseClass:MTRUnitTestingClusterGlobalEchoResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+- (void)testCheckCommandFlagsWithCompletion:(MTRStatusCompletion)completion
+{
+    [self testCheckCommandFlagsWithParams:nil completion:completion];
+}
+- (void)testCheckCommandFlagsWithParams:(MTRUnitTestingClusterTestCheckCommandFlagsParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestCheckCommandFlagsParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = UnitTesting::Commands::TestCheckCommandFlags::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

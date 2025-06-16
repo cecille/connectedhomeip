@@ -31,6 +31,12 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
+    return CHIP_NO_ERROR;
+}
+
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
@@ -50,6 +56,10 @@ CHIP_ERROR LinuxEthernetDriver::Init(NetworkStatusChangeCallback * networkStatus
     ByteSpan span(reinterpret_cast<unsigned char *>(name), strnlen(name, Inet::InterfaceId::kMaxIfNameLength));
     networkStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(span), NullOptional);
     return CHIP_NO_ERROR;
+}
+void LinuxEthernetDriver::Shutdown()
+{
+    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
 } // namespace NetworkCommissioning
