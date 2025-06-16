@@ -50,6 +50,7 @@ executable("valve-app") {
     "${chip_root}/examples/valve/valve-common",
   ]
   output_dir = root_out_dir
+  libs = [ "pigpiod_if2" ]
 }
 
 group("linux") {

@@ -31,12 +31,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
-{
-    ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
-    return CHIP_NO_ERROR;
-}
-
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
@@ -46,7 +40,7 @@ NetworkIterator * LinuxEthernetDriver::GetNetworks()
     return ret;
 }
 
-CHIP_ERROR LinuxEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     ChipLogError(NotSpecified, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     // This is on the stack, but that's OK because this gets copied out in the callback

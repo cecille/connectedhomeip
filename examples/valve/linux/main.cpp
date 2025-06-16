@@ -173,7 +173,30 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
       .tag         = kNamespaceCommonPositionRow,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("2"_span)) },
 };
+
+int sPigpio = -1;
 } // namespace
+
+void ShutdownGpio(){
+    if (sPigpio != -1) {
+	    pigpio_stop(sPigpio);
+	    sPigpio = -1;
+    }
+}
+
+bool SetupGpio(int num, unsigned mode) {
+    if (set_mode(sPigpio, num, mode) != 0) {
+	    ChipLogError(NotSpecified, "Error setting gpio mode %d", num);
+	    ShutdownGpio();
+	    return false;
+    }
+    if (set_pull_up_down(sPigpio, num, PI_PUD_UP) != 0) {
+	    ChipLogError(NotSpecified, "Error setting PUD %d", num);
+	    ShutdownGpio();
+	    return false;
+    }
+    return true;
+}
 
 void ApplicationInit()
 {
@@ -188,6 +211,24 @@ void ApplicationInit()
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
 
     AirPurifierManager::InitInstance(EndpointId(3));
+
+    sPigpio = pigpio_start(nullptr, nullptr);
+    if (sPigpio < 0) {
+	    ChipLogError(NotSpecified, "Unable to start PI GPIO handler");
+	    return;
+    }
+    if (!SetupGpio(20, PI_OUTPUT)) {
+	    return;
+    }
+    if (!SetupGpio(26, PI_OUTPUT)) {
+	    return;
+    }
+    if (!SetupGpio(13, PI_INPUT)) {
+	    return;
+    }
+    if (!SetupGpio(12, PI_INPUT)) {
+	    return;
+    }
 }
 
 void ApplicationShutdown()
