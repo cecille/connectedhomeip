@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <air-purifier-manager.h>
+#include <pigpiod_if2.h>
 #include <AppMain.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h>
