@@ -330,7 +330,7 @@ def dump_ids_from_prebuilt_dirs():
         device_types, _ = build_xml_device_types(dir)
 
         def cluster_support_str(c):
-            return "P" if c.is_provisional else "C"
+            return f"P ({c.revision})" if c.is_provisional else f"C ({c.revision})"
 
         version_clusters[dir] = {id: cluster_support_str(c) for id, c in clusters.items()}
         # Device types don't currently have provisional markings in the spec
@@ -344,8 +344,8 @@ def dump_ids_from_prebuilt_dirs():
             provisional = [clusters[c].name for c in dt_mandatory if clusters[c].is_provisional]
             if provisional:
                 print(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir.dirname}")
-                return "P"
-            return "C"
+                return f"P ({d.revision})"
+            return f"C ({d.revision})"
 
         version_device_types[dir] = {id: device_type_support_str(d) for id, d in device_types.items()}
 
