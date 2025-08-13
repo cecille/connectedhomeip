@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-app_data_model = "${chip_root}/examples/valve/valve-common:valve-common"
+app_data_model = "${chip_root}/examples/thread_led/thread-led-common:thread-led-common"
 chip_enable_ota_requestor = false
 chip_enable_openthread = true
 

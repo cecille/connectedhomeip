@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("valve-common") {
-  zap_file = "valve-app.zap"
+chip_data_model("thread-led-common") {
+  zap_file = "thread-led.zap"
   is_server = true
 }

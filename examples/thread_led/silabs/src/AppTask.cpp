@@ -36,7 +36,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include "DrinksMachineDeviceDriver.h"
+#include "ThreadLedDeviceDriver.h"
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster-logic.h>
@@ -69,7 +69,7 @@ DeviceAttestationCredentialsProvider * GetExampleDACProvider()
 } // namespace chip
 
 namespace {
-DrinksMachineSilabsDriver driver;
+ThreadLedSilabsDriver driver;
 class GPIODelegate : public NonLevelControlDelegate
 {
 public:
@@ -180,15 +180,13 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init()
 {
-    // DrinksMachineSilabsDriver::GetInstance().Init();
-
     CHIP_ERROR err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
-    google::matter::DrinkMachineMatterProviders::GetInstance().Init();
+    google::matter::ThreadLedMatterProviders::GetInstance().Init();
 
     return err;
 }

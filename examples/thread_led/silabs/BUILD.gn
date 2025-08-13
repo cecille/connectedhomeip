@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-silabs_project_dir = "${chip_root}/examples/valve/silabs"
+silabs_project_dir = "${chip_root}/examples/thread_led/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
@@ -125,8 +125,8 @@ if (wifi_soc) {
     }
   }
 }
-silabs_executable("drink-machine") {
-  output_name = "drink-machine.out"
+silabs_executable("thread-badge") {
+  output_name = "thread-badge.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -136,10 +136,10 @@ silabs_executable("drink-machine") {
 
   sources = [
     "${examples_common_plat_dir}/main.cpp",
-    "include/DrinkMachineCommon.h",
-    "include/DrinksMachineDeviceDriver.h",
+    "include/ThreadLedCommon.h",
+    "include/ThreadLedDeviceDriver.h",
     "src/AppTask.cpp",
-    "src/DrinksMachineDeviceDriver.cpp",
+    "src/ThreadLedDeviceDriver.cpp",
     "src/ZclCallbacks.cpp",
     "src/dm_dac.cpp",
     "src/dm_pai.cpp",
@@ -230,7 +230,7 @@ silabs_executable("drink-machine") {
 }
 
 group("silabs") {
-  deps = [ ":drink-machine" ]
+  deps = [ ":thread-badge" ]
 }
 
 group("default") {

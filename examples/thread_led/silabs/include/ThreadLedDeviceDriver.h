@@ -8,18 +8,18 @@
 namespace google {
 namespace matter {
 
-class DrinksMachineSilabsDriver
+class ThreadLedSilabsDriver
 {
 public:
-    DrinksMachineSilabsDriver() {}
+    ThreadLedSilabsDriver() {}
 
     void Init();
 
     void SetPumpEnabled(uint8_t pump, bool enabled);
 
-    static DrinksMachineSilabsDriver & GetInstance()
+    static ThreadLedSilabsDriver & GetInstance()
     {
-        static DrinksMachineSilabsDriver sInstance;
+        static ThreadLedSilabsDriver sInstance;
         return sInstance;
     }
 };

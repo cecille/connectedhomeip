@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Google, all rights reserved
+# Copyright (c) 2025 Google, all rights reserved
 #
 
 import("//build_overrides/chip.gni")
@@ -11,4 +11,4 @@ import("${chip_root}/src/platform/silabs/wifi_args.gni")
 chip_enable_read_client = false
 
 chip_enable_ota_requestor = false
-app_data_model = "${chip_root}/examples/valve/valve-common:valve-common"
+app_data_model = "${chip_root}/examples/thread_led/thread-led-common:thread-led-common"

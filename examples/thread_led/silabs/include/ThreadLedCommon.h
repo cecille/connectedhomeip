@@ -1,4 +1,4 @@
-// Copyright 2024 Google. All rights reserved.
+// Copyright 2025 Google. All rights reserved.
 #pragma once
 
 #include <memory>
@@ -22,8 +22,8 @@
 namespace google {
 namespace matter {
 
-class DrinkMachineInfoProvider : public chip::DeviceLayer::DeviceInstanceInfoProvider,
-                                 public chip::DeviceLayer::CommissionableDataProvider
+class ThreadLedInfoProvider : public chip::DeviceLayer::DeviceInstanceInfoProvider,
+                              public chip::DeviceLayer::CommissionableDataProvider
 {
 public:
     // =============== DeviceInstanceInfoProvider interface =============
@@ -41,7 +41,7 @@ public:
 
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override
     {
-        chip::Platform::CopyString(buf, bufSize, "Disco Drink Machine");
+        chip::Platform::CopyString(buf, bufSize, "Thread badge");
         return CHIP_NO_ERROR;
     }
 
@@ -64,7 +64,7 @@ public:
 
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override
     {
-        chip::Platform::CopyString(buf, bufSize, "DiscoDrinkMachine");
+        chip::Platform::CopyString(buf, bufSize, "ThreadBadge");
         return CHIP_NO_ERROR;
     }
 
@@ -147,7 +147,7 @@ private:
     uint16_t mDiscriminator                                                             = 2233;
 };
 
-class DrinkMachineCredentialsProvider : public chip::Credentials::DeviceAttestationCredentialsProvider
+class ThreadLedCredentialsProvider : public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(chip::MutableByteSpan & out_cd_buffer) override
@@ -218,14 +218,14 @@ private:
     }
 };
 
-class DrinkMachineMatterProviders
+class ThreadLedMatterProviders
 {
 public:
-    DrinkMachineMatterProviders() {}
-    ~DrinkMachineMatterProviders() {}
+    ThreadLedMatterProviders() {}
+    ~ThreadLedMatterProviders() {}
 
-    DrinkMachineMatterProviders(const DrinkMachineMatterProviders &)             = delete;
-    DrinkMachineMatterProviders & operator=(const DrinkMachineMatterProviders &) = delete;
+    ThreadLedMatterProviders(const ThreadLedMatterProviders &)             = delete;
+    ThreadLedMatterProviders & operator=(const ThreadLedMatterProviders &) = delete;
 
     void Init()
     {
@@ -233,15 +233,15 @@ public:
         mInfo.Register();
     }
 
-    static DrinkMachineMatterProviders & GetInstance()
+    static ThreadLedMatterProviders & GetInstance()
     {
-        static DrinkMachineMatterProviders instance;
+        static ThreadLedMatterProviders instance;
         return instance;
     }
 
 private:
-    DrinkMachineCredentialsProvider mCreds;
-    DrinkMachineInfoProvider mInfo;
+    ThreadLedCredentialsProvider mCreds;
+    ThreadLedInfoProvider mInfo;
 };
 
 } // namespace matter

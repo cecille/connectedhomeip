@@ -5,7 +5,7 @@
 #include <cmsis_os2.h>
 #include <stdint.h>
 
-#include "DrinksMachineDeviceDriver.h"
+#include "ThreadLedDeviceDriver.h"
 
 #include "gpiointerrupt.h"
 
@@ -64,7 +64,7 @@ const size_t kNumPumps = sizeof(gPumpMappings) / sizeof(PortAndPin);
 
 // Singleton instance.
 
-void DrinksMachineSilabsDriver::Init()
+void ThreadLedSilabsDriver::Init()
 {
     /* Enable GPIO in CMU */
     CMU_ClockEnable(cmuClock_GPIO, true);
@@ -78,7 +78,7 @@ void DrinksMachineSilabsDriver::Init()
     }
 }
 
-void DrinksMachineSilabsDriver::SetPumpEnabled(uint8_t pump, bool enabled)
+void ThreadLedSilabsDriver::SetPumpEnabled(uint8_t pump, bool enabled)
 {
     if (pump >= kNumPumps)
     {
