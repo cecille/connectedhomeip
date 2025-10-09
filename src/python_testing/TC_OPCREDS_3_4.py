@@ -314,18 +314,22 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.step(28)
-        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
+        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
+        self.th2 = new_fabric_admin.NewController(nodeId=2, paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+
+        await self.th2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
 
         self.step(29)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
-        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+        resp = await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=cmd)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Error code status returned from arm failsafe")
 
         self.step(30)
         cmd = opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
         try:
-            await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
+            await self.send_single_cmd(dev_ctrl=self.th2, node_id=self.dut_node_id, cmd=cmd)
             asserts.fail("Unexpected error sending CSRRequest command")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Failure status returned from CSRRequest")
