@@ -338,6 +338,12 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
+        # This should fail, but NOPE!!!
+        res = await self.read_single_attribute_check_success(dev_ctrl=self.th2, node_id=self.dut_node_id, cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, fabric_filtered=True)
+        print("-------------------------------------")
+        print(f'returned vid: {res} - we should not have this and yet here we are')
+        print("-------------------------------------")
+
         self.step(32)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
