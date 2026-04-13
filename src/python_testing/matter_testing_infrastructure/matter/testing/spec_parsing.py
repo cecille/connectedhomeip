@@ -403,7 +403,8 @@ class ClusterParser:
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
         element, problem = get_conformance(element, self._cluster_id)
-        if problem:
+        if problem and self._derived is None:
+            # Don't report conformance problems on derived clusters, these fall back to the parent
             self._problems.append(problem)
         return element
 
@@ -846,7 +847,10 @@ class ClusterParser:
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
 
-            _, _, privilege = self.parse_access(element, access_xml, conformance)
+            if command_type == CommandType.ACCEPTED:
+                _, _, privilege = self.parse_access(element, access_xml, conformance)
+            else:
+                privilege = ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                               privilege=get_access_privilege_or_unknown(privilege))
         return commands
@@ -915,7 +919,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
 
             parser = ClusterParser(c, cluster_id, name)
             new = parser.create_cluster()
-            problems = problems + parser.get_problems()
+            problems.extend(parser.get_problems())
 
             if cluster_id:
                 clusters[cluster_id] = new

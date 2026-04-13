@@ -47,13 +47,15 @@ PROVISIONAL_CONFORM = 'provisionalConform'
 MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
+DESCRIBED_CONFORM = 'describedConform'
 TOP_LEVEL_CONFORMANCE_TAGS = {OTHERWISE_CONFORM, OPTIONAL_CONFORM,
-                              PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM}
+                              PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM, DESCRIBED_CONFORM}
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
 GREATER_TERM = 'greaterTerm'
 GREATER_EQUAL_TERM = 'greaterOrEqualTerm'
+EQUAL_TERM = 'equalTerm'
 FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
@@ -61,6 +63,8 @@ CONDITION_TAG = 'condition'
 LITERAL_TAG = 'literal'
 REVISION_TAG = 'revision'
 ZIGBEE_CONDITION = 'zigbee'
+FIELD_TAG = 'field'
+ENUM_TAG = 'enum'
 
 
 class ConformanceException(Exception):
@@ -276,7 +280,8 @@ BASIC_CONFORMANCE: dict[str, Conformance] = {
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
     DEPRECATE_CONFORM: deprecated(),
-    DISALLOW_CONFORM: disallowed()
+    DISALLOW_CONFORM: disallowed(),
+    DESCRIBED_CONFORM: optional(),
 }
 
 
@@ -496,6 +501,11 @@ class greater_equal_operation(ArithmeticConformance):
         self.operator = operator.ge
         self.opstr = '>='
 
+class equal_operation(ArithmeticConformance):
+    def __init__(self, op1: Conformance, op2: Conformance):
+        super().__init__(op1, op2)
+        self.operator = operator.eq
+        self.opstr = '=='
 
 class otherwise(Conformance):
     def __init__(self, op_list: list[Conformance]):
@@ -531,6 +541,7 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
     - disallowConform (X)
     - deprecateConform (D)
     - provisionalConform (P)
+    - describedConform (desc)
     - zigbee conditions
     - literal values
 
@@ -560,11 +571,15 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
         if element.tag == CONDITION_TAG and condition_name and condition_name.lower() == ZIGBEE_CONDITION:
             return zigbee()
         if element.tag == LITERAL_TAG:
-            literal_value = element.get('value')
+            literal_value = element.get('value', None)
             if literal_value is None:
                 raise ConformanceException(
-                    f"Literal tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
-            return literal(literal_value)
+                        f"Literal tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            try:
+                return literal(literal_value)
+            except ValueError:
+                raise ConformanceException(
+                    f"Literal tag bad 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
         if element.tag == REVISION_TAG:
             value = element.get('value')
             if value is None:
@@ -627,8 +642,12 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conf
         return greater_operation(ops[0], ops[1])
     if element.tag == GREATER_EQUAL_TERM:
         if len(ops) != 2:
-            raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
+            raise ConformanceException(f'Greater or equal than term found with more than two subelements {list(element)}')
         return greater_equal_operation(ops[0], ops[1])
+    if element.tag == EQUAL_TERM:
+        if len(ops) != 2:
+            raise ConformanceException(f'Equal term found with more than two subelements {list(element)}')
+        return equal_operation(ops[0], ops[1])
     raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 
@@ -692,6 +711,12 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
             return command(params.command_map[element.get('name')], element.get('name'))
         elif element.tag == CONDITION_TAG:
             return device_feature(element.attrib['name'])
+        elif element.tag == FIELD_TAG:
+            # Returning just optional for now since we don't have any field parsing.
+            return optional()
+        elif element.tag == ENUM_TAG:
+            # Returning just optional for now since we don't have any enum parsing.
+            return optional()
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
