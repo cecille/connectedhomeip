@@ -123,10 +123,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         ignore_attributes: dict[int, list[int]] = {}
         if ignore_in_progress_test_event_only_disallowed_for_certification:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
-            in_progress_attributes = {
-                Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40],
-                Clusters.BasicInformation.id: [0x18],
-            }
+            in_progress_attributes = {}
             ignore_attributes.update(in_progress_attributes)
 
         if is_ci:
@@ -145,7 +142,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         if is_ci:
             # This is a manually curated list of features that are present in the SDK, but not in the spec.
             # TODO(#43606): Remove the AUX feature (0x04) from here once spec updates are merged to include the feature.
-            ci_ignore_features = {Clusters.AccessControl.id: [0x04]}
+            ci_ignore_features = {}
             ignore_feature_masks.update(ci_ignore_features)
 
         success = True
