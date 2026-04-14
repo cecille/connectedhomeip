@@ -58,6 +58,10 @@ from test_testing.DeviceConformanceTests import DeviceConformanceTests
 
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.spec_parsing import XmlFeature
+from matter.testing.conformance import optional
+
+import matter.clusters as Clusters
 
 
 class TC_DeviceConformance(DeviceConformanceTests):
@@ -65,6 +69,12 @@ class TC_DeviceConformance(DeviceConformanceTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
+        # TODO: Remove once the parser is updated to correctly parse this conformance
+        print("adding feature to acl")
+        acl_id = Clusters.AccessControl.id
+        aux_mask = Clusters.AccessControl.Bitmaps.Feature.kAuxiliary
+        self.xml_clusters[acl_id].features[aux_mask] = XmlFeature(code='AUX', name='Auxiliary', conformance=optional())
+        self.xml_clusters[acl_id].feature_map['AUX'] = aux_mask
 
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
