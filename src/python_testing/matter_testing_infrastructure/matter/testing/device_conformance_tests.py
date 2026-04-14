@@ -125,7 +125,6 @@ class DeviceConformanceTests(BasicCompositionTests):
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {
                 Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40],
-                Clusters.BasicInformation.id: [0x18],
             }
             ignore_attributes.update(in_progress_attributes)
 
@@ -144,8 +143,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         if is_ci:
             # This is a manually curated list of features that are present in the SDK, but not in the spec.
-            # TODO(#43606): Remove the AUX feature (0x04) from here once spec updates are merged to include the feature.
-            ci_ignore_features = {Clusters.AccessControl.id: [0x04]}
+            ci_ignore_features = {}
             ignore_feature_masks.update(ci_ignore_features)
 
         success = True
@@ -202,7 +200,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     conformance_decision_with_choice = xml_feature.conformance(cluster_info)
                     if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification):
                         record_error(location=location,
-                                     problem=f'Disallowed feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
+                                     problem=f'Disallowed feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1}). {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
                     conformance_decision_with_choice = xml_feature.conformance(cluster_info)
                     if conformance_decision_with_choice.is_mandatory() and feature_mask not in feature_masks:

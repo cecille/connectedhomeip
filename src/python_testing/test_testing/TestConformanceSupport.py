@@ -111,6 +111,15 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), 'Zigbee')
 
+    def test_conformance_desc(self):
+        xml = '<describedConform />'
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            info = ConformanceAssessmentData(feature_map=f, attribute_list=[], all_command_list=[], cluster_revision=1)
+            asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(str(xml_callable), 'desc')
+
     def test_conformance_mandatory_on_condition(self):
         xml = ('<mandatoryConform>'
                '<feature name="AB" />'
